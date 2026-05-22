@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sign Up — SkillLoop</title>
+<title>Log In — SkillLoop</title>
 <link rel="icon" type="image/png" href="skillloop-logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -27,9 +27,9 @@
     justify-content: space-between;
   }
   .nav-logo img { height: 44px; }
-  .nav-login { font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 700; color: #718096; text-decoration: none; }
-  .nav-login span { color: #26a4de; }
-  .nav-login:hover span { text-decoration: underline; }
+  .nav-signup { font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 700; color: #718096; text-decoration: none; }
+  .nav-signup span { color: #26a4de; }
+  .nav-signup:hover span { text-decoration: underline; }
 
   /* MAIN LAYOUT */
   .page {
@@ -40,7 +40,7 @@
     padding: 3rem 1.5rem;
   }
 
-  .signup-card {
+  .login-card {
     background: #fff;
     border-radius: 24px;
     box-shadow: 0 8px 40px rgba(0,0,0,0.08);
@@ -70,40 +70,7 @@
     font-weight: 400;
   }
 
-  /* ACCOUNT TYPE TOGGLE */
-  .account-type {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    background: #f0f4f8;
-    border-radius: 12px;
-    padding: 4px;
-  }
-  .type-btn {
-    padding: 0.6rem;
-    border-radius: 9px;
-    border: none;
-    background: transparent;
-    font-family: 'Nunito', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #718096;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .type-btn.active {
-    background: #fff;
-    color: #26a4de;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  }
-
   /* FORM */
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-  }
   .form-group { margin-bottom: 1rem; }
   .form-group label {
     display: block;
@@ -121,6 +88,8 @@
     font-size: 1rem;
     color: #a0aec0;
     pointer-events: none;
+    display: flex;
+    align-items: center;
   }
   input[type="text"],
   input[type="email"],
@@ -150,24 +119,25 @@
     color: #a0aec0;
     font-size: 1rem;
     padding: 4px;
+    display: flex;
+    align-items: center;
   }
-
-  /* STRENGTH BAR */
-  .strength-wrap { margin-top: 6px; display: none; }
-  .strength-bar { height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; }
-  .strength-fill { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; width: 0%; }
-  .strength-label { font-size: 0.75rem; color: #a0aec0; margin-top: 3px; font-weight: 600; }
 
   .err-msg { font-size: 0.75rem; color: #e24b4a; margin-top: 4px; display: none; font-weight: 600; }
 
-  /* REMEMBER + TERMS */
-  .remember-row {
+  /* REMEMBER + FORGOT */
+  .options-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+  .remember-group {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 1rem;
   }
-  .remember-row input[type="checkbox"] {
+  .remember-group input[type="checkbox"] {
     width: 16px; height: 16px;
     accent-color: #26a4de;
     cursor: pointer;
@@ -175,22 +145,20 @@
     border: none;
     border-radius: 0;
   }
-  .remember-row label {
+  .remember-group label {
     font-size: 0.83rem;
     color: #718096;
     font-weight: 600;
     cursor: pointer;
     margin: 0;
   }
-
-  .terms {
-    font-size: 0.78rem;
-    color: #a0aec0;
-    text-align: center;
-    margin-bottom: 1.25rem;
-    line-height: 1.5;
+  .forgot-link {
+    font-size: 0.83rem;
+    color: #26a4de;
+    font-weight: 700;
+    text-decoration: none;
   }
-  .terms a { color: #26a4de; text-decoration: none; font-weight: 700; }
+  .forgot-link:hover { text-decoration: underline; }
 
   /* SUBMIT */
   .submit-btn {
@@ -240,38 +208,16 @@
     transition: border-color 0.2s;
   }
   .social-btn:hover { border-color: #26a4de; color: #26a4de; }
-  .social-icon { font-size: 1rem; }
+  .social-icon { font-size: 1rem; display: flex; align-items: center; }
 
-  /* LOGIN LINK */
-  .login-link {
+  /* SIGNUP LINK */
+  .signup-link {
     text-align: center;
     font-size: 0.85rem;
     color: #718096;
     font-weight: 600;
   }
-  .login-link a { color: #26a4de; text-decoration: none; font-weight: 800; }
-
-  /* SUCCESS */
-  .success-state {
-    display: none;
-    text-align: center;
-    padding: 1rem 0;
-  }
-  .success-icon { font-size: 3.5rem; margin-bottom: 1rem; }
-  .success-state h2 { font-size: 1.4rem; font-weight: 900; color: #1a202c; margin-bottom: 0.5rem; }
-  .success-state p { color: #718096; font-size: 0.9rem; margin-bottom: 1.5rem; }
-  .success-btn {
-    display: inline-block;
-    padding: 0.75rem 2rem;
-    background: #4ab851;
-    color: #fff;
-    border-radius: 50px;
-    font-family: 'Nunito', sans-serif;
-    font-weight: 800;
-    font-size: 0.95rem;
-    text-decoration: none;
-    box-shadow: 0 4px 16px rgba(74,184,81,0.3);
-  }
+  .signup-link a { color: #26a4de; text-decoration: none; font-weight: 800; }
 
   /* FOOTER */
   footer {
@@ -294,35 +240,21 @@
 
 <nav>
   <div class="nav-logo"><a href="index.html"><img src="skillloop-logo.png" alt="SkillLoop"></a></div>
-  <a href="login.html" class="nav-login">Already have an account? <span>Log in</span></a>
+  <a href="signup.html" class="nav-signup">Don't have an account? <span>Sign up</span></a>
 </nav>
 
 <div class="page">
-  <div class="signup-card">
+  <div class="login-card">
 
     <!-- LOGO HEADER -->
     <div class="card-header">
       <img src="skillloop-logo.png" alt="SkillLoop">
-      <h1>Create your account</h1>
-      <p>Start building real-world skills today — free for 14 days.</p>
-    </div>
-
-    <!-- SUCCESS STATE (hidden) -->
-    <div class="success-state" id="success">
-      <div class="success-icon"><svg width="56" height="56" viewBox="0 0 56 56" fill="none"><circle cx="28" cy="28" r="28" fill="#4ab851"/><path d="M18 28l7 7 13-13" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <h2>Welcome to SkillLoop!</h2>
-      <p>Your account has been created successfully. You're ready to start building skills.</p>
-      <a href="index.html" class="success-btn">Go to Dashboard</a>
+      <h1>Welcome back</h1>
+      <p>Log in to continue building real-world skills.</p>
     </div>
 
     <!-- FORM -->
     <div id="form-area">
-
-      <!-- ACCOUNT TYPE -->
-      <div class="account-type">
-        <button class="type-btn active" onclick="setType(this)">Individual / Family</button>
-        <button class="type-btn" onclick="setType(this)">School / Institution</button>
-      </div>
 
       <!-- SOCIAL LOGIN -->
       <div class="social-btns">
@@ -330,27 +262,7 @@
         <button class="social-btn"><svg class="social-icon" width="16" height="16" viewBox="0 0 16 16" fill="#000"><path d="M11.18 8.44c-.02-1.7 1.39-2.52 1.45-2.56a3.14 3.14 0 00-2.48-1.34c-1.05-.11-2.06.62-2.6.62-.54 0-1.36-.61-2.24-.59A3.3 3.3 0 002.52 6.6c-1.2 2.07-.3 5.13.85 6.81.57.82 1.25 1.74 2.14 1.71.86-.03 1.18-.55 2.22-.55 1.04 0 1.33.55 2.24.53.93-.01 1.5-.83 2.06-1.66a6.8 6.8 0 00.94-1.92 3.05 3.05 0 01-1.79-2.78zM9.55 3.85A3.1 3.1 0 0010.28 1a3.16 3.16 0 00-2.04 1.06 2.96 2.96 0 00-.75 2.14 2.62 2.62 0 002.06-.85z"/></svg> Apple</button>
       </div>
 
-      <div class="divider"><hr><span>or sign up with email</span><hr></div>
-
-      <!-- NAME ROW -->
-      <div class="form-row">
-        <div class="form-group">
-          <label>First name</label>
-          <div class="input-wrap">
-            <span class="icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#a0aec0" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2.5 14.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke-linecap="round"/></svg></span>
-            <input type="text" id="fname" placeholder="John" oninput="validate()">
-          </div>
-          <div class="err-msg" id="fname-err">Required</div>
-        </div>
-        <div class="form-group">
-          <label>Last name</label>
-          <div class="input-wrap">
-            <span class="icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#a0aec0" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2.5 14.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke-linecap="round"/></svg></span>
-            <input type="text" id="lname" placeholder="Doe" oninput="validate()">
-          </div>
-          <div class="err-msg" id="lname-err">Required</div>
-        </div>
-      </div>
+      <div class="divider"><hr><span>or log in with email</span><hr></div>
 
       <!-- EMAIL -->
       <div class="form-group">
@@ -367,35 +279,29 @@
         <label>Password</label>
         <div class="input-wrap">
           <span class="icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#a0aec0" stroke-width="1.5"><rect x="3.5" y="7" width="9" height="7" rx="1.5"/><path d="M5 7V5a3 3 0 016 0v2"/></svg></span>
-          <input type="password" id="password" placeholder="Minimum 8 characters" oninput="validate()">
+          <input type="password" id="password" placeholder="Enter your password" oninput="validate()">
           <button class="pw-toggle" onclick="togglePw()" type="button"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#a0aec0" stroke-width="1.5"><ellipse cx="8" cy="8" rx="6" ry="4"/><circle cx="8" cy="8" r="2"/></svg></button>
         </div>
-        <div class="strength-wrap" id="strength-wrap">
-          <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
-          <div class="strength-label" id="strength-label"></div>
+        <div class="err-msg" id="pw-err">Please enter your password</div>
+      </div>
+
+      <!-- REMEMBER ME + FORGOT -->
+      <div class="options-row">
+        <div class="remember-group">
+          <input type="checkbox" id="remember">
+          <label for="remember">Remember me</label>
         </div>
-        <div class="err-msg" id="pw-err">Password must be at least 8 characters</div>
-      </div>
-
-      <!-- REMEMBER ME -->
-      <div class="remember-row">
-        <input type="checkbox" id="remember">
-        <label for="remember">Remember me for 30 days</label>
-      </div>
-
-      <!-- TERMS -->
-      <div class="terms">
-        By creating an account you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+        <a href="#" class="forgot-link">Forgot password?</a>
       </div>
 
       <!-- SUBMIT -->
       <button class="submit-btn" id="submit-btn" disabled onclick="handleSubmit()">
-        Create Account
+        Log In
       </button>
 
       <div class="divider" style="margin-top:1.25rem"><hr></div>
 
-      <div class="login-link">Already have an account? <a href="login.html">Log in</a></div>
+      <div class="signup-link">Don't have an account? <a href="signup.html">Sign up</a></div>
 
     </div>
   </div>
@@ -409,48 +315,21 @@
     <a href="#">FAQ</a>
     <a href="#">Contact</a>
   </div>
-  <div class="footer-copy">© 2026 SkillLoop. All rights reserved.</div>
+  <div class="footer-copy">&copy; 2026 SkillLoop. All rights reserved.</div>
 </footer>
 
 <script>
-function setType(btn) {
-  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-
 function validate() {
-  const fname = document.getElementById('fname').value.trim();
-  const lname = document.getElementById('lname').value.trim();
   const email = document.getElementById('email').value.trim();
   const pw = document.getElementById('password').value;
   const btn = document.getElementById('submit-btn');
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const pwValid = pw.length >= 8;
 
   document.getElementById('email-err').style.display = email.length > 0 && !emailValid ? 'block' : 'none';
-  document.getElementById('pw-err').style.display = pw.length > 0 && !pwValid ? 'block' : 'none';
+  document.getElementById('pw-err').style.display = pw.length > 0 && pw.length < 1 ? 'block' : 'none';
 
-  if (pw.length > 0) {
-    document.getElementById('strength-wrap').style.display = 'block';
-    let s = 0;
-    if (pw.length >= 8) s++;
-    if (pw.length >= 12) s++;
-    if (/[A-Z]/.test(pw)) s++;
-    if (/[0-9]/.test(pw)) s++;
-    if (/[^A-Za-z0-9]/.test(pw)) s++;
-    const pct = Math.min(100, s * 22);
-    const colors = ['#e24b4a','#e24b4a','#fec41d','#4ab851','#4ab851'];
-    const labels = ['Too short','Weak','Fair','Strong','Very strong'];
-    document.getElementById('strength-fill').style.width = pct + '%';
-    document.getElementById('strength-fill').style.background = colors[Math.max(0, s-1)];
-    document.getElementById('strength-label').textContent = pw.length >= 8 ? labels[Math.max(0, s-1)] : '';
-  } else {
-    document.getElementById('strength-wrap').style.display = 'none';
-  }
-
-  const allValid = fname && lname && emailValid && pwValid;
-  btn.disabled = !allValid;
+  btn.disabled = !(emailValid && pw.length > 0);
 }
 
 function togglePw() {
@@ -459,8 +338,7 @@ function togglePw() {
 }
 
 function handleSubmit() {
-  document.getElementById('form-area').style.display = 'none';
-  document.getElementById('success').style.display = 'block';
+  alert('Login functionality would be connected here.');
 }
 </script>
 </body>

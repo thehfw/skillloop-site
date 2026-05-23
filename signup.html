@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up — SkillLoop</title>
+<link rel="icon" type="image/png" href="skillloop-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito Sans', sans-serif;
+    background: #f0f4f8;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  h1,h2,h3,label,button,a.btn { font-family: 'Nunito', sans-serif; }
+
+  /* NAV */
+  nav {
+    background: #fff;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    padding: 1rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-logo img { height: 44px; }
+  .nav-login { font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 700; color: #718096; text-decoration: none; }
+  .nav-login span { color: #26a4de; }
+  .nav-login:hover span { text-decoration: underline; }
+
+  /* MAIN LAYOUT */
+  .page {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+  }
+
+  .signup-card {
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 460px;
+    padding: 2.5rem 2.5rem;
+  }
+
+  /* LOGO HEADER */
+  .card-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .card-header img {
+    height: 72px;
+    margin-bottom: 0.75rem;
+  }
+  .card-header h1 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #1a202c;
+    margin-bottom: 0.35rem;
+  }
+  .card-header p {
+    font-size: 0.9rem;
+    color: #718096;
+    font-weight: 400;
+  }
+
+  /* ACCOUNT TYPE TOGGLE */
+  .account-type {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    background: #f0f4f8;
+    border-radius: 12px;
+    padding: 4px;
+  }
+  .type-btn {
+    padding: 0.6rem;
+    border-radius: 9px;
+    border: none;
+    background: transparent;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #718096;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .type-btn.active {
+    background: #fff;
+    color: #26a4de;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  /* FORM */
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  .form-group { margin-bottom: 1rem; }
+  .form-group label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #4a5568;
+    margin-bottom: 6px;
+  }
+  .input-wrap { position: relative; }
+  .input-wrap .icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: #a0aec0;
+    pointer-events: none;
+  }
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    padding: 0.7rem 0.9rem 0.7rem 2.4rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.9rem;
+    color: #2d3748;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #fafafa;
+  }
+  input:focus { border-color: #26a4de; background: #fff; }
+  input.error { border-color: #e24b4a; }
+
+  .pw-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #a0aec0;
+    font-size: 1rem;
+    padding: 4px;
+  }
+
+  /* STRENGTH BAR */
+  .strength-wrap { margin-top: 6px; display: none; }
+  .strength-bar { height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; }
+  .strength-fill { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; width: 0%; }
+  .strength-label { font-size: 0.75rem; color: #a0aec0; margin-top: 3px; font-weight: 600; }
+
+  .err-msg { font-size: 0.75rem; color: #e24b4a; margin-top: 4px; display: none; font-weight: 600; }
+
+  /* REMEMBER + TERMS */
+  .remember-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+  .remember-row input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: #26a4de;
+    cursor: pointer;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+  }
+  .remember-row label {
+    font-size: 0.83rem;
+    color: #718096;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 0;
+  }
+
+  .terms {
+    font-size: 0.78rem;
+    color: #a0aec0;
+    text-align: center;
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
+  }
+  .terms a { color: #26a4de; text-decoration: none; font-weight: 700; }
+
+  /* SUBMIT */
+  .submit-btn {
+    width: 100%;
+    padding: 0.85rem;
+    border-radius: 50px;
+    border: none;
+    background: #26a4de;
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(38,164,222,0.3);
+    opacity: 0.5;
+  }
+  .submit-btn:not(:disabled) { opacity: 1; }
+  .submit-btn:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(38,164,222,0.4); }
+
+  /* DIVIDER */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.25rem 0;
+  }
+  .divider hr { flex: 1; border: none; border-top: 1px solid #e2e8f0; }
+  .divider span { font-size: 0.78rem; color: #a0aec0; font-weight: 600; }
+
+  /* SOCIAL */
+  .social-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem; }
+  .social-btn {
+    padding: 0.65rem;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+    background: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: #4a5568;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: border-color 0.2s;
+  }
+  .social-btn:hover { border-color: #26a4de; color: #26a4de; }
+  .social-icon { font-size: 1rem; }
+
+  /* LOGIN LINK */
+  .login-link {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #718096;
+    font-weight: 600;
+  }
+  .login-link a { color: #26a4de; text-decoration: none; font-weight: 800; }
+
+  /* SUCCESS */
+  .success-state {
+    display: none;
+    text-align: center;
+    padding: 1rem 0;
+  }
+  .success-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+  .success-state h2 { font-size: 1.4rem; font-weight: 900; color: #1a202c; margin-bottom: 0.5rem; }
+  .success-state p { color: #718096; font-size: 0.9rem; margin-bottom: 1.5rem; }
+  .success-btn {
+    display: inline-block;
+    padding: 0.75rem 2rem;
+    background: #4ab851;
+    color: #fff;
+    border-radius: 50px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 0.95rem;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(74,184,81,0.3);
+  }
+
+  /* FOOTER */
+  footer {
+    background: #1a202c;
+    padding: 1.5rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  footer img { height: 32px; }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a { color: #718096; text-decoration: none; font-size: 0.82rem; font-weight: 500; transition: color 0.2s; }
+  .footer-links a:hover { color: #fff; }
+  .footer-copy { color: #4a5568; font-size: 0.78rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo"><a href="index.html"><img src="skillloop-logo.png" alt="SkillLoop"></a></div>
+  <a href="#" class="nav-login">Already have an account? <span>Log in</span></a>
+</nav>
+
+<div class="page">
+  <div class="signup-card">
+
+    <!-- LOGO HEADER -->
+    <div class="card-header">
+      <img src="skillloop-logo.png" alt="SkillLoop">
+      <h1>Create your account</h1>
+      <p>Start building real-world skills today — free for 14 days.</p>
+    </div>
+
+    <!-- SUCCESS STATE (hidden) -->
+    <div class="success-state" id="success">
+      <div class="success-icon">🎉</div>
+      <h2>Welcome to SkillLoop!</h2>
+      <p>Your account has been created successfully. You're ready to start building skills.</p>
+      <a href="dashboard.html" class="success-btn">Go to Dashboard</a>
+    </div>
+
+    <!-- FORM -->
+    <div id="form-area">
+
+      <!-- ACCOUNT TYPE -->
+      <div class="account-type">
+        <button class="type-btn active" onclick="setType(this)">👤 Individual / Family</button>
+        <button class="type-btn" onclick="setType(this)">🏫 School / Institution</button>
+      </div>
+
+      <!-- SOCIAL LOGIN -->
+      <div class="social-btns">
+        <button class="social-btn"><span class="social-icon">🔵</span> Google</button>
+        <button class="social-btn"><span class="social-icon">🍎</span> Apple</button>
+      </div>
+
+      <div class="divider"><hr><span>or sign up with email</span><hr></div>
+
+      <!-- NAME ROW -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>First name</label>
+          <div class="input-wrap">
+            <span class="icon">👤</span>
+            <input type="text" id="fname" placeholder="Harrison" oninput="validate()">
+          </div>
+          <div class="err-msg" id="fname-err">Required</div>
+        </div>
+        <div class="form-group">
+          <label>Last name</label>
+          <div class="input-wrap">
+            <span class="icon">👤</span>
+            <input type="text" id="lname" placeholder="Webb" oninput="validate()">
+          </div>
+          <div class="err-msg" id="lname-err">Required</div>
+        </div>
+      </div>
+
+      <!-- EMAIL -->
+      <div class="form-group">
+        <label>Email address</label>
+        <div class="input-wrap">
+          <span class="icon">✉️</span>
+          <input type="email" id="email" placeholder="you@example.com" oninput="validate()">
+        </div>
+        <div class="err-msg" id="email-err">Please enter a valid email address</div>
+      </div>
+
+      <!-- PASSWORD -->
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <span class="icon">🔒</span>
+          <input type="password" id="password" placeholder="Minimum 8 characters" oninput="validate()">
+          <button class="pw-toggle" onclick="togglePw()" type="button">👁</button>
+        </div>
+        <div class="strength-wrap" id="strength-wrap">
+          <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+          <div class="strength-label" id="strength-label"></div>
+        </div>
+        <div class="err-msg" id="pw-err">Password must be at least 8 characters</div>
+      </div>
+
+      <!-- REMEMBER ME -->
+      <div class="remember-row">
+        <input type="checkbox" id="remember">
+        <label for="remember">Remember me for 30 days</label>
+      </div>
+
+      <!-- TERMS -->
+      <div class="terms">
+        By creating an account you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+      </div>
+
+      <!-- SUBMIT -->
+      <button class="submit-btn" id="submit-btn" disabled onclick="handleSubmit()">
+        Create Account
+      </button>
+
+      <div class="divider" style="margin-top:1.25rem"><hr></div>
+
+      <div class="login-link">Already have an account? <a href="#">Log in</a></div>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  <img src="skillloop-logo.png" alt="SkillLoop">
+  <div class="footer-links">
+    <a href="#">Terms of Service</a>
+    <a href="#">Privacy Policy</a>
+    <a href="#">FAQ</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 SkillLoop. All rights reserved.</div>
+</footer>
+
+<script>
+function setType(btn) {
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function validate() {
+  const fname = document.getElementById('fname').value.trim();
+  const lname = document.getElementById('lname').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const pw = document.getElementById('password').value;
+  const btn = document.getElementById('submit-btn');
+
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const pwValid = pw.length >= 8;
+
+  document.getElementById('email-err').style.display = email.length > 0 && !emailValid ? 'block' : 'none';
+  document.getElementById('pw-err').style.display = pw.length > 0 && !pwValid ? 'block' : 'none';
+
+  if (pw.length > 0) {
+    document.getElementById('strength-wrap').style.display = 'block';
+    let s = 0;
+    if (pw.length >= 8) s++;
+    if (pw.length >= 12) s++;
+    if (/[A-Z]/.test(pw)) s++;
+    if (/[0-9]/.test(pw)) s++;
+    if (/[^A-Za-z0-9]/.test(pw)) s++;
+    const pct = Math.min(100, s * 22);
+    const colors = ['#e24b4a','#e24b4a','#fec41d','#4ab851','#4ab851'];
+    const labels = ['Too short','Weak','Fair','Strong','Very strong'];
+    document.getElementById('strength-fill').style.width = pct + '%';
+    document.getElementById('strength-fill').style.background = colors[Math.max(0, s-1)];
+    document.getElementById('strength-label').textContent = pw.length >= 8 ? labels[Math.max(0, s-1)] : '';
+  } else {
+    document.getElementById('strength-wrap').style.display = 'none';
+  }
+
+  const allValid = fname && lname && emailValid && pwValid;
+  btn.disabled = !allValid;
+}
+
+function togglePw() {
+  const input = document.getElementById('password');
+  input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+function handleSubmit() {
+  document.getElementById('form-area').style.display = 'none';
+  document.getElementById('success').style.display = 'block';
+}
+</script>
+</body>
+</html>
+<script>
+// Override handleSubmit to redirect to dashboard after short delay
+const _orig = window.handleSubmit;
+window.handleSubmit = function() {
+  document.getElementById('form-area').style.display = 'none';
+  document.getElementById('success').style.display = 'block';
+  setTimeout(() => { window.location.href = 'dashboard.html'; }, 2000);
+}
+</script>

@@ -7,6 +7,9 @@
 <link rel="icon" type="image/png" href="skillloop-logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": { "@netlify/identity": "./js/identity.js", "gotrue-js": "./js/gotrue.js" } }
+</script>
 </head>
 <body>
 
@@ -22,7 +25,7 @@
     <li><a href="#">About</a></li>
   </ul>
   <div class="nav-actions">
-    <a href="#" class="btn-outline">Log In</a>
+    <a href="login.html" class="btn-outline">Log In</a>
     <a href="signup.html" class="btn-primary">Get Started</a>
   </div>
 </nav>
@@ -77,30 +80,30 @@
           <div class="sidebar-link">Privacy Policy</div>
         </div>
         <div class="mockup-main">
-          <div class="mockup-welcome">Welcome, Jacob!</div>
+          <div class="mockup-welcome">Welcome!</div>
           <div class="mockup-sub">SkillLoop is a digital learning platform that helps teens develop skills.</div>
           <div class="mockup-section-title">Skill Progress</div>
           <div class="skill-cards">
             <div class="skill-card">
-              <div class="skill-card-header"><div class="skill-dot blue">💪</div><div class="skill-name">Physical Coordination</div></div>
+              <div class="skill-card-header"><div class="skill-dot blue">PC</div><div class="skill-name">Physical Coordination</div></div>
               <div class="skill-pct">45<span>%</span></div>
               <div class="progress-bar"><div class="progress-fill" style="width:45%;background:#26a4de"></div></div>
               <div class="skill-level">Level 2 / 5</div>
             </div>
             <div class="skill-card">
-              <div class="skill-card-header"><div class="skill-dot green">💡</div><div class="skill-name">Independence Skills</div></div>
+              <div class="skill-card-header"><div class="skill-dot green">IS</div><div class="skill-name">Independence Skills</div></div>
               <div class="skill-pct">20<span>%</span></div>
               <div class="progress-bar"><div class="progress-fill" style="width:20%;background:#4ab851"></div></div>
               <div class="skill-level">Level 1 / 5</div>
             </div>
             <div class="skill-card">
-              <div class="skill-card-header"><div class="skill-dot yellow">💬</div><div class="skill-name">Social Skills</div></div>
+              <div class="skill-card-header"><div class="skill-dot yellow">SS</div><div class="skill-name">Social Skills</div></div>
               <div class="skill-pct">35<span>%</span></div>
               <div class="progress-bar"><div class="progress-fill" style="width:35%;background:#fec41d"></div></div>
               <div class="skill-level">Level 1 / 5</div>
             </div>
             <div class="skill-card">
-              <div class="skill-card-header"><div class="skill-dot pink">📋</div><div class="skill-name">Executive Function</div></div>
+              <div class="skill-card-header"><div class="skill-dot pink">EF</div><div class="skill-name">Executive Function</div></div>
               <div class="skill-pct">15<span>%</span></div>
               <div class="progress-bar"><div class="progress-fill" style="width:15%;background:#c94098"></div></div>
               <div class="skill-level">Level 1 / 5</div>
@@ -108,10 +111,10 @@
           </div>
           <div class="mockup-bottom">
             <div class="activity-card">
-              <div class="activity-title">✅ Today's Activities</div>
+              <div class="activity-title">Today's Activities</div>
               <div class="activity-sub">Complete your activities for the day:</div>
               <div class="activity-item"><span class="activity-item-text">Complete a balance exercise</span><span class="done-badge">Done!</span></div>
-              <div class="activity-item"><span style="font-size:0.7rem">🔄</span><span class="activity-item-text">Practice starting a conversation</span></div>
+              <div class="activity-item"><span class="activity-item-text">Practice starting a conversation</span></div>
             </div>
             <div class="progress-card">
               <div class="progress-title">Total Progress</div>
@@ -141,7 +144,7 @@
     <p class="section-sub">Every module is designed with structure, clarity, and real-world application so teens can build confidence that sticks.</p>
     <div class="pillars-grid">
       <div class="pillar-card blue">
-        <div class="pillar-icon-wrap">💪</div>
+        <div class="pillar-icon-wrap">PC</div>
         <h3>Physical Coordination & Strength</h3>
         <p>Exercises that improve posture, coordination, balance, and body awareness through motion-based video modules.</p>
         <ul class="pillar-bullets">
@@ -152,7 +155,7 @@
         </ul>
       </div>
       <div class="pillar-card green">
-        <div class="pillar-icon-wrap">🏠</div>
+        <div class="pillar-icon-wrap">IS</div>
         <h3>Independence Skills</h3>
         <p>Lessons that teach real-world abilities such as cooking, budgeting, organization, and daily living routines.</p>
         <ul class="pillar-bullets">
@@ -163,18 +166,18 @@
         </ul>
       </div>
       <div class="pillar-card yellow">
-        <div class="pillar-icon-wrap">💬</div>
+        <div class="pillar-icon-wrap">SS</div>
         <h3>Social Skills</h3>
         <p>Interactive training focused on communication, conversation flow, emotional awareness, and navigating social situations.</p>
         <ul class="pillar-bullets">
           <li>5 series, 10 scenario-based models</li>
           <li>Role-play situations with guided prompts</li>
           <li>AI-graded reflection journal</li>
-          <li>Self-scored confidence tracking (1–10)</li>
+          <li>Self-scored confidence tracking (1-10)</li>
         </ul>
       </div>
       <div class="pillar-card pink">
-        <div class="pillar-icon-wrap">📋</div>
+        <div class="pillar-icon-wrap">EF</div>
         <h3>Executive Function & Daily Structure</h3>
         <p>Tools and lessons designed to improve planning, task management, focus, and organization for daily life.</p>
         <ul class="pillar-bullets">
@@ -209,10 +212,10 @@
     <h2 class="section-title">Built for every member of the support team.</h2>
     <p class="section-sub">SkillLoop works for the whole ecosystem — not just the teen.</p>
     <div class="who-grid">
-      <div class="who-card"><div class="who-icon">🧑</div><h3>Teenagers</h3><p>Developing independence, confidence, and the life skills school doesn't teach.</p></div>
-      <div class="who-card"><div class="who-icon">👨‍👩‍👧</div><h3>Parents</h3><p>A structured tool to support their child's growth with full visibility via Parent Dashboard.</p></div>
-      <div class="who-card"><div class="who-icon">🏫</div><h3>Schools & Educators</h3><p>Licensable platform supporting IEP and 504 students with structured skill-building modules.</p></div>
-      <div class="who-card"><div class="who-icon">🩺</div><h3>Therapists</h3><p>Assign take-home practice and track progress between sessions with Therapist Mode.</p></div>
+      <div class="who-card"><div class="who-icon-badge blue">T</div><h3>Teenagers</h3><p>Developing independence, confidence, and the life skills school doesn't teach.</p></div>
+      <div class="who-card"><div class="who-icon-badge green">P</div><h3>Parents</h3><p>A structured tool to support their child's growth with full visibility via Parent Dashboard.</p></div>
+      <div class="who-card"><div class="who-icon-badge yellow">S</div><h3>Schools & Educators</h3><p>Licensable platform supporting IEP and 504 students with structured skill-building modules.</p></div>
+      <div class="who-card"><div class="who-icon-badge pink">Th</div><h3>Therapists</h3><p>Assign take-home practice and track progress between sessions with Therapist Mode.</p></div>
     </div>
   </div>
 </section>
@@ -230,12 +233,12 @@
         <div class="pricing-price"><sup>$</sup>50<sub>/mo</sub></div>
         <div class="pricing-desc">Full platform access, all four modules, unlimited depth. Everything included.</div>
         <ul class="pricing-features">
-          <li><span class="check">✓</span> All 4 modules, unlimited depth</li>
-          <li><span class="check">✓</span> AI feedback on reflections</li>
-          <li><span class="check">✓</span> Progress dashboard</li>
-          <li><span class="check">✓</span> Parent Dashboard access</li>
-          <li><span class="check">✓</span> Therapist Mode</li>
-          <li><span class="check">✓</span> Annual: 2 months free</li>
+          <li><span class="check">&#10003;</span> All 4 modules, unlimited depth</li>
+          <li><span class="check">&#10003;</span> AI feedback on reflections</li>
+          <li><span class="check">&#10003;</span> Progress dashboard</li>
+          <li><span class="check">&#10003;</span> Parent Dashboard access</li>
+          <li><span class="check">&#10003;</span> Therapist Mode</li>
+          <li><span class="check">&#10003;</span> Annual: 2 months free</li>
         </ul>
         <a href="signup.html" class="pricing-btn featured-btn">Get Started</a>
       </div>
@@ -244,17 +247,17 @@
         <div class="pricing-price"><sup>$</sup>25<sub>/mo</sub></div>
         <div class="pricing-desc">Access to all modules with limited depth — ideal for families exploring the platform.</div>
         <ul class="pricing-features">
-          <li><span class="check">✓</span> All 4 modules, limited depth</li>
-          <li><span class="check">✓</span> Basic progress tracking</li>
-          <li><span class="check">✓</span> Parent Dashboard access</li>
-          <li><span class="x">✗</span> AI feedback</li>
-          <li><span class="x">✗</span> Therapist Mode</li>
-          <li><span class="check">✓</span> Annual: 2 months free</li>
+          <li><span class="check">&#10003;</span> All 4 modules, limited depth</li>
+          <li><span class="check">&#10003;</span> Basic progress tracking</li>
+          <li><span class="check">&#10003;</span> Parent Dashboard access</li>
+          <li><span class="x">&#10007;</span> AI feedback</li>
+          <li><span class="x">&#10007;</span> Therapist Mode</li>
+          <li><span class="check">&#10003;</span> Annual: 2 months free</li>
         </ul>
         <a href="signup.html" class="pricing-btn ghost-btn">Start Free Trial</a>
       </div>
     </div>
-    <p class="pricing-note">B2B institutional licensing available for schools and therapy practices. <a href="#">Contact us →</a></p>
+    <p class="pricing-note">B2B institutional licensing available for schools and therapy practices. <a href="#">Contact us &#8594;</a></p>
   </div>
 </section>
 
@@ -278,9 +281,28 @@
       <a href="#">FAQ</a>
       <a href="#">Contact</a>
     </div>
-    <div class="footer-copy">© 2026 SkillLoop. All rights reserved.</div>
+    <div class="footer-copy">&copy; 2026 SkillLoop. All rights reserved.</div>
   </div>
 </footer>
+
+<script type="module">
+import { getUser, handleAuthCallback } from '@netlify/identity';
+
+(async () => {
+  try {
+    const result = await handleAuthCallback();
+    if (result && (result.type === 'oauth' || result.type === 'confirmation') && result.user) {
+      window.location.href = 'dashboard.html';
+      return;
+    }
+  } catch (e) {}
+
+  const user = await getUser();
+  if (user) {
+    window.location.href = 'dashboard.html';
+  }
+})();
+</script>
 
 </body>
 </html>

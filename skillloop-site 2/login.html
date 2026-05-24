@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In — SkillLoop</title>
+<link rel="icon" type="image/png" href="skillloop-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Nunito Sans', sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; flex-direction: column; }
+  h1,h2,h3,label,button { font-family: 'Nunito', sans-serif; }
+
+  nav { background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 1rem 3rem; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo img { height: 44px; }
+  .nav-signup { font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 700; color: #718096; text-decoration: none; }
+  .nav-signup span { color: #4ab851; }
+
+  .page { flex: 1; display: flex; align-items: center; justify-content: center; padding: 3rem 1.5rem; }
+
+  .login-card { background: #fff; border-radius: 24px; box-shadow: 0 8px 40px rgba(0,0,0,0.08); width: 100%; max-width: 420px; padding: 2.5rem; }
+
+  .card-header { text-align: center; margin-bottom: 2rem; }
+  .card-header img { height: 72px; margin-bottom: 0.75rem; }
+  .card-header h1 { font-size: 1.5rem; font-weight: 900; color: #1a202c; margin-bottom: 0.35rem; }
+  .card-header p { font-size: 0.9rem; color: #718096; }
+
+  .social-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem; }
+  .social-btn { padding: 0.65rem; border-radius: 10px; border: 2px solid #e2e8f0; background: #fff; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.82rem; color: #4a5568; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: border-color 0.2s; }
+  .social-btn:hover { border-color: #26a4de; color: #26a4de; }
+
+  .divider { display: flex; align-items: center; gap: 1rem; margin: 1.25rem 0; }
+  .divider hr { flex: 1; border: none; border-top: 1px solid #e2e8f0; }
+  .divider span { font-size: 0.78rem; color: #a0aec0; font-weight: 600; }
+
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { display: block; font-size: 0.82rem; font-weight: 700; color: #4a5568; margin-bottom: 6px; }
+  .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .forgot-link { font-size: 0.78rem; color: #26a4de; text-decoration: none; font-weight: 700; }
+  .forgot-link:hover { text-decoration: underline; }
+  .input-wrap { position: relative; }
+  input[type="email"], input[type="password"] {
+    width: 100%; padding: 0.7rem 0.9rem;
+    border: 2px solid #e2e8f0; border-radius: 10px;
+    font-family: 'Nunito Sans', sans-serif; font-size: 0.9rem; color: #2d3748;
+    outline: none; transition: border-color 0.2s; background: #fafafa;
+  }
+  input:focus { border-color: #26a4de; background: #fff; }
+  .pw-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #a0aec0; font-size: 0.8rem; font-family: 'Nunito', sans-serif; font-weight: 700; padding: 4px; }
+  .err-msg { font-size: 0.75rem; color: #e24b4a; margin-top: 4px; display: none; font-weight: 600; }
+
+  .remember-row { display: flex; align-items: center; gap: 8px; margin-bottom: 1.5rem; }
+  .remember-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: #26a4de; cursor: pointer; }
+  .remember-row label { font-size: 0.83rem; color: #718096; font-weight: 600; cursor: pointer; margin: 0; }
+
+  .submit-btn { width: 100%; padding: 0.85rem; border-radius: 50px; border: none; background: #26a4de; color: #fff; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 16px rgba(38,164,222,0.3); opacity: 0.5; }
+  .submit-btn:not(:disabled) { opacity: 1; }
+  .submit-btn:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(38,164,222,0.4); }
+
+  .signup-link { text-align: center; font-size: 0.85rem; color: #718096; font-weight: 600; margin-top: 1.25rem; }
+  .signup-link a { color: #26a4de; text-decoration: none; font-weight: 800; }
+
+  footer { background: #1a202c; padding: 1.5rem 3rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  footer img { height: 32px; }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a { color: #718096; text-decoration: none; font-size: 0.82rem; font-weight: 500; transition: color 0.2s; }
+  .footer-links a:hover { color: #fff; }
+  .footer-copy { color: #4a5568; font-size: 0.78rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo"><a href="index.html"><img src="skillloop-logo.png" alt="SkillLoop"></a></div>
+  <a href="signup.html" class="nav-signup">Don't have an account? <span>Sign up free</span></a>
+</nav>
+
+<div class="page">
+  <div class="login-card">
+    <div class="card-header">
+      <img src="skillloop-logo.png" alt="SkillLoop">
+      <h1>Welcome back</h1>
+      <p>Log in to continue building your skills.</p>
+    </div>
+
+    <div class="social-btns">
+      <button class="social-btn">G &nbsp; Google</button>
+      <button class="social-btn">A &nbsp; Apple</button>
+    </div>
+
+    <div class="divider"><hr><span>or log in with email</span><hr></div>
+
+    <div class="form-group">
+      <label>Email address</label>
+      <input type="email" id="email" placeholder="you@example.com" oninput="validate()">
+      <div class="err-msg" id="email-err">Please enter a valid email address</div>
+    </div>
+
+    <div class="form-group">
+      <div class="label-row">
+        <label>Password</label>
+        <a href="#" class="forgot-link">Forgot password?</a>
+      </div>
+      <div class="input-wrap">
+        <input type="password" id="password" placeholder="Enter your password" oninput="validate()">
+        <button class="pw-toggle" onclick="togglePw()" type="button">Show</button>
+      </div>
+      <div class="err-msg" id="pw-err">Password must be at least 8 characters</div>
+    </div>
+
+    <div class="remember-row">
+      <input type="checkbox" id="remember">
+      <label for="remember">Remember me for 30 days</label>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" disabled onclick="handleLogin()">Log In</button>
+
+    <div class="signup-link">Don't have an account? <a href="signup.html">Sign up free</a></div>
+  </div>
+</div>
+
+<footer>
+  <img src="skillloop-logo.png" alt="SkillLoop">
+  <div class="footer-links">
+    <a href="#">Terms of Service</a>
+    <a href="#">Privacy Policy</a>
+    <a href="#">FAQ</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 SkillLoop. All rights reserved.</div>
+</footer>
+
+<script>
+function validate() {
+  const email = document.getElementById('email').value.trim();
+  const pw = document.getElementById('password').value;
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const pwValid = pw.length >= 8;
+  document.getElementById('email-err').style.display = email.length > 0 && !emailValid ? 'block' : 'none';
+  document.getElementById('pw-err').style.display = pw.length > 0 && !pwValid ? 'block' : 'none';
+  document.getElementById('submit-btn').disabled = !(emailValid && pwValid);
+}
+function togglePw() {
+  const input = document.getElementById('password');
+  const btn = document.querySelector('.pw-toggle');
+  input.type = input.type === 'password' ? 'text' : 'password';
+  btn.textContent = input.type === 'password' ? 'Show' : 'Hide';
+}
+function handleLogin() {
+  window.location.href = 'dashboard.html';
+}
+</script>
+</body>
+</html>

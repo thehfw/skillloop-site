@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — SkillLoop</title>
+<link rel="icon" type="image/png" href="skillloop-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; font-family: 'Nunito Sans', sans-serif; background: #f0f4f8; color: #2d3748; }
+  h1,h2,h3,h4,h5 { font-family: 'Nunito', sans-serif; }
+
+  .app { display: grid; grid-template-columns: 220px 1fr; height: 100vh; overflow: hidden; }
+
+  /* SIDEBAR */
+  .sidebar { background: #4ab851; display: flex; flex-direction: column; padding: 1.25rem 1rem; overflow: hidden; }
+  .sidebar-logo { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; padding: 0 0.25rem; }
+  .sidebar-logo img { height: 38px; }
+  .menu-icon { color: rgba(255,255,255,0.8); font-size: 1.1rem; cursor: pointer; background: none; border: none; line-height: 1; }
+  .sidebar-label { font-family: 'Nunito', sans-serif; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5); padding: 0 0.5rem; margin-bottom: 0.4rem; margin-top: 1rem; }
+  .sidebar-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0.75rem; border-radius: 10px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.82rem; color: rgba(255,255,255,0.85); cursor: pointer; transition: all 0.2s; margin-bottom: 0.15rem; }
+  .sidebar-item:hover { background: rgba(255,255,255,0.15); color: #fff; }
+  .sidebar-item.active { background: rgba(255,255,255,0.22); color: #fff; }
+  .sidebar-divider { height: 1px; background: rgba(255,255,255,0.2); margin: 0.75rem 0.5rem; }
+  .sidebar-bottom { margin-top: auto; }
+  .sidebar-link { display: block; font-family: 'Nunito', sans-serif; font-size: 0.72rem; font-weight: 600; color: rgba(255,255,255,0.6); text-decoration: underline; padding: 0.2rem 0.5rem; cursor: pointer; }
+  .sidebar-link:hover { color: rgba(255,255,255,0.9); }
+
+  /* MAIN */
+  .main { display: grid; grid-template-rows: 64px 1fr; overflow: hidden; }
+
+  /* TOP NAV */
+  .topnav { background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 1.75rem; }
+  .topnav-links { display: flex; gap: 0.25rem; }
+  .topnav-link { padding: 0.45rem 1rem; border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700; color: #a0aec0; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
+  .topnav-link:hover { color: #2d3748; background: #f0f4f8; }
+  .topnav-link.active { color: #26a4de; border-bottom: 2px solid #26a4de; border-radius: 0; }
+  .topnav-right { display: flex; align-items: center; gap: 1rem; }
+  .notif-btn { width: 36px; height: 36px; border-radius: 10px; background: #f0f4f8; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-family: 'Nunito', sans-serif; font-weight: 700; color: #718096; position: relative; }
+  .notif-dot { width: 8px; height: 8px; background: #e24b4a; border-radius: 50%; position: absolute; top: 6px; right: 6px; border: 2px solid #fff; }
+  .avatar-wrap { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #26a4de, #4ab851); display: flex; align-items: center; justify-content: center; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.85rem; color: #fff; }
+  .avatar-name { font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700; color: #2d3748; }
+
+  /* CONTENT */
+  .content { overflow: hidden; padding: 1.5rem 1.75rem; display: grid; grid-template-rows: auto 1fr auto; gap: 1.25rem; }
+
+  /* WELCOME */
+  .welcome-row { display: flex; align-items: center; justify-content: space-between; }
+  .welcome-text h1 { font-size: 1.4rem; font-weight: 900; color: #1a202c; margin-bottom: 0.2rem; }
+  .welcome-text p { font-size: 0.85rem; color: #a0aec0; font-weight: 500; }
+  .date-badge { background: #fff; border-radius: 10px; padding: 0.5rem 1rem; font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700; color: #718096; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+  /* SKILL CARDS */
+  .skill-cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; }
+  .skill-card { background: #fff; border-radius: 16px; padding: 1.1rem; box-shadow: 0 2px 12px rgba(0,0,0,0.05); border: 2px solid transparent; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+  .skill-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+  .skill-card.blue { border-color: rgba(38,164,222,0.2); }
+  .skill-card.green { border-color: rgba(74,184,81,0.2); }
+  .skill-card.yellow { border-color: rgba(254,196,29,0.2); }
+  .skill-card.pink { border-color: rgba(201,64,152,0.2); }
+  .skill-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+  .skill-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; font-family: 'Nunito', sans-serif; }
+  .skill-card.blue .skill-icon { background: #e8f6fb; color: #26a4de; }
+  .skill-card.green .skill-icon { background: #edf7ee; color: #4ab851; }
+  .skill-card.yellow .skill-icon { background: #fff8e6; color: #c9930a; }
+  .skill-card.pink .skill-icon { background: #f9eaf6; color: #c94098; }
+  .skill-badge { font-family: 'Nunito', sans-serif; font-size: 0.65rem; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 50px; }
+  .skill-card.blue .skill-badge { background: #e8f6fb; color: #26a4de; }
+  .skill-card.green .skill-badge { background: #edf7ee; color: #4ab851; }
+  .skill-card.yellow .skill-badge { background: #fff8e6; color: #c9930a; }
+  .skill-card.pink .skill-badge { background: #f9eaf6; color: #c94098; }
+  .skill-name { font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 800; color: #2d3748; margin-bottom: 0.5rem; line-height: 1.3; }
+  .skill-pct { font-family: 'Nunito', sans-serif; font-size: 1.6rem; font-weight: 900; color: #1a202c; line-height: 1; margin-bottom: 0.5rem; }
+  .skill-pct span { font-size: 0.9rem; font-weight: 600; color: #a0aec0; }
+  .progress-bar { height: 6px; background: #e8edf2; border-radius: 3px; overflow: hidden; margin-bottom: 0.4rem; }
+  .progress-fill { height: 100%; border-radius: 3px; }
+  .skill-level { font-size: 0.68rem; color: #a0aec0; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  /* BOTTOM ROW */
+  .bottom-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+  .card { background: #fff; border-radius: 16px; padding: 1.1rem; box-shadow: 0 2px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 0.6rem; }
+  .card-title { font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 800; color: #2d3748; }
+  .card-sub { font-size: 0.75rem; color: #a0aec0; font-weight: 500; margin-top: -0.3rem; }
+
+  /* ACTIVITIES */
+  .activity-item { display: flex; align-items: center; gap: 0.6rem; background: #f8fafc; border-radius: 10px; padding: 0.6rem 0.75rem; }
+  .activity-item-text { font-size: 0.8rem; color: #4a5568; font-weight: 600; flex: 1; }
+  .done-badge { background: #4ab851; color: #fff; border-radius: 50px; padding: 0.2rem 0.65rem; font-family: 'Nunito', sans-serif; font-size: 0.68rem; font-weight: 800; }
+  .pending-badge { background: #fec41d; color: #7a5900; border-radius: 50px; padding: 0.2rem 0.65rem; font-family: 'Nunito', sans-serif; font-size: 0.68rem; font-weight: 800; }
+  .activity-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* PROGRESS CARD */
+  .progress-card { align-items: center; justify-content: center; }
+  .donut-wrap { position: relative; width: 110px; height: 110px; }
+  .donut-wrap svg { width: 110px; height: 110px; transform: rotate(-90deg); }
+  .donut-pct { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .donut-num { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.5rem; color: #1a202c; line-height: 1; }
+  .donut-label { font-size: 0.65rem; color: #a0aec0; font-weight: 700; }
+  .donut-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 1rem; width: 100%; }
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .legend-text { font-size: 0.68rem; color: #718096; font-weight: 600; }
+  .view-report-btn { width: 100%; padding: 0.55rem; border-radius: 10px; border: 2px solid #e2e8f0; background: #fff; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.8rem; color: #26a4de; cursor: pointer; transition: all 0.2s; margin-top: auto; }
+  .view-report-btn:hover { background: #e8f6fb; border-color: #26a4de; }
+
+  /* UPCOMING */
+  .upcoming-item { display: flex; align-items: center; gap: 0.65rem; padding: 0.5rem 0.6rem; border-radius: 10px; background: #f8fafc; transition: background 0.2s; cursor: pointer; }
+  .upcoming-item:hover { background: #edf7ee; }
+  .upcoming-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .upcoming-info { flex: 1; }
+  .upcoming-name { font-family: 'Nunito', sans-serif; font-size: 0.78rem; font-weight: 700; color: #2d3748; }
+  .upcoming-time { font-size: 0.68rem; color: #a0aec0; font-weight: 500; }
+  .upcoming-arrow { color: #a0aec0; font-size: 0.9rem; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <img src="skillloop-logo.png" alt="SkillLoop">
+      <button class="menu-icon">&#9776;</button>
+    </div>
+    <div class="sidebar-label">My Skills</div>
+    <div class="sidebar-item active" onclick="setActive(this)">Physical Coordination</div>
+    <div class="sidebar-item" onclick="setActive(this)">Independence Skills</div>
+    <div class="sidebar-item" onclick="setActive(this)">Social Skills</div>
+    <div class="sidebar-item" onclick="setActive(this)">Executive Function</div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Account</div>
+    <div class="sidebar-item" onclick="setActive(this)">Parent Dashboard</div>
+    <div class="sidebar-item" onclick="setActive(this)">Therapist Mode</div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-link">Terms of Service</div>
+      <div class="sidebar-link">FAQ</div>
+      <div class="sidebar-link">Privacy Policy</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topnav">
+      <div class="topnav-links">
+        <a class="topnav-link active" href="#">Dashboard</a>
+        <a class="topnav-link" href="#">Lessons</a>
+        <a class="topnav-link" href="#">Progress</a>
+        <a class="topnav-link" href="#">Parent Dashboard</a>
+        <a class="topnav-link" href="#">Therapist Mode</a>
+      </div>
+      <div class="topnav-right">
+        <button class="notif-btn">&#128276;<div class="notif-dot"></div></button>
+        <div class="avatar-wrap">
+          <div class="avatar" id="avatar-initials">SL</div>
+          <span class="avatar-name" id="avatar-name">My Account</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- WELCOME -->
+      <div class="welcome-row">
+        <div class="welcome-text">
+          <h1 id="welcome-msg">Welcome back!</h1>
+          <p>Here is your progress overview for today.</p>
+        </div>
+        <div class="date-badge" id="date-badge"></div>
+      </div>
+
+      <!-- SKILL CARDS -->
+      <div class="skill-cards">
+        <div class="skill-card blue">
+          <div class="skill-card-top">
+            <div class="skill-icon">PC</div>
+            <span class="skill-badge">Level 2 / 5</span>
+          </div>
+          <div class="skill-name">Physical Coordination</div>
+          <div class="skill-pct">45<span>%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:45%;background:#26a4de"></div></div>
+          <div class="skill-level">5 series · 10 modules</div>
+        </div>
+        <div class="skill-card green">
+          <div class="skill-card-top">
+            <div class="skill-icon">IS</div>
+            <span class="skill-badge">Level 1 / 5</span>
+          </div>
+          <div class="skill-name">Independence Skills</div>
+          <div class="skill-pct">20<span>%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:20%;background:#4ab851"></div></div>
+          <div class="skill-level">4 series · 8 modules</div>
+        </div>
+        <div class="skill-card yellow">
+          <div class="skill-card-top">
+            <div class="skill-icon">SS</div>
+            <span class="skill-badge">Level 1 / 5</span>
+          </div>
+          <div class="skill-name">Social Skills</div>
+          <div class="skill-pct">35<span>%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:35%;background:#fec41d"></div></div>
+          <div class="skill-level">5 series · 10 modules</div>
+        </div>
+        <div class="skill-card pink">
+          <div class="skill-card-top">
+            <div class="skill-icon">EF</div>
+            <span class="skill-badge">Level 1 / 5</span>
+          </div>
+          <div class="skill-name">Executive Function</div>
+          <div class="skill-pct">15<span>%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:15%;background:#c94098"></div></div>
+          <div class="skill-level">4 series · 8 modules</div>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW -->
+      <div class="bottom-row">
+
+        <div class="card">
+          <div class="card-title">Today's Activities</div>
+          <div class="card-sub">Complete your activities for the day</div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:#4ab851"></div>
+            <span class="activity-item-text">Complete a balance exercise</span>
+            <span class="done-badge">Done</span>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:#fec41d"></div>
+            <span class="activity-item-text">Practice starting a conversation</span>
+            <span class="pending-badge">Pending</span>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:#fec41d"></div>
+            <span class="activity-item-text">Daily structure builder</span>
+            <span class="pending-badge">Pending</span>
+          </div>
+        </div>
+
+        <div class="card progress-card">
+          <div class="card-title">Total Progress</div>
+          <div class="donut-wrap">
+            <svg viewBox="0 0 110 110">
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#e8edf2" stroke-width="10"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#26a4de" stroke-width="10" stroke-dasharray="79 185" stroke-linecap="round"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#4ab851" stroke-width="10" stroke-dasharray="37 185" stroke-dashoffset="-79" stroke-linecap="round"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#fec41d" stroke-width="10" stroke-dasharray="65 185" stroke-dashoffset="-116" stroke-linecap="round"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#c94098" stroke-width="10" stroke-dasharray="28 185" stroke-dashoffset="-181" stroke-linecap="round"/>
+            </svg>
+            <div class="donut-pct">
+              <span class="donut-num">29%</span>
+              <span class="donut-label">Overall</span>
+            </div>
+          </div>
+          <div class="donut-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#26a4de"></div><span class="legend-text">Physical 45%</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#4ab851"></div><span class="legend-text">Independence 20%</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#fec41d"></div><span class="legend-text">Social 35%</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#c94098"></div><span class="legend-text">Executive 15%</span></div>
+          </div>
+          <button class="view-report-btn">View Full Report</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Up Next</div>
+          <div class="card-sub">Your next recommended modules</div>
+          <div class="upcoming-item">
+            <div class="upcoming-dot" style="background:#26a4de"></div>
+            <div class="upcoming-info">
+              <div class="upcoming-name">Balance and Posture — Series 3</div>
+              <div class="upcoming-time">Physical Coordination · 15 min</div>
+            </div>
+            <span class="upcoming-arrow">›</span>
+          </div>
+          <div class="upcoming-item">
+            <div class="upcoming-dot" style="background:#fec41d"></div>
+            <div class="upcoming-info">
+              <div class="upcoming-name">Starting a Conversation</div>
+              <div class="upcoming-time">Social Skills · 10 min</div>
+            </div>
+            <span class="upcoming-arrow">›</span>
+          </div>
+          <div class="upcoming-item">
+            <div class="upcoming-dot" style="background:#4ab851"></div>
+            <div class="upcoming-info">
+              <div class="upcoming-name">Weekly Budget Challenge</div>
+              <div class="upcoming-time">Independence Skills · 20 min</div>
+            </div>
+            <span class="upcoming-arrow">›</span>
+          </div>
+          <div class="upcoming-item">
+            <div class="upcoming-dot" style="background:#c94098"></div>
+            <div class="upcoming-info">
+              <div class="upcoming-name">Daily Structure Builder</div>
+              <div class="upcoming-time">Executive Function · 10 min</div>
+            </div>
+            <span class="upcoming-arrow">›</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pull name from signup session
+  const name = sessionStorage.getItem('userName') || '';
+  if (name) {
+    document.getElementById('welcome-msg').textContent = 'Welcome back, ' + name + '!';
+    document.getElementById('avatar-name').textContent = name;
+    document.getElementById('avatar-initials').textContent = name.charAt(0).toUpperCase();
+  }
+
+  // Date
+  document.getElementById('date-badge').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+  // Sidebar nav
+  function setActive(el) {
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // Top nav
+  document.querySelectorAll('.topnav-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelectorAll('.topnav-link').forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

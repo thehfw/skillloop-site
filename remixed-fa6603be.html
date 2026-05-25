@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lessons — SkillLoop</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito Sans',sans-serif;background:#f4f6f9;color:#1a2235;}
+
+/* NAV */
+nav{background:#fff;border-bottom:1px solid #e8edf2;padding:0 2rem;display:flex;align-items:center;gap:2rem;height:60px;position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;color:#1a2235;}
+.nav-logo span{color:#26a4de;}
+.nav-tabs{display:flex;gap:0.25rem;flex:1;}
+.nav-tab{padding:0.5rem 1rem;border-radius:8px;font-size:0.875rem;font-weight:600;color:#6b7a99;cursor:pointer;text-decoration:none;transition:all 0.2s;}
+.nav-tab:hover{background:#f4f6f9;color:#1a2235;}
+.nav-tab.active{background:#ebf6fd;color:#26a4de;}
+.nav-right{display:flex;align-items:center;gap:1rem;}
+.nav-avatar{width:36px;height:36px;border-radius:50%;background:#26a4de;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.9rem;}
+
+/* LAYOUT */
+.layout{display:flex;min-height:calc(100vh - 60px);}
+
+/* SIDEBAR */
+.sidebar{width:240px;background:#fff;border-right:1px solid #e8edf2;padding:1.5rem 0;flex-shrink:0;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;}
+.sidebar-section{padding:0 1rem;margin-bottom:1.5rem;}
+.sidebar-label{font-size:0.7rem;font-weight:800;color:#a0aec0;text-transform:uppercase;letter-spacing:1.5px;padding:0 0.75rem;margin-bottom:0.5rem;}
+.sidebar-item{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0.75rem;border-radius:10px;cursor:pointer;transition:all 0.2s;font-size:0.875rem;font-weight:600;color:#6b7a99;margin-bottom:2px;}
+.sidebar-item:hover{background:#f4f6f9;color:#1a2235;}
+.sidebar-item.active{background:#ebf6fd;color:#26a4de;}
+.sidebar-item .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.sidebar-progress{margin:0 0.75rem;margin-top:4px;}
+.sidebar-bar{background:#e8edf2;border-radius:100px;height:4px;overflow:hidden;}
+.sidebar-fill{height:100%;border-radius:100px;transition:width 0.6s ease;}
+
+/* MAIN */
+.main{flex:1;padding:2rem;max-width:900px;}
+
+/* MODULE HEADER */
+.module-header{background:#fff;border-radius:16px;padding:1.75rem;margin-bottom:1.5rem;border:1px solid #e8edf2;display:flex;align-items:center;gap:1.5rem;}
+.module-icon-big{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;}
+.module-header-info{flex:1;}
+.module-header-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.5rem;color:#1a2235;margin-bottom:4px;}
+.module-header-sub{font-size:0.875rem;color:#6b7a99;margin-bottom:12px;}
+.module-header-meta{display:flex;gap:1rem;}
+.meta-pill{background:#f4f6f9;border-radius:20px;padding:4px 12px;font-size:0.75rem;font-weight:700;color:#6b7a99;}
+.module-progress-wrap{min-width:120px;text-align:center;}
+.module-pct-big{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.5rem;}
+.module-pct-label{font-size:0.75rem;color:#6b7a99;font-weight:600;}
+.big-bar{background:#e8edf2;border-radius:100px;height:8px;overflow:hidden;margin-top:8px;}
+.big-fill{height:100%;border-radius:100px;transition:width 1s ease;}
+
+/* THERAPIST CARD */
+.therapist-card{background:#fff;border-radius:16px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;border:1px solid #e8edf2;display:flex;align-items:center;gap:1rem;}
+.therapist-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}
+.therapist-name{font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;color:#1a2235;}
+.therapist-role{font-size:0.8rem;color:#6b7a99;margin-top:2px;}
+.therapist-badge{margin-left:auto;background:#e8f8ee;color:#4ab851;font-size:0.75rem;font-weight:700;padding:4px 12px;border-radius:20px;}
+
+/* SERIES */
+.series-block{background:#fff;border-radius:16px;border:1px solid #e8edf2;margin-bottom:1.25rem;overflow:hidden;}
+.series-header{padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1rem;cursor:pointer;transition:background 0.2s;}
+.series-header:hover{background:#f9fafb;}
+.series-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:800;color:#fff;flex-shrink:0;}
+.series-title{font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;color:#1a2235;flex:1;}
+.series-meta{font-size:0.75rem;color:#a0aec0;font-weight:600;}
+.series-chevron{font-size:1rem;color:#a0aec0;transition:transform 0.3s;}
+.series-chevron.open{transform:rotate(180deg);}
+.series-body{border-top:1px solid #e8edf2;display:none;}
+.series-body.open{display:block;}
+
+/* LESSON ITEM */
+.lesson-item{display:flex;align-items:center;gap:1rem;padding:1rem 1.5rem;border-bottom:1px solid #f4f6f9;cursor:pointer;transition:background 0.2s;}
+.lesson-item:last-child{border-bottom:none;}
+.lesson-item:hover{background:#f9fafb;}
+.lesson-item.active{background:#ebf6fd;}
+.lesson-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:800;flex-shrink:0;}
+.lesson-num.done{background:#4ab851;color:#fff;}
+.lesson-num.current{background:#26a4de;color:#fff;}
+.lesson-num.locked{background:#e8edf2;color:#a0aec0;}
+.lesson-info{flex:1;}
+.lesson-title{font-weight:700;font-size:0.9rem;color:#1a2235;}
+.lesson-sub{font-size:0.75rem;color:#a0aec0;margin-top:2px;}
+.lesson-badge{font-size:0.7rem;font-weight:700;padding:3px 10px;border-radius:20px;}
+.badge-done{background:#e8f8ee;color:#4ab851;}
+.badge-current{background:#ebf6fd;color:#26a4de;}
+.badge-locked{background:#f4f6f9;color:#a0aec0;}
+
+/* VIDEO PLAYER */
+.video-section{background:#fff;border-radius:16px;border:1px solid #e8edf2;overflow:hidden;margin-bottom:1.5rem;display:none;}
+.video-section.open{display:block;}
+.video-player{background:linear-gradient(135deg,#1a2235,#2d3a52);aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;cursor:pointer;}
+.play-btn{width:72px;height:72px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;backdrop-filter:blur(4px);border:2px solid rgba(255,255,255,0.3);transition:all 0.2s;margin-bottom:16px;}
+.play-btn:hover{background:rgba(255,255,255,0.25);transform:scale(1.05);}
+.video-title-overlay{color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:1.1rem;text-align:center;}
+.video-sub-overlay{color:rgba(255,255,255,0.6);font-size:0.8rem;margin-top:6px;}
+.video-playing{display:none;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a2235,#2d3a52);aspect-ratio:16/9;position:relative;}
+.video-playing.show{display:flex;}
+.video-loader{width:60px;height:60px;border:4px solid rgba(255,255,255,0.15);border-top:4px solid #26a4de;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.video-progress-bar{position:absolute;bottom:0;left:0;right:0;height:4px;background:rgba(255,255,255,0.15);}
+.video-progress-fill{height:100%;background:#26a4de;width:0%;transition:width 0.3s;}
+.video-controls{padding:1rem 1.5rem;display:flex;align-items:center;gap:1rem;border-top:1px solid #e8edf2;}
+.video-lesson-title{font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;color:#1a2235;flex:1;}
+.video-duration{font-size:0.8rem;color:#a0aec0;font-weight:600;}
+
+/* VIDEO INFO */
+.video-info{padding:1.5rem;}
+.video-info-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:#1a2235;margin-bottom:8px;}
+.video-info-desc{font-size:0.875rem;color:#6b7a99;line-height:1.7;margin-bottom:1.25rem;}
+.video-tabs{display:flex;gap:0.5rem;margin-bottom:1.25rem;border-bottom:1px solid #e8edf2;padding-bottom:0;}
+.video-tab{padding:0.6rem 1rem;font-size:0.85rem;font-weight:700;color:#a0aec0;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s;}
+.video-tab.active{color:#26a4de;border-bottom-color:#26a4de;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.key-points{list-style:none;}
+.key-points li{display:flex;gap:10px;margin-bottom:10px;font-size:0.875rem;color:#1a2235;line-height:1.6;}
+.key-points li::before{content:"✓";color:#4ab851;font-weight:800;flex-shrink:0;}
+.activity-box{background:#f4f6f9;border-radius:12px;padding:1.25rem;margin-bottom:1rem;}
+.activity-box-title{font-family:'Nunito',sans-serif;font-weight:800;font-size:0.9rem;color:#1a2235;margin-bottom:8px;}
+.activity-box-desc{font-size:0.85rem;color:#6b7a99;line-height:1.65;}
+.complete-btn{width:100%;background:#26a4de;color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.95rem;cursor:pointer;transition:all 0.2s;margin-top:1rem;}
+.complete-btn:hover{background:#1a8bc4;transform:translateY(-1px);}
+.complete-btn.done{background:#4ab851;}
+.reflection-area{width:100%;background:#fff;border:1.5px solid #e8edf2;border-radius:10px;padding:12px;font-family:'Nunito Sans',sans-serif;font-size:0.875rem;color:#1a2235;resize:none;line-height:1.6;min-height:100px;}
+.reflection-area:focus{border-color:#26a4de;outline:none;}
+.ai-feedback-box{background:#ebf6fd;border:1px solid #b3d9f5;border-radius:12px;padding:1.25rem;margin-top:1rem;}
+.ai-feedback-title{font-size:0.8rem;font-weight:800;color:#26a4de;margin-bottom:8px;}
+.ai-feedback-text{font-size:0.875rem;color:#1a2235;line-height:1.7;}
+
+/* QUIZ */
+.quiz-box{background:#fff5eb;border:1px solid #fddcb5;border-radius:12px;padding:1.25rem;}
+.quiz-title{font-family:'Nunito',sans-serif;font-weight:800;color:#f97316;margin-bottom:8px;}
+.quiz-q{font-size:0.875rem;color:#1a2235;margin-bottom:12px;line-height:1.6;}
+.quiz-options{display:grid;gap:8px;}
+.quiz-option{background:#fff;border:1.5px solid #e8edf2;border-radius:10px;padding:10px 14px;font-size:0.85rem;cursor:pointer;transition:all 0.2s;font-weight:600;}
+.quiz-option:hover{border-color:#26a4de;background:#ebf6fd;}
+.quiz-option.correct{border-color:#4ab851;background:#e8f8ee;color:#4ab851;}
+.quiz-option.wrong{border-color:#ef4444;background:#fee2e2;color:#ef4444;}
+
+/* COMPLETION */
+.completion-banner{background:linear-gradient(135deg,#4ab851,#26a4de);border-radius:16px;padding:1.5rem;text-align:center;color:#fff;margin-top:1rem;display:none;}
+.completion-banner.show{display:block;}
+.completion-icon{font-size:3rem;margin-bottom:8px;}
+.completion-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;margin-bottom:4px;}
+.completion-sub{font-size:0.875rem;opacity:0.85;}
+.xp-badge{display:inline-block;background:rgba(255,255,255,0.2);border-radius:20px;padding:6px 16px;font-weight:800;font-size:1rem;margin-top:8px;}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{display:none;}
+  .main{padding:1rem;}
+  .module-header{flex-direction:column;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Skill<span>Loop</span></div>
+  <div class="nav-tabs">
+    <a href="#" class="nav-tab">Dashboard</a>
+    <a href="#" class="nav-tab active">Lessons</a>
+    <a href="#" class="nav-tab">Progress</a>
+    <a href="#" class="nav-tab">Parent Dashboard</a>
+    <a href="#" class="nav-tab">Therapist Mode</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-avatar">R</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Modules</div>
+
+      <div class="sidebar-item active" onclick="switchModule('pc')">
+        <div class="dot" style="background:#26a4de"></div>
+        Physical Coordination
+        <div class="sidebar-progress">
+          <div class="sidebar-bar"><div class="sidebar-fill" style="width:45%;background:#26a4de"></div></div>
+        </div>
+      </div>
+
+      <div class="sidebar-item" onclick="switchModule('is')">
+        <div class="dot" style="background:#4ab851"></div>
+        Independence Skills
+        <div class="sidebar-progress">
+          <div class="sidebar-bar"><div class="sidebar-fill" style="width:20%;background:#4ab851"></div></div>
+        </div>
+      </div>
+
+      <div class="sidebar-item" onclick="switchModule('ss')">
+        <div class="dot" style="background:#fec41d"></div>
+        Social Skills
+        <div class="sidebar-progress">
+          <div class="sidebar-bar"><div class="sidebar-fill" style="width:35%;background:#fec41d"></div></div>
+        </div>
+      </div>
+
+      <div class="sidebar-item" onclick="switchModule('ef')">
+        <div class="dot" style="background:#c94098"></div>
+        Executive Function
+        <div class="sidebar-progress">
+          <div class="sidebar-bar"><div class="sidebar-fill" style="width:15%;background:#c94098"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- MODULE: PHYSICAL COORDINATION -->
+    <div id="module-pc" class="module-view">
+
+      <div class="module-header">
+        <div class="module-icon-big" style="background:#ebf6fd;font-size:2.2rem">💪</div>
+        <div class="module-header-info">
+          <div class="module-header-title">Physical Coordination & Strength</div>
+          <div class="module-header-sub">Build body awareness, posture, balance, and coordination through therapist-guided video modules.</div>
+          <div class="module-header-meta">
+            <div class="meta-pill">5 Series</div>
+            <div class="meta-pill">10 Modules</div>
+            <div class="meta-pill">Licensed OT Content</div>
+          </div>
+        </div>
+        <div class="module-progress-wrap">
+          <div class="module-pct-big" style="color:#26a4de">45%</div>
+          <div class="module-pct-label">Complete</div>
+          <div class="big-bar"><div class="big-fill" style="width:45%;background:#26a4de"></div></div>
+        </div>
+      </div>
+
+      <div class="therapist-card">
+        <div class="therapist-avatar" style="background:#ebf6fd">👩‍⚕️</div>
+        <div>
+          <div class="therapist-name">Dr. Sarah Chen</div>
+          <div class="therapist-role">Licensed Occupational Therapist · 12 years experience · Pediatric Specialist</div>
+        </div>
+        <div class="therapist-badge">✓ Licensed & Verified</div>
+      </div>
+
+      <!-- VIDEO PLAYER (shown when lesson clicked) -->
+      <div class="video-section" id="video-player-pc">
+        <div class="video-player" id="video-thumb-pc" onclick="playVideo('pc')">
+          <div class="play-btn">▶</div>
+          <div class="video-title-overlay" id="video-title-pc">Balance and Posture — Series 1</div>
+          <div class="video-sub-overlay">Dr. Sarah Chen, Licensed OT · 15 min</div>
+        </div>
+        <div class="video-playing" id="video-loading-pc">
+          <div class="video-loader"></div>
+          <div style="color:#fff;font-weight:700">Loading video...</div>
+          <div class="video-progress-bar"><div class="video-progress-fill" id="vid-prog-pc"></div></div>
+        </div>
+        <div class="video-controls">
+          <div class="video-lesson-title" id="video-lesson-label-pc">Balance and Posture — Series 1</div>
+          <div class="video-duration">15 min · Licensed OT</div>
+        </div>
+        <div class="video-info">
+          <div class="video-tabs">
+            <div class="video-tab active" onclick="switchTab('pc','about')">About</div>
+            <div class="video-tab" onclick="switchTab('pc','activity')">Activity</div>
+            <div class="video-tab" onclick="switchTab('pc','quiz')">Quiz</div>
+            <div class="video-tab" onclick="switchTab('pc','reflect')">Reflect</div>
+          </div>
+
+          <div class="tab-content active" id="tab-pc-about">
+            <div class="video-info-desc">In this lesson, Dr. Sarah Chen walks you through foundational balance and posture techniques designed specifically for teens. You'll learn how body awareness connects to daily confidence and independence.</div>
+            <ul class="key-points">
+              <li>Understand how posture affects your mood and confidence</li>
+              <li>Learn 3 balance exercises you can do anywhere</li>
+              <li>Practice proper sitting and standing alignment</li>
+              <li>Build a 5-minute daily routine for physical awareness</li>
+            </ul>
+          </div>
+
+          <div class="tab-content" id="tab-pc-activity">
+            <div class="activity-box">
+              <div class="activity-box-title">🎯 Today's Activity</div>
+              <div class="activity-box-desc">Practice the balance exercise from the video for 5 minutes. Stand on one foot for 30 seconds, then switch. Try with eyes open, then eyes closed. Notice how your body adjusts.</div>
+            </div>
+            <div class="activity-box">
+              <div class="activity-box-title">📍 Real-World Challenge</div>
+              <div class="activity-box-desc">During dinner tonight, focus on sitting up straight with both feet flat on the floor. Notice how it feels different from your normal posture.</div>
+            </div>
+            <button class="complete-btn" id="complete-btn-pc" onclick="markComplete('pc')">✓ Mark Activity Complete</button>
+            <div class="completion-banner" id="completion-pc">
+              <div class="completion-icon">🎉</div>
+              <div class="completion-title">Activity Complete!</div>
+              <div class="completion-sub">Balance and Posture · Series 1</div>
+              <div class="xp-badge">+25 XP Earned</div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="tab-pc-quiz">
+            <div class="quiz-box">
+              <div class="quiz-title">📝 Quick Check</div>
+              <div class="quiz-q">What is the primary benefit of practicing balance exercises regularly?</div>
+              <div class="quiz-options">
+                <div class="quiz-option" onclick="answerQuiz(this,'wrong','pc')">It makes you run faster</div>
+                <div class="quiz-option" onclick="answerQuiz(this,'correct','pc')">It improves body awareness and daily confidence</div>
+                <div class="quiz-option" onclick="answerQuiz(this,'wrong','pc')">It only helps with sports</div>
+                <div class="quiz-option" onclick="answerQuiz(this,'wrong','pc')">It has no effect on daily life</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="tab-pc-reflect">
+            <div class="activity-box-title" style="margin-bottom:10px">✍️ Reflection Journal</div>
+            <div style="font-size:0.85rem;color:#6b7a99;margin-bottom:10px;line-height:1.6">How did the balance exercise feel? What did you notice about your body? Write anything that comes to mind.</div>
+            <textarea class="reflection-area" id="reflect-pc" placeholder="Write your reflection here..."></textarea>
+            <button class="complete-btn" onclick="submitReflection('pc')" style="background:#4ab851">Submit & Get AI Feedback ✨</button>
+            <div class="ai-feedback-box" id="ai-feedback-pc" style="display:none">
+              <div class="ai-feedback-title">🤖 AI Coach Feedback</div>
+              <div class="ai-feedback-text" id="ai-text-pc"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SERIES -->
+      <div class="series-block">
+        <div class="series-header" onclick="toggleSeries('pc-s1')">
+          <div class="series-num" style="background:#26a4de">1</div>
+          <div class="series-title">Series 1 — Balance & Posture</div>
+          <div class="series-meta">2 lessons · 30 min</div>
+          <div class="series-chevron open" id="chevron-pc-s1">▼</div>
+        </div>
+        <div class="series-body open" id="series-pc-s1">
+          <div class="lesson-item active" onclick="openLesson('pc','Balance and Posture — Series 1','Dr. Sarah Chen, Licensed OT','15 min')">
+            <div class="lesson-num current">▶</div>
+            <div class="lesson-info"><div class="lesson-title">Balance and Posture</div><div class="lesson-sub">Dr. Sarah Chen · 15 min · Video + Activity</div></div>
+            <div class="lesson-badge badge-current">In Progress</div>
+          </div>
+          <div class="lesson-item" onclick="openLesson('pc','Core Strength Basics','Dr. Sarah Chen, Licensed OT','15 min')">
+            <div class="lesson-num locked">2</div>
+            <div class="lesson-info"><div class="lesson-title">Core Strength Basics</div><div class="lesson-sub">Dr. Sarah Chen · 15 min · Video + Activity</div></div>
+            <div class="lesson-badge badge-locked">Locked</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="series-block">
+        <div class="series-header" onclick="toggleSeries('pc-s2')">
+          <div class="series-num" style="background:#26a4de">2</div>
+          <div class="series-title">Series 2 — Fine Motor Skills</div>
+          <div class="series-meta">2 lessons · 30 min</div>
+          <div class="series-chevron" id="chevron-pc-s2">▼</div>
+        </div>
+        <div class="series-body" id="series-pc-s2">
+          <div class="lesson-item" onclick="openLesson('pc','Hand Coordination','Dr. Sarah Chen, Licensed OT','15 min')">
+            <div class="lesson-num locked">1</div>
+            <div class="lesson-info"><div class="lesson-title">Hand Coordination</div><div class="lesson-sub">Dr. Sarah Chen · 15 min · Video + Activity</div></div>
+            <div class="lesson-badge badge-locked">Locked</div>
+          </div>
+          <div class="lesson-item" onclick="openLesson('pc','Writing & Daily Tasks','Dr. Sarah Chen, Licensed OT','15 min')">
+            <div class="lesson-num locked">2</div>
+            <div class="lesson-info"><div class="lesson-title">Writing & Daily Tasks</div><div class="lesson-sub">Dr. Sarah Chen · 15 min</div></div>
+            <div class="lesson-badge badge-locked">Locked</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="series-block">
+        <div class="series-header" onclick="toggleSeries('pc-s3')">
+          <div class="series-num" style="background:#26a4de">3</div>
+          <div class="series-title">Series 3 — Morning Routines</div>
+          <div class="series-meta">2 lessons · 25 min</div>
+          <div class="series-chevron" id="chevron-pc-s3">▼</div>
+        </div>
+        <div class="series-body" id="series-pc-s3">
+          <div class="lesson-item" onclick="openLesson('pc','Building a Morning Routine','Dr. Sarah Chen, Licensed OT','12 min')">
+            <div class="lesson-num locked">1</div>
+            <div class="lesson-info"><div class="lesson-title">Building a Morning Routine</div><div class="lesson-sub">Dr. Sarah Chen · 12 min</div></div>
+            <div class="lesson-badge badge-locked">Locked</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MODULE: INDEPENDENCE SKILLS -->
+    <div id="module-is" class="module-view" style="display:none">
+      <div class="module-header">
+        <div class="module-icon-big" style="background:#e8f8ee;font-size:2.2rem">🏠</div>
+        <div class="module-header-info">
+          <div class="module-header-title">Independence Skills</div>
+          <div class="module-header-sub">Real-world lessons covering cooking, budgeting, organization, and daily living routines.</div>
+          <div class="module-header-meta">
+            <div class="meta-pill">4 Series</div>
+            <div class="meta-pill">8 Modules</div>
+            <div class="meta-pill">Licensed OT Content</div>
+          </div>
+        </div>
+        <div class="module-progress-wrap">
+          <div class="module-pct-big" style="color:#4ab851">20%</div>
+          <div class="module-pct-label">Complete</div>
+          <div class="big-bar"><div class="big-fill" style="width:20%;background:#4ab851"></div></div>
+        </div>
+      </div>
+      <div class="therapist-card">
+        <div class="therapist-avatar" style="background:#e8f8ee">👩‍⚕️</div>
+        <div>
+          <div class="therapist-name">Dr. Sarah Chen</div>
+          <div class="therapist-role">Licensed Occupational Therapist · Independence & Daily Living Specialist</div>
+        </div>
+        <div class="therapist-badge">✓ Licensed & Verified</div>
+      </div>
+      <div class="video-section" id="video-player-is">
+        <div class="video-player" id="video-thumb-is" onclick="playVideo('is')">
+          <div class="play-btn">▶</div>
+          <div class="video-title-overlay" id="video-title-is">Cooking Basics — Series 1</div>
+          <div class="video-sub-overlay">Dr. Sarah Chen, Licensed OT · 20 min</div>
+        </div>
+        <div class="video-playing" id="video-loading-is">
+          <div class="video-loader"></div>
+          <div style="color:#fff;font-weight:700">Loading video...</div>
+          <div class="video-progress-bar"><div class="video-progress-fill" id="vid-prog-is"></div></div>
+        </div>
+        <div class="video-controls">
+          <div class="video-lesson-title" id="video-lesson-label-is">Cooking Basics — Series 1</div>
+          <div class="video-duration">20 min · Licensed OT</div>
+        </div>
+        <div class="video-info">
+          <div class="video-tabs">
+            <div class="video-tab active" onclick="switchTab('is','about')">About</div>
+            <div class="video-tab" onclick="switchTab('is','activity')">Activity</div>
+            <div class="video-tab" onclick="switchTab('is','quiz')">Quiz</div>
+            <div class="video-tab" onclick="switchTab('is','reflect')">Reflect</div>
+          </div>
+          <div class="tab-content active" id="tab-is-about">
+            <div class="video-info-desc">Learn foundational cooking skills that build real independence. Dr. Chen covers kitchen safety, simple meal preparation, and how to follow a recipe step by step.</div>
+            <ul class="key-points">
+              <li>Kitchen safety rules every teen should know</li>
+              <li>How to read and follow a simple recipe</li>
+              <li>Prepare a basic meal independently</li>
+              <li>Clean up after yourself — part of the skill</li>
+            </ul>
+          </div>
+          <div class="tab-content" id="tab-is-activity">
+            <div class="activity-box">
+              <div class="activity-box-title">🎯 Weekly Challenge</div>
+              <div class="activity-box-desc">Cook one simple meal this week completely on your own — scrambled eggs, pasta, or a sandwich. Take a photo or write about the experience.</div>
+            </div>
+            <button class="complete-btn" id="complete-btn-is" onclick="markComplete('is')">✓ Mark Activity Complete</button>
+            <div class="completion-banner" id="completion-is">
+              <div class="completion-icon">🎉</div>
+              <div class="completion-title">Activity Complete!</div>
+              <div class="completion-sub">Cooking Basics · Series 1</div>
+              <div class="xp-badge">+25 XP Earned</div>
+            </div>
+          </div>
+          <div class="tab-content" id="tab-is-quiz">
+            <div class="quiz-box">
+              <div class="quiz-title">📝 Quick Check</div>
+              <div class="quiz-q">What is the first thing you should do before starting to cook?</div>
+              <div class="quiz-options">
+                <div class="quiz-option" onclick="answerQuiz(this,'wrong','is')">Turn on the stove immediately</div>
+                <div class="quiz-option" onclick="answerQuiz(this,'correct','is')">Wash your hands and read the recipe fully</div>
+                <div class="quiz-option" onclick="answerQuiz(this,'wrong','is')">Get all the plates ready</div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-content" id="tab-is-reflect">
+            <div class="activity-box-title" style="margin-bottom:10px">✍️ Reflection Journal</div>
+            <div style="font-size:0.85rem;color:#6b7a99;margin-bottom:10px">What did you cook? How did it feel to make something yourself?</div>
+            <textarea class="reflection-area" id="reflect-is" placeholder="Write your reflection here..."></textarea>
+            <button class="complete-btn" onclick="submitReflection('is')" style="background:#4ab851">Submit & Get AI Feedback ✨</button>
+            <div class="ai-feedback-box" id="ai-feedback-is" style="display:none">
+              <div class="ai-feedback-title">🤖 AI Coach Feedback</div>
+              <div class="ai-feedback-text" id="ai-text-is"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="series-block">
+        <div class="series-header" onclick="toggleSeries('is-s1')">
+          <div class="series-num" style="background:#4ab851">1</div>
+          <div class="series-title">Series 1 — Cooking Basics</div>
+          <div class="series-meta">2 lessons · 40 min</div>
+          <div class="series-chevron open" id="chevron-is-s1">▼</div>
+        </div>
+        <div class="series-body open" id="series-is-s1">
+          <div class="lesson-item" onclick="openLesson('is','Cooking Basics — Series 1','Dr. Sarah Chen, Licensed OT','20 min')">
+            <div class="lesson-num current">▶</div>
+            <div class="lesson-info"><div class="lesson-title">Kitchen Safety & Simple Meals</div><div class="lesson-sub">Dr. Sarah Chen · 20 min</div></div>
+            <div class="lesson-badge badge-current">Start</div>
+          </div>
+        </div>
+      </div>
+      <div class="series-block">
+        <div class="series-header" onclick="toggleSeries('is-s2')">
+          <div class="series-num" style="background:#4ab851">2</div>
+          <div class="series-title">Series 2 — Money Management</div>
+          <div class="series-meta">2 lessons · 35 min</div>
+          <div class="series-chevron" id="chevron-is-s2">▼</div>
+        </div>
+        <div class="series-body" id="series-is-s2">
+          <div class="lesson-item" onclick="openLesson('is','Budgeting Basics','Dr. Sarah Chen, Licensed OT','18 min')">
+            <div class="lesson-num locked">1</div>
+            <div class="lesson-info"><div class="lesson-title">Budgeting Basics</div><div class="lesson-sub">Dr. Sarah Chen · 18 min</div></div>
+            <div class="lesson-badge badge-locked">Locked</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE: SOCIAL SKILLS -->
+    <div id="module-ss" class="module-view" style="display:none">
+      <div class="module-header">
+        <div class="module-icon-big" style="background:#fffbeb;font-size:2.2rem">💬</div>
+        <div class="module-header-info">
+          <div class="module-header-title">Social Skills</div>
+          <div class="module-header-sub">Communication, conversation, emotional awareness and navigating social situations confidently.</div>
+          <div class="module-header-meta">
+            <div class="meta-pill">5 Series</div>
+            <div class="meta-pill">10 Modules</div>
+            <div class="meta-pill">Licensed Counselor</div>
+          </div>
+        </div>
+        <div class="module-progress-wrap">
+          <div class="module-pct-big" style="color:#fec41d">35%</div>
+          <div class="module-pct-label">Complete</div>
+          <div class="big-bar"><div class="big-fill" style="width:35%;background:#fec41d"></div></div>
+        </div>
+      </div>
+      <div class="therapist-card">
+        <div class="therapist-avatar" style="background:#fffbeb">👨‍⚕️</div>
+        <div>
+          <div class="therapist-name">Marcus Williams, LPC</div>
+          <div class="therapist-role">Licensed Professional Counselor · 8 years experience · Teen Social Skills Specialist</div>
+        </div>
+        <div class="therapist-badge">✓ Licensed & Verified</div>
+      </div>
+      <div class="video-section" id="video-player-ss">
+        <div class="video-player" id="video-thumb-ss" onclick="playVideo('ss')">
+          <div class="play-btn">▶</div>
+          <div class="video-title-overlay" id="video-title-ss">Starting a Conversation</div>
+          <div class="video-sub-overlay">Marcus Williams, LPC · 10 min</div>
+        </div>
+        <div class="video-playing" id="video-loading-ss">
+          <div class="video-loader"></div>
+          <div style="color:#fff;font-weight:700">Loading video...</div>
+          <div class="video-progress-bar"><div class="video-progress-fill" id="vid-prog-ss"></div></div>
+        </div>
+        <div class="video-controls">
+          <div class="video-lesson-title" id="video-lesson-label-ss">Starting a Conversation</div>
+          <div class="video-duration">10 min · Licensed Counselor</div>
+        </div>
+        <div class="video-info">
+          <div class="video-tabs">
+            <div class="video-tab active" onclick="switchTab('ss','about')">About</div>
+            <div class="video-tab" onclick="switchTab('ss','activity')">Activity</div>
+            <div class="video-tab" onclick="switchTab('ss','quiz')">Quiz</div>
+            <div class="video-tab" onclick="switchTab('ss','reflect')">Reflect</div>
+          </div>
+          <div class="tab-content active" id="tab-ss-about">
+            <div class="video-info-desc">Marcus walks through practical strategies for starting conversations confidently. Learn how to approach someone new, keep a conversation going, and read social cues in real time.</div>
+            <ul class="key-points">
+              <li>3 simple conversation starters that work in any situation</li>
+              <li>How to read if someone wants to keep talking</li>
+              <li>What to do when conversation gets awkward</li>
+              <li>Practice with low-stakes scenarios first</li>
+            </ul>
+          </div>
+          <div class="tab-content" id="tab-ss-activity">
+            <div class="activity-box">
+              <div class="activity-box-title">🎯 Role-Play Challenge</div>
+              <div class="activity-box-desc">This week, start one conversation with someone you don't usually talk to. It can be a classmate, a neighbor, or someone in a store. Use the techniques from the video.</div>
+            </div>
+            <button class="complete-btn" id="complete-btn-ss" onclick="markComplete('ss')">✓ Mark Activity Complete</button>
+            <div class="completion-banner" id="completion-ss">
+              <div class="completion-icon">🎉</div>
+              <div class="completion-title">Activity Complete!</div>
+              <div class="completion-sub">Starting a Conversation</div>
+              <div class="xp-badge">+25 XP Earned</div>
+            </div>
+          </div>
+          <div class="tab-content" id="tab-ss-quiz">
+            <div class="quiz-box">
+              <div class="quiz-title">📝 Quick Check</div>
+              <div class="quiz-q">What is the best way to know if someone wants to keep talking to you?</div>
+              <div class="quiz-options">
+                <div class="quiz-option" onclick="answerQuiz(this,'wrong','ss')">They are standing near you</div>
+                <div class="quiz-option" onclick="answerQuiz(this,'correct','ss')">They maintain eye contact and respond with questions</div>
+                <div class="quiz-option" onclick="answerQuiz(this,'wrong','ss')">They smile once</div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-content" id="tab-ss-reflect">
+            <div class="activity-box-title" style="margin-bottom:10px">✍️ Reflection Journal</div>
+            <div style="font-size:0.85rem;color:#6b7a99;margin-bottom:10px">How did starting a conversation feel? What worked? What was hard?</div>
+            <textarea class="reflection-area" id="reflect-ss" placeholder="Write your reflection here..."></textarea>
+            <button class="complete-btn" onclick="submitReflection('ss')" style="background:#4ab851">Submit & Get AI Feedback ✨</button>
+            <div class="ai-feedback-box" id="ai-feedback-ss" style="display:none">
+              <div class="ai-feedback-title">🤖 AI Coach Feedback</div>
+              <div class="ai-feedback-text" id="ai-text-ss"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="series-block">
+        <div class="series-header" onclick="toggleSeries('ss-s1')">
+          <div class="series-num" style="background:#fec41d">1</div>
+          <div class="series-title">Series 1 — Starting Conversations</div>
+          <div class="series-meta">2 lessons · 20 min</div>
+          <div class="series-chevron open" id="chevron-ss-s1">▼</div>
+        </div>
+        <div class="series-body open" id="series-ss-s1">
+          <div class="lesson-item" onclick="openLesson('ss','Starting a Conversation','Marcus Williams, LPC','10 min')">
+            <div class="lesson-num current">▶</div>
+            <div class="lesson-info"><div class="lesson-title">Starting a Conversation</div><div class="lesson-sub">Marcus Williams, LPC · 10 min</div></div>
+            <div class="lesson-badge badge-current">Start</div>
+          </div>
+        </div>
+      </div>
+      <div class="series-block">
+        <div class="series-header" onclick="toggleSeries('ss-s2')">
+          <div class="series-num" style="background:#fec41d">2</div>
+          <div class="series-title">Series 2 — Reading Social Cues</div>
+          <div class="series-meta">2 lessons · 25 min</div>
+          <div class="series-chevron" id="chevron-ss-s2">▼</div>
+        </div>
+        <div class="series-body" id="series-ss-s2">
+          <div class="lesson-item">
+            <div class="lesson-num locked">1</div>
+            <div class="lesson-info"><div class="lesson-title">Body Language Basics</div><div class="lesson-sub">Marcus Williams · 12 min</div></div>
+            <div class="lesson-badge badge-locked">Locked</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE: EXECUTIVE FUNCTION -->
+    <div id="module-ef" class="module-view" style="display:none">
+      <div class="module-header">
+        <div class="module-icon-big" style="background:#fdf0f8;font-size:2.2rem">📋</div>
+        <div class="module-header-info">
+          <div class="module-header-title">Executive Function & Daily Structure</div>
+          <div class="module-header-sub">Planning, task management, focus, and organization for daily life success.</div>
+          <div class="module-header-meta">
+            <div class="meta-pill">4 Series</div>
+            <div class="meta-pill">8 Modules</div>
+            <div class="meta-pill">Licensed Counselor</div>
+          </div>
+        </div>
+        <div class="module-progress-wrap">
+          <div class="module-pct-big" style="color:#c94098">15%</div>
+          <div class="module-pct-label">Complete</div>
+          <div class="big-bar"><div class="big-fill" style="width:15%;background:#c94098"></div></div>
+        </div>
+      </div>
+      <div class="therapist-card">
+        <div class="therapist-avatar" style="background:#fdf0f8">👨‍⚕️</div>
+        <div>
+          <div class="therapist-name">Marcus Williams, LPC</div>
+          <div class="therapist-role">Licensed Professional Counselor · Executive Function & ADHD Specialist</div>
+        </div>
+        <div class="therapist-badge">✓ Licensed & Verified</div>
+      </div>
+      <div class="video-section" id="video-player-ef">
+        <div class="video-player" id="video-thumb-ef" onclick="playVideo('ef')">
+          <div class="play-btn">▶</div>
+          <div class="video-title-overlay" id="video-title-ef">Time Management Basics</div>
+          <div class="video-sub-overlay">Marcus Williams, LPC · 12 min</div>
+        </div>
+        <div class="video-playing" id="video-loading-ef">
+          <div class="video-loader"></div>
+          <div style="color:#fff;font-weight:700">Loading video...</div>
+          <div class="video-progress-bar"><div class="video-progress-fill" id="vid-prog-ef"></div></div>
+        </div>
+        <div class="video-controls">
+          <div class="video-lesson-title" id="video-lesson-label-ef">Time Management Basics</div>
+          <div class="video-duration">12 min · Licensed Counselor</div>
+        </div>
+        <div class="video-info">
+          <div class="video-tabs">
+            <div class="video-tab active" onclick="switchTab('ef','about')">About</div>
+            <div class="video-tab" onclick="switchTab('ef','activity')">Activity</div>
+            <div class="video-tab" onclick="switchTab('ef','quiz')">Quiz</div>
+            <div class="video-tab" onclick="switchTab('ef','reflect')">Reflect</div>
+          </div>
+          <div class="tab-content active" id="tab-ef-about">
+            <div class="video-info-desc">Marcus explains how teens with ADHD and executive function challenges can use simple systems to manage time, reduce overwhelm, and build structure into daily life.</div>
+            <ul class="key-points">
+              <li>Why time feels different for ADHD brains</li>
+              <li>The 3-task daily priority system</li>
+              <li>How to use timers to stay on track</li>
+              <li>Build a weekly schedule that actually works</li>
+            </ul>
+          </div>
+          <div class="tab-content" id="tab-ef-activity">
+            <div class="activity-box">
+              <div class="activity-box-title">🎯 Daily Structure Builder</div>
+              <div class="activity-box-desc">Write out your top 3 tasks for tomorrow before you go to sleep tonight. Assign each one a time slot. Check them off as you complete them.</div>
+            </div>
+            <button class="complete-btn" id="complete-btn-ef" onclick="markComplete('ef')">✓ Mark Activity Complete</button>
+            <div class="completion-banner" id="completion-ef">
+              <div class="completion-icon">🎉</div>
+              <div class="completion-title">Activity Complete!</div>
+              <div class="completion-sub">Time Management Basics</div>
+              <div class="xp-badge">+25 XP Earned</div>
+            </div>
+          </div>
+          <div class="tab-content" id="tab-ef-quiz">
+            <div class="quiz-box">
+              <div class="quiz-title">📝 Quick Check</div>
+              <div class="quiz-q">What is the most effective way to manage a big overwhelming task?</div>
+              <div class="quiz-options">
+                <div class="quiz-option" onclick="answerQuiz(this,'wrong','ef')">Do it all at once as fast as possible</div>
+                <div class="quiz-option" onclick="answerQuiz(this,'correct','ef')">Break it into small steps and tackle one at a time</div>
+                <div class="quiz-option" onclick="answerQuiz(this,'wrong','ef')">Wait until you feel motivated</div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-content" id="tab-ef-reflect">
+            <div class="activity-box-title" style="margin-bottom:10px">✍️ Reflection Journal</div>
+            <div style="font-size:0.85rem;color:#6b7a99;margin-bottom:10px">Did the 3-task system help? What was easy or hard about following a structure?</div>
+            <textarea class="reflection-area" id="reflect-ef" placeholder="Write your reflection here..."></textarea>
+            <button class="complete-btn" onclick="submitReflection('ef')" style="background:#4ab851">Submit & Get AI Feedback ✨</button>
+            <div class="ai-feedback-box" id="ai-feedback-ef" style="display:none">
+              <div class="ai-feedback-title">🤖 AI Coach Feedback</div>
+              <div class="ai-feedback-text" id="ai-text-ef"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="series-block">
+        <div class="series-header" onclick="toggleSeries('ef-s1')">
+          <div class="series-num" style="background:#c94098">1</div>
+          <div class="series-title">Series 1 — Time Management</div>
+          <div class="series-meta">2 lessons · 25 min</div>
+          <div class="series-chevron open" id="chevron-ef-s1">▼</div>
+        </div>
+        <div class="series-body open" id="series-ef-s1">
+          <div class="lesson-item" onclick="openLesson('ef','Time Management Basics','Marcus Williams, LPC','12 min')">
+            <div class="lesson-num current">▶</div>
+            <div class="lesson-info"><div class="lesson-title">Time Management Basics</div><div class="lesson-sub">Marcus Williams, LPC · 12 min</div></div>
+            <div class="lesson-badge badge-current">Start</div>
+          </div>
+        </div>
+      </div>
+      <div class="series-block">
+        <div class="series-header" onclick="toggleSeries('ef-s2')">
+          <div class="series-num" style="background:#c94098">2</div>
+          <div class="series-title">Series 2 — Task Planning</div>
+          <div class="series-meta">2 lessons · 30 min</div>
+          <div class="series-chevron" id="chevron-ef-s2">▼</div>
+        </div>
+        <div class="series-body" id="series-ef-s2">
+          <div class="lesson-item">
+            <div class="lesson-num locked">1</div>
+            <div class="lesson-info"><div class="lesson-title">Breaking Down Big Tasks</div><div class="lesson-sub">Marcus Williams · 15 min</div></div>
+            <div class="lesson-badge badge-locked">Locked</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// Switch module from sidebar
+function switchModule(mod) {
+  document.querySelectorAll('.module-view').forEach(m => m.style.display = 'none');
+  document.getElementById('module-' + mod).style.display = 'block';
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// Open lesson and show video player
+function openLesson(mod, title, therapist, duration) {
+  const player = document.getElementById('video-player-' + mod);
+  const thumb = document.getElementById('video-thumb-' + mod);
+  const titleEl = document.getElementById('video-title-' + mod);
+  const labelEl = document.getElementById('video-lesson-label-' + mod);
+  player.classList.add('open');
+  thumb.style.display = 'flex';
+  document.getElementById('video-loading-' + mod).classList.remove('show');
+  titleEl.textContent = title;
+  labelEl.textContent = title;
+  player.scrollIntoView({behavior: 'smooth', block: 'start'});
+  document.querySelectorAll('#module-' + mod + ' .lesson-item').forEach(i => i.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+// Play video simulation
+function playVideo(mod) {
+  const thumb = document.getElementById('video-thumb-' + mod);
+  const loading = document.getElementById('video-loading-' + mod);
+  const progBar = document.getElementById('vid-prog-' + mod);
+  thumb.style.display = 'none';
+  loading.classList.add('show');
+  let prog = 0;
+  const t = setInterval(() => {
+    prog += 1.5;
+    progBar.style.width = prog + '%';
+    if (prog >= 100) {
+      clearInterval(t);
+      loading.classList.remove('show');
+      thumb.style.display = 'flex';
+      thumb.innerHTML = `<div style="font-size:3rem;margin-bottom:12px">✅</div><div style="color:#4ab851;font-weight:800;font-size:1.1rem">Video Complete!</div><div style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin-top:6px">Switch to Activity tab to continue</div>`;
+    }
+  }, 80);
+}
+
+// Toggle series open/close
+function toggleSeries(id) {
+  const body = document.getElementById('series-' + id);
+  const chevron = document.getElementById('chevron-' + id);
+  body.classList.toggle('open');
+  chevron.classList.toggle('open');
+}
+
+// Switch video tabs
+function switchTab(mod, tab) {
+  const tabs = document.querySelectorAll(`#video-player-${mod} .video-tab`);
+  const contents = document.querySelectorAll(`#video-player-${mod} .tab-content`);
+  tabs.forEach(t => t.classList.remove('active'));
+  contents.forEach(c => c.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById(`tab-${mod}-${tab}`).classList.add('active');
+}
+
+// Mark activity complete
+function markComplete(mod) {
+  const btn = document.getElementById('complete-btn-' + mod);
+  const banner = document.getElementById('completion-' + mod);
+  btn.textContent = '✓ Completed!';
+  btn.classList.add('done');
+  btn.disabled = true;
+  banner.classList.add('show');
+}
+
+// Quiz answer
+function answerQuiz(el, result, mod) {
+  const options = el.parentElement.querySelectorAll('.quiz-option');
+  options.forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(result);
+  if (result === 'correct') {
+    setTimeout(() => {
+      el.parentElement.innerHTML += `<div style="margin-top:12px;background:#e8f8ee;border-radius:10px;padding:10px 14px;font-size:0.85rem;color:#4ab851;font-weight:700">✓ Correct! Great work.</div>`;
+    }, 200);
+  } else {
+    options.forEach(o => { if (o.onclick && o.onclick.toString().includes("'correct'")) o.classList.add('correct'); });
+  }
+}
+
+// Submit reflection with AI feedback
+async function submitReflection(mod) {
+  const text = document.getElementById('reflect-' + mod).value;
+  if (text.length < 8) return;
+  const feedbackBox = document.getElementById('ai-feedback-' + mod);
+  const textEl = document.getElementById('ai-text-' + mod);
+  textEl.textContent = 'Getting your personalized feedback...';
+  feedbackBox.style.display = 'block';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 1000,
+        system: `You are a warm encouraging AI coach on SkillLoop, a life skills platform for teens with ADHD and IEPs. Give short feedback on their journal reflection. 3-4 sentences: acknowledge what they shared, name one strength, give one small tip. Warm, direct, age-appropriate. No clinical language.`,
+        messages: [{role: 'user', content: `Reflection: "${text}"`}],
+      }),
+    });
+    const d = await res.json();
+    textEl.textContent = d.content?.find(b => b.type === 'text')?.text || 'Great reflection! Your self-awareness is growing. Keep it up!';
+  } catch {
+    textEl.textContent = 'Great reflection! Your willingness to think about your experience shows real self-awareness and growth.';
+  }
+}
+</script>
+</body>
+</html>

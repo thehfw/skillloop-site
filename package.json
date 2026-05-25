@@ -1,0 +1,23 @@
+{
+  "name": "repo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://x-access-token:ghs_ZInCZAgGl79h7cKL1oGWb8QXjejg5E3cx88u@github.com/thehfw/skillloop-site.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thehfw/skillloop-site/issues"
+  },
+  "homepage": "https://github.com/thehfw/skillloop-site#readme",
+  "dependencies": {
+    "@netlify/identity": "^1.2.0"
+  }
+}

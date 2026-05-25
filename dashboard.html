@@ -118,8 +118,8 @@
   <div class="main">
     <div class="topnav">
       <div class="topnav-links">
-        <a class="topnav-link active" href="#">Dashboard</a>
-        <a class="topnav-link" href="#">Lessons</a>
+        <a class="topnav-link active" href="dashboard.html">Dashboard</a>
+        <a class="topnav-link" href="lessons.html">Lessons</a>
         <a class="topnav-link" href="#">Progress</a>
         <a class="topnav-link" href="#">Parent Dashboard</a>
         <a class="topnav-link" href="#">Therapist Mode</a>
@@ -153,7 +153,7 @@
 
       <!-- SKILL CARDS -->
       <div class="skill-cards">
-        <div class="skill-card blue">
+        <div class="skill-card blue" onclick="window.location.href='lessons.html?module=pc'">
           <div class="skill-card-top">
             <div class="skill-icon">PC</div>
             <span class="skill-badge">Level 2 / 5</span>
@@ -163,7 +163,7 @@
           <div class="progress-bar"><div class="progress-fill" style="width:45%;background:#26a4de"></div></div>
           <div class="skill-level">5 series &middot; 10 modules</div>
         </div>
-        <div class="skill-card green">
+        <div class="skill-card green" onclick="window.location.href='lessons.html?module=is'">
           <div class="skill-card-top">
             <div class="skill-icon">IS</div>
             <span class="skill-badge">Level 1 / 5</span>
@@ -173,7 +173,7 @@
           <div class="progress-bar"><div class="progress-fill" style="width:20%;background:#4ab851"></div></div>
           <div class="skill-level">4 series &middot; 8 modules</div>
         </div>
-        <div class="skill-card yellow">
+        <div class="skill-card yellow" onclick="window.location.href='lessons.html?module=ss'">
           <div class="skill-card-top">
             <div class="skill-icon">SS</div>
             <span class="skill-badge">Level 1 / 5</span>
@@ -183,7 +183,7 @@
           <div class="progress-bar"><div class="progress-fill" style="width:35%;background:#fec41d"></div></div>
           <div class="skill-level">5 series &middot; 10 modules</div>
         </div>
-        <div class="skill-card pink">
+        <div class="skill-card pink" onclick="window.location.href='lessons.html?module=ef'">
           <div class="skill-card-top">
             <div class="skill-icon">EF</div>
             <span class="skill-badge">Level 1 / 5</span>
@@ -326,7 +326,9 @@ initDashboard();
 
   document.querySelectorAll('.topnav-link').forEach(link => {
     link.addEventListener('click', function(e) {
-      e.preventDefault();
+      if (this.getAttribute('href') === '#') {
+        e.preventDefault();
+      }
       document.querySelectorAll('.topnav-link').forEach(l => l.classList.remove('active'));
       this.classList.add('active');
     });

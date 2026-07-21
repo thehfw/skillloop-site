@@ -3,306 +3,134 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SkillLoop — Building Real-World Skills for Teen Success</title>
-<link rel="icon" type="image/png" href="skillloop-logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-<script type="importmap">
-{ "imports": { "@netlify/identity": "./js/identity.js", "gotrue-js": "./js/gotrue.js" } }
-</script>
+<title>SkillLoop — Building Life Skills, One Teenager at a Time</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .hero { padding: 4rem 0 3rem; text-align:center; }
+  .hero-chip {
+    display:inline-block; background:#e8f6fb; color:#0c4d6b; font-size:0.78rem; font-weight:700;
+    padding: 0.35rem 0.9rem; border-radius:999px; margin-bottom:1.2rem;
+  }
+  .hero h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight:800; letter-spacing:-0.02em; line-height:1.1; }
+  .hero h1 .blue { color:#26a4de; } .hero h1 .green { color:#4ab851; }
+  .hero p { max-width: 560px; margin: 1.1rem auto 1.8rem; color:var(--muted); font-size:1.05rem; }
+  .hero-actions { display:flex; gap:0.8rem; justify-content:center; }
+  .stats-row { display:flex; justify-content:center; gap:2.5rem; margin-top: 2.6rem; flex-wrap:wrap; }
+  .stat { text-align:center; }
+  .stat .num { font-family:'Bricolage Grotesque'; font-weight:800; font-size:1.6rem; }
+  .stat .lbl { font-size:0.78rem; color:var(--faint); font-weight:600; }
+
+  .pillars { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; padding: 3rem 0; }
+  .pillar { border-radius: var(--radius); padding:1.3rem; border:1px solid var(--line); }
+  .pillar h3 { font-size:0.95rem; font-weight:700; margin-bottom:0.4rem; }
+  .pillar p { font-size:0.82rem; color:var(--muted); }
+
+  .pricing { display:grid; grid-template-columns: 1fr 1fr; gap:1.2rem; padding: 2rem 0 4rem; }
+  .price-card { border-radius: var(--radius); border:1px solid var(--line); padding:1.6rem; }
+  .price-card.featured { border-color:#26a4de; box-shadow: 0 12px 30px rgba(38,164,222,0.12); }
+  .price-card h3 { font-size:1.1rem; font-weight:800; }
+  .price-card .amount { font-family:'Bricolage Grotesque'; font-size:2rem; font-weight:800; margin: 0.6rem 0; }
+  .price-card .amount span { font-size:0.9rem; font-weight:600; color:var(--muted); }
+  .price-card ul { list-style:none; margin:1rem 0 1.4rem; font-size:0.85rem; color:var(--muted); }
+  .price-card li { padding: 0.3rem 0; }
+
+  @media (max-width: 800px) {
+    .pillars, .pricing { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 560px) {
+    .pillars, .pricing { grid-template-columns: 1fr; }
+    .hero-actions { flex-direction:column; align-items:center; }
+  }
+</style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <div class="nav-logo">
-    <img src="skillloop-logo.png" alt="SkillLoop" style="height:44px;">
+<header class="site-header container">
+  <a href="/index.html" class="brand">
+    <svg width="28" height="28" viewBox="0 0 30 30" aria-hidden="true">
+      <path d="M 15.7 2.6 A 12.5 12.5 0 0 1 27.4 14.3" fill="none" stroke="#26a4de" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 27.4 15.7 A 12.5 12.5 0 0 1 15.7 27.4" fill="none" stroke="#c94098" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 14.3 27.4 A 12.5 12.5 0 0 1 2.6 15.7" fill="none" stroke="#fec41d" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 2.6 14.3 A 12.5 12.5 0 0 1 14.3 2.6" fill="none" stroke="#4ab851" stroke-width="4.4" stroke-linecap="round"/>
+    </svg>
+    <span class="brand-name"><span class="sk">Skill</span><span class="lo">Loop</span></span>
+  </a>
+  <div class="header-actions">
+    <a href="/login.html" class="btn btn-secondary">Log In</a>
+    <a href="/signup.html" class="btn btn-primary">Get Started</a>
   </div>
-  <ul class="nav-links">
-    <li><a href="#pillars">How It Works</a></li>
-    <li><a href="#who">Who It Helps</a></li>
-    <li><a href="#pricing">Pricing</a></li>
-    <li><a href="#">About</a></li>
-  </ul>
-  <div class="nav-actions">
-    <a href="login.html" class="btn-outline">Log In</a>
-    <a href="signup.html" class="btn-primary">Get Started</a>
-  </div>
-</nav>
+</header>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-left">
-    <div class="hero-badge"><span></span> Now available for families & schools</div>
-    <h1>Build <span class="blue">Real-World</span> Skills for <span class="green">Teen Success</span></h1>
-    <p>SkillLoop is a structured digital platform helping teens develop the life skills that school doesn't teach — from social confidence to daily independence.</p>
-    <div class="hero-btns">
-      <a href="signup.html" class="hero-btn-primary">Start Free Trial</a>
-      <a href="#pillars" class="hero-btn-ghost">See How It Works</a>
+<main>
+  <section class="hero container">
+    <span class="hero-chip">Now available for families &amp; schools</span>
+    <h1>Build <span class="blue">real-world skills</span> for <span class="green">teen success</span></h1>
+    <p>SkillLoop is a structured digital learning platform helping teens develop the life skills school doesn't teach — from social confidence to daily independence.</p>
+    <div class="hero-actions">
+      <a href="/signup.html" class="btn btn-primary">Start Free Trial</a>
+      <a href="#pricing" class="btn btn-secondary">See Pricing</a>
     </div>
-    <div class="hero-stats">
-      <div class="stat-item"><div class="stat-num blue">7.5M+</div><div class="stat-label">Teens with IEPs in the US</div></div>
-      <div class="stat-item"><div class="stat-num green">4</div><div class="stat-label">Core Skill Modules</div></div>
-      <div class="stat-item"><div class="stat-num yellow">$50</div><div class="stat-label">Per month, all-inclusive</div></div>
+    <div class="stats-row">
+      <div class="stat"><div class="num">7.5M+</div><div class="lbl">Teens with IEPs in the US</div></div>
+      <div class="stat"><div class="num">4</div><div class="lbl">Core skill modules</div></div>
+      <div class="stat"><div class="num">$50</div><div class="lbl">Per month, all-inclusive</div></div>
     </div>
-  </div>
-  <div class="hero-right">
-    <div class="mockup-wrapper">
-      <div class="mockup-nav">
-        <div class="mockup-logo">
-          <img src="skillloop-logo.png" alt="SkillLoop" style="height:28px;">
-          <span class="mockup-logo-text">SkillLoop</span>
-        </div>
-        <div class="mockup-nav-links">
-          <a class="mockup-nav-link active" href="#">Dashboard</a>
-          <a class="mockup-nav-link" href="#">Lessons</a>
-          <a class="mockup-nav-link" href="#">Progress</a>
-          <a class="mockup-nav-link" href="#">Parent Dashboard</a>
-          <a class="mockup-nav-link" href="#">Therapist Mode</a>
-        </div>
-        <div class="mockup-avatar"></div>
-      </div>
-      <div class="mockup-body">
-        <div class="mockup-sidebar">
-          <div class="sidebar-logo"><img src="skillloop-logo.png" alt="SkillLoop" style="height:36px; margin-bottom:0.5rem;"></div>
-          <div class="sidebar-title">MySkills</div>
-          <div class="sidebar-item">Physical Coordination & Strength</div>
-          <div class="sidebar-item">Independence Skills</div>
-          <div class="sidebar-item">Social Skills</div>
-          <div class="sidebar-item">Executive Function & Daily Structure</div>
-          <div style="flex:1"></div>
-          <div class="sidebar-divider"></div>
-          <div class="sidebar-link">Parent Dashboard</div>
-          <div class="sidebar-link">Therapist Mode</div>
-          <div style="height:1rem"></div>
-          <div class="sidebar-link">Terms of Service</div>
-          <div class="sidebar-link">FAQ</div>
-          <div class="sidebar-link">Privacy Policy</div>
-        </div>
-        <div class="mockup-main">
-          <div class="mockup-welcome">Welcome!</div>
-          <div class="mockup-sub">SkillLoop is a digital learning platform that helps teens develop skills.</div>
-          <div class="mockup-section-title">Skill Progress</div>
-          <div class="skill-cards">
-            <div class="skill-card">
-              <div class="skill-card-header"><div class="skill-dot blue">PC</div><div class="skill-name">Physical Coordination</div></div>
-              <div class="skill-pct">45<span>%</span></div>
-              <div class="progress-bar"><div class="progress-fill" style="width:45%;background:#26a4de"></div></div>
-              <div class="skill-level">Level 2 / 5</div>
-            </div>
-            <div class="skill-card">
-              <div class="skill-card-header"><div class="skill-dot green">IS</div><div class="skill-name">Independence Skills</div></div>
-              <div class="skill-pct">20<span>%</span></div>
-              <div class="progress-bar"><div class="progress-fill" style="width:20%;background:#4ab851"></div></div>
-              <div class="skill-level">Level 1 / 5</div>
-            </div>
-            <div class="skill-card">
-              <div class="skill-card-header"><div class="skill-dot yellow">SS</div><div class="skill-name">Social Skills</div></div>
-              <div class="skill-pct">35<span>%</span></div>
-              <div class="progress-bar"><div class="progress-fill" style="width:35%;background:#fec41d"></div></div>
-              <div class="skill-level">Level 1 / 5</div>
-            </div>
-            <div class="skill-card">
-              <div class="skill-card-header"><div class="skill-dot pink">EF</div><div class="skill-name">Executive Function</div></div>
-              <div class="skill-pct">15<span>%</span></div>
-              <div class="progress-bar"><div class="progress-fill" style="width:15%;background:#c94098"></div></div>
-              <div class="skill-level">Level 1 / 5</div>
-            </div>
-          </div>
-          <div class="mockup-bottom">
-            <div class="activity-card">
-              <div class="activity-title">Today's Activities</div>
-              <div class="activity-sub">Complete your activities for the day:</div>
-              <div class="activity-item"><span class="activity-item-text">Complete a balance exercise</span><span class="done-badge">Done!</span></div>
-              <div class="activity-item"><span class="activity-item-text">Practice starting a conversation</span></div>
-            </div>
-            <div class="progress-card">
-              <div class="progress-title">Total Progress</div>
-              <div class="donut">
-                <svg viewBox="0 0 70 70">
-                  <circle cx="35" cy="35" r="28" fill="none" stroke="#e8edf2" stroke-width="8"/>
-                  <circle cx="35" cy="35" r="28" fill="none" stroke="#26a4de" stroke-width="8" stroke-dasharray="52 124" stroke-linecap="round"/>
-                  <circle cx="35" cy="35" r="28" fill="none" stroke="#4ab851" stroke-width="8" stroke-dasharray="25 124" stroke-dashoffset="-52" stroke-linecap="round"/>
-                  <circle cx="35" cy="35" r="28" fill="none" stroke="#fec41d" stroke-width="8" stroke-dasharray="20 124" stroke-dashoffset="-77" stroke-linecap="round"/>
-                  <circle cx="35" cy="35" r="28" fill="none" stroke="#c94098" stroke-width="8" stroke-dasharray="10 124" stroke-dashoffset="-97" stroke-linecap="round"/>
-                </svg>
-                <div class="donut-pct">29%</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+  </section>
 
-<!-- PILLARS -->
-<section id="pillars" class="section-bg-grey">
-  <div class="section">
-    <div class="section-label blue">The Platform</div>
-    <h2 class="section-title">Four pillars. One complete system.</h2>
-    <p class="section-sub">Every module is designed with structure, clarity, and real-world application so teens can build confidence that sticks.</p>
-    <div class="pillars-grid">
-      <div class="pillar-card blue">
-        <div class="pillar-icon-wrap">PC</div>
-        <h3>Physical Coordination & Strength</h3>
-        <p>Exercises that improve posture, coordination, balance, and body awareness through motion-based video modules.</p>
-        <ul class="pillar-bullets">
-          <li>5 series, 10 exercise modules</li>
-          <li>Quiz at end of each series</li>
-          <li>Motion video exercises</li>
-          <li>Honor-system completion tracking</li>
-        </ul>
+  <section class="container">
+    <div class="pillars">
+      <div class="pillar" style="border-left:4px solid #26a4de;">
+        <h3>Physical Coordination</h3>
+        <p>Exercises that improve posture, coordination, balance, and body awareness.</p>
       </div>
-      <div class="pillar-card green">
-        <div class="pillar-icon-wrap">IS</div>
+      <div class="pillar" style="border-left:4px solid #4ab851;">
         <h3>Independence Skills</h3>
-        <p>Lessons that teach real-world abilities such as cooking, budgeting, organization, and daily living routines.</p>
-        <ul class="pillar-bullets">
-          <li>4 series, 8 real-world skill modules</li>
-          <li>Weekly challenge (cook a meal, build a budget)</li>
-          <li>Photo or written reflection with AI feedback</li>
-          <li>Quiz at the end of each series</li>
-        </ul>
+        <p>Lessons that teach cooking, budgeting, organization, and daily routines.</p>
       </div>
-      <div class="pillar-card yellow">
-        <div class="pillar-icon-wrap">SS</div>
+      <div class="pillar" style="border-left:4px solid #fec41d;">
         <h3>Social Skills</h3>
-        <p>Interactive training focused on communication, conversation flow, emotional awareness, and navigating social situations.</p>
-        <ul class="pillar-bullets">
-          <li>5 series, 10 scenario-based models</li>
-          <li>Role-play situations with guided prompts</li>
-          <li>AI-graded reflection journal</li>
-          <li>Self-scored confidence tracking (1-10)</li>
-        </ul>
+        <p>Interactive training in communication, conversation flow, and emotional awareness.</p>
       </div>
-      <div class="pillar-card pink">
-        <div class="pillar-icon-wrap">EF</div>
-        <h3>Executive Function & Daily Structure</h3>
-        <p>Tools and lessons designed to improve planning, task management, focus, and organization for daily life.</p>
-        <ul class="pillar-bullets">
-          <li>4 series, 8 planning & focus modules</li>
-          <li>Daily structure builder each week</li>
-          <li>Task breakdown challenges with deadlines</li>
-          <li>Completion tracking via progress dashboard</li>
-        </ul>
+      <div class="pillar" style="border-left:4px solid #c94098;">
+        <h3>Executive Function</h3>
+        <p>Tools to improve planning, task management, focus, and daily structure.</p>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- HOW IT WORKS -->
-<section id="how" class="section-bg-white">
-  <div class="section">
-    <div class="section-label blue">How It Works</div>
-    <h2 class="section-title">Simple. Structured. Effective.</h2>
-    <p class="section-sub">Three steps that turn structured lessons into real-world confidence.</p>
-    <div class="steps">
-      <div class="step"><div class="step-num" style="background:#26a4de">1</div><h3>Learn</h3><p>Complete short, accessible lessons designed for clarity. Each module builds on the last with guided structure.</p></div>
-      <div class="step"><div class="step-num" style="background:#4ab851">2</div><h3>Practice</h3><p>Apply skills through interactive activities, role-play scenarios, and guided real-world exercises.</p></div>
-      <div class="step"><div class="step-num" style="background:#c94098">3</div><h3>Apply</h3><p>Real-world challenges encourage teens to use what they've learned outside the platform, in daily life.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- WHO IT HELPS -->
-<section id="who" class="section-bg-grey">
-  <div class="section">
-    <div class="section-label blue">Who It Helps</div>
-    <h2 class="section-title">Built for every member of the support team.</h2>
-    <p class="section-sub">SkillLoop works for the whole ecosystem — not just the teen.</p>
-    <div class="who-grid">
-      <div class="who-card"><div class="who-icon-badge blue">T</div><h3>Teenagers</h3><p>Developing independence, confidence, and the life skills school doesn't teach.</p></div>
-      <div class="who-card"><div class="who-icon-badge green">P</div><h3>Parents</h3><p>A structured tool to support their child's growth with full visibility via Parent Dashboard.</p></div>
-      <div class="who-card"><div class="who-icon-badge yellow">S</div><h3>Schools & Educators</h3><p>Licensable platform supporting IEP and 504 students with structured skill-building modules.</p></div>
-      <div class="who-card"><div class="who-icon-badge pink">Th</div><h3>Therapists</h3><p>Assign take-home practice and track progress between sessions with Therapist Mode.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- PRICING -->
-<section id="pricing" class="section-bg-white">
-  <div class="section">
-    <div class="section-label blue">Pricing</div>
-    <h2 class="section-title">Affordable. All-inclusive.</h2>
-    <p class="section-sub">No hidden fees. Cancel anytime. Save 2 months with annual billing.</p>
-    <div class="pricing-grid">
-      <div class="pricing-card featured">
-        <div class="featured-tag">Most Popular</div>
-        <div class="pricing-tier">Premium</div>
-        <div class="pricing-price"><sup>$</sup>50<sub>/mo</sub></div>
-        <div class="pricing-desc">Full platform access, all four modules, unlimited depth. Everything included.</div>
-        <ul class="pricing-features">
-          <li><span class="check">&#10003;</span> All 4 modules, unlimited depth</li>
-          <li><span class="check">&#10003;</span> AI feedback on reflections</li>
-          <li><span class="check">&#10003;</span> Progress dashboard</li>
-          <li><span class="check">&#10003;</span> Parent Dashboard access</li>
-          <li><span class="check">&#10003;</span> Therapist Mode</li>
-          <li><span class="check">&#10003;</span> Annual: 2 months free</li>
+  <section class="container" id="pricing">
+    <h2 class="text-center" style="font-size:1.7rem; font-weight:800; margin-bottom:0.4rem;">Simple, transparent pricing</h2>
+    <p class="text-center muted" style="margin-bottom:1rem;">Cancel anytime. No hidden fees.</p>
+    <div class="pricing">
+      <div class="price-card">
+        <h3>Standard</h3>
+        <div class="amount">$25<span>/month</span></div>
+        <ul>
+          <li>✓ Access to all four modules</li>
+          <li>✓ Limited depth per series</li>
+          <li>✓ Great for exploring SkillLoop</li>
         </ul>
-        <a href="signup.html" class="pricing-btn featured-btn">Get Started</a>
+        <a href="/signup.html" class="btn btn-secondary btn-block">Start Standard</a>
       </div>
-      <div class="pricing-card">
-        <div class="pricing-tier">Standard</div>
-        <div class="pricing-price"><sup>$</sup>25<sub>/mo</sub></div>
-        <div class="pricing-desc">Access to all modules with limited depth — ideal for families exploring the platform.</div>
-        <ul class="pricing-features">
-          <li><span class="check">&#10003;</span> All 4 modules, limited depth</li>
-          <li><span class="check">&#10003;</span> Basic progress tracking</li>
-          <li><span class="check">&#10003;</span> Parent Dashboard access</li>
-          <li><span class="x">&#10007;</span> AI feedback</li>
-          <li><span class="x">&#10007;</span> Therapist Mode</li>
-          <li><span class="check">&#10003;</span> Annual: 2 months free</li>
+      <div class="price-card featured">
+        <h3>Premium</h3>
+        <div class="amount">$50<span>/month</span></div>
+        <ul>
+          <li>✓ Full platform access, unlimited depth</li>
+          <li>✓ Progress dashboard for parents</li>
+          <li>✓ AI feedback on reflections and journals</li>
         </ul>
-        <a href="signup.html" class="pricing-btn ghost-btn">Start Free Trial</a>
+        <a href="/signup.html" class="btn btn-primary btn-block">Start Premium</a>
       </div>
     </div>
-    <p class="pricing-note">B2B institutional licensing available for schools and therapy practices. <a href="#">Contact us &#8594;</a></p>
-  </div>
-</section>
+  </section>
+</main>
 
-<!-- CTA -->
-<section class="cta-section">
-  <h2>Every teen deserves to feel capable.</h2>
-  <p>Join families, schools, and therapists using SkillLoop to build real skills that last a lifetime.</p>
-  <div class="cta-btns">
-    <a href="signup.html" class="cta-btn-white">Start Free Trial</a>
-    <a href="#" class="cta-btn-outline">Request a Demo</a>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-inner">
-    <img src="skillloop-logo.png" alt="SkillLoop" style="height:40px;">
-    <div class="footer-links">
-      <a href="#">Terms of Service</a>
-      <a href="#">Privacy Policy</a>
-      <a href="#">FAQ</a>
-      <a href="#">Contact</a>
-    </div>
-    <div class="footer-copy">&copy; 2026 SkillLoop. All rights reserved.</div>
-  </div>
+<footer class="container text-center muted" style="padding: 2rem 0; font-size:0.8rem;">
+  &copy; 2026 SkillLoop. Building life skills, one teenager at a time.
 </footer>
-
-<script type="module">
-import { getUser, handleAuthCallback } from '@netlify/identity';
-
-(async () => {
-  try {
-    const result = await handleAuthCallback();
-    if (result && (result.type === 'oauth' || result.type === 'confirmation') && result.user) {
-      window.location.href = 'dashboard.html';
-      return;
-    }
-  } catch (e) {}
-
-  const user = await getUser();
-  if (user) {
-    window.location.href = 'dashboard.html';
-  }
-})();
-</script>
 
 </body>
 </html>

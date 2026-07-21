@@ -4,295 +4,109 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign Up — SkillLoop</title>
-<link rel="icon" type="image/png" href="skillloop-logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Nunito Sans', sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; flex-direction: column; }
-  h1,h2,h3,label,button { font-family: 'Nunito', sans-serif; }
-
-  nav { background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 1rem 3rem; display: flex; align-items: center; justify-content: space-between; }
-  .nav-logo img { height: 44px; }
-  .nav-login { font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 700; color: #718096; text-decoration: none; }
-  .nav-login span { color: #26a4de; }
-
-  .page { flex: 1; display: flex; align-items: center; justify-content: center; padding: 3rem 1.5rem; }
-
-  .signup-card { background: #fff; border-radius: 24px; box-shadow: 0 8px 40px rgba(0,0,0,0.08); width: 100%; max-width: 460px; padding: 2.5rem; }
-
-  .card-header { text-align: center; margin-bottom: 2rem; }
-  .card-header img { height: 72px; margin-bottom: 0.75rem; }
-  .card-header h1 { font-size: 1.5rem; font-weight: 900; color: #1a202c; margin-bottom: 0.35rem; }
-  .card-header p { font-size: 0.9rem; color: #718096; font-weight: 400; }
-
-  .account-type { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1.5rem; background: #f0f4f8; border-radius: 12px; padding: 4px; }
-  .type-btn { padding: 0.6rem; border-radius: 9px; border: none; background: transparent; font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700; color: #718096; cursor: pointer; transition: all 0.2s; }
-  .type-btn.active { background: #fff; color: #26a4de; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-  .form-group { margin-bottom: 1rem; }
-  .form-group label { display: block; font-size: 0.82rem; font-weight: 700; color: #4a5568; margin-bottom: 6px; }
-  .input-wrap { position: relative; }
-  input[type="text"], input[type="email"], input[type="password"] {
-    width: 100%; padding: 0.7rem 0.9rem 0.7rem 0.9rem;
-    border: 2px solid #e2e8f0; border-radius: 10px;
-    font-family: 'Nunito Sans', sans-serif; font-size: 0.9rem; color: #2d3748;
-    outline: none; transition: border-color 0.2s; background: #fafafa;
-  }
-  input:focus { border-color: #26a4de; background: #fff; }
-
-  .pw-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #a0aec0; font-size: 0.8rem; font-family: 'Nunito', sans-serif; font-weight: 700; padding: 4px; }
-
-  .strength-wrap { margin-top: 6px; display: none; }
-  .strength-bar { height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; }
-  .strength-fill { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; width: 0%; }
-  .strength-label { font-size: 0.75rem; color: #a0aec0; margin-top: 3px; font-weight: 600; }
-  .err-msg { font-size: 0.75rem; color: #e24b4a; margin-top: 4px; display: none; font-weight: 600; }
-  .auth-error { font-size: 0.82rem; color: #e24b4a; text-align: center; margin-bottom: 1rem; font-weight: 600; display: none; }
-
-  .remember-row { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
-  .remember-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: #26a4de; cursor: pointer; }
-  .remember-row label { font-size: 0.83rem; color: #718096; font-weight: 600; cursor: pointer; margin: 0; }
-
-  .terms { font-size: 0.78rem; color: #a0aec0; text-align: center; margin-bottom: 1.25rem; line-height: 1.5; }
-  .terms a { color: #26a4de; text-decoration: none; font-weight: 700; }
-
-  .submit-btn { width: 100%; padding: 0.85rem; border-radius: 50px; border: none; background: #26a4de; color: #fff; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 16px rgba(38,164,222,0.3); opacity: 0.5; }
-  .submit-btn:not(:disabled) { opacity: 1; }
-  .submit-btn:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(38,164,222,0.4); }
-
-  .divider { display: flex; align-items: center; gap: 1rem; margin: 1.25rem 0; }
-  .divider hr { flex: 1; border: none; border-top: 1px solid #e2e8f0; }
-  .divider span { font-size: 0.78rem; color: #a0aec0; font-weight: 600; }
-
-  .social-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem; }
-  .social-btn { padding: 0.65rem; border-radius: 10px; border: 2px solid #e2e8f0; background: #fff; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.82rem; color: #4a5568; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: border-color 0.2s; }
-  .social-btn:hover { border-color: #26a4de; color: #26a4de; }
-
-  .login-link { text-align: center; font-size: 0.85rem; color: #718096; font-weight: 600; }
-  .login-link a { color: #26a4de; text-decoration: none; font-weight: 800; }
-
-  .success-state { display: none; text-align: center; padding: 1rem 0; }
-  .success-state h2 { font-size: 1.4rem; font-weight: 900; color: #1a202c; margin-bottom: 0.5rem; }
-  .success-state p { color: #718096; font-size: 0.9rem; margin-bottom: 1.5rem; }
-  .success-btn { display: inline-block; padding: 0.75rem 2rem; background: #4ab851; color: #fff; border-radius: 50px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; text-decoration: none; box-shadow: 0 4px 16px rgba(74,184,81,0.3); }
-
-  footer { background: #1a202c; padding: 1.5rem 3rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
-  footer img { height: 32px; }
-  .footer-links { display: flex; gap: 1.5rem; }
-  .footer-links a { color: #718096; text-decoration: none; font-size: 0.82rem; font-weight: 500; transition: color 0.2s; }
-  .footer-links a:hover { color: #fff; }
-  .footer-copy { color: #4a5568; font-size: 0.78rem; }
-</style>
-<script type="importmap">
-{ "imports": { "@netlify/identity": "./js/identity.js", "gotrue-js": "./js/gotrue.js" } }
-</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
-<nav>
-  <div class="nav-logo"><a href="index.html"><img src="skillloop-logo.png" alt="SkillLoop"></a></div>
-  <a href="login.html" class="nav-login">Already have an account? <span>Log in</span></a>
-</nav>
-
-<div class="page">
-  <div class="signup-card">
-
-    <div class="card-header">
-      <img src="skillloop-logo.png" alt="SkillLoop">
-      <h1>Create your account</h1>
-      <p>Start building real-world skills today — free for 14 days.</p>
-    </div>
-
-    <div class="success-state" id="success">
-      <h2>Welcome to SkillLoop!</h2>
-      <p id="success-msg">Your account has been created. Taking you to your dashboard...</p>
-      <a href="dashboard.html" class="success-btn">Go to Dashboard</a>
-    </div>
-
-    <div id="form-area">
-      <div class="account-type">
-        <button class="type-btn active" onclick="setType(this)">Individual / Family</button>
-        <button class="type-btn" onclick="setType(this)">School / Institution</button>
-      </div>
-
-      <div class="social-btns">
-        <button class="social-btn" id="google-btn">G &nbsp; Google</button>
-        <button class="social-btn" id="apple-btn">A &nbsp; Apple</button>
-      </div>
-
-      <div class="divider"><hr><span>or sign up with email</span><hr></div>
-
-      <div class="auth-error" id="auth-error"></div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>First name</label>
-          <div class="input-wrap">
-            <input type="text" id="fname" placeholder="First name" oninput="validate()">
-          </div>
-          <div class="err-msg" id="fname-err">Required</div>
-        </div>
-        <div class="form-group">
-          <label>Last name</label>
-          <div class="input-wrap">
-            <input type="text" id="lname" placeholder="Last name" oninput="validate()">
-          </div>
-          <div class="err-msg" id="lname-err">Required</div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Email address</label>
-        <div class="input-wrap">
-          <input type="email" id="email" placeholder="you@example.com" oninput="validate()">
-        </div>
-        <div class="err-msg" id="email-err">Please enter a valid email address</div>
-      </div>
-
-      <div class="form-group">
-        <label>Password</label>
-        <div class="input-wrap">
-          <input type="password" id="password" placeholder="Minimum 8 characters" oninput="validate()">
-          <button class="pw-toggle" onclick="togglePw()" type="button">Show</button>
-        </div>
-        <div class="strength-wrap" id="strength-wrap">
-          <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
-          <div class="strength-label" id="strength-label"></div>
-        </div>
-        <div class="err-msg" id="pw-err">Password must be at least 8 characters</div>
-      </div>
-
-      <div class="remember-row">
-        <input type="checkbox" id="remember">
-        <label for="remember">Remember me for 30 days</label>
-      </div>
-
-      <div class="terms">
-        By creating an account you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
-      </div>
-
-      <button class="submit-btn" id="submit-btn" disabled onclick="handleSubmit()">Create Account</button>
-
-      <div class="divider"><hr></div>
-      <div class="login-link">Already have an account? <a href="login.html">Log in</a></div>
-    </div>
+<header class="site-header container">
+  <a href="/index.html" class="brand">
+    <svg width="28" height="28" viewBox="0 0 30 30" aria-hidden="true">
+      <path d="M 15.7 2.6 A 12.5 12.5 0 0 1 27.4 14.3" fill="none" stroke="#26a4de" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 27.4 15.7 A 12.5 12.5 0 0 1 15.7 27.4" fill="none" stroke="#c94098" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 14.3 27.4 A 12.5 12.5 0 0 1 2.6 15.7" fill="none" stroke="#fec41d" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 2.6 14.3 A 12.5 12.5 0 0 1 14.3 2.6" fill="none" stroke="#4ab851" stroke-width="4.4" stroke-linecap="round"/>
+    </svg>
+    <span class="brand-name"><span class="sk">Skill</span><span class="lo">Loop</span></span>
+  </a>
+  <div class="header-actions">
+    <span class="muted">Already have an account?</span>
+    <a href="/login.html" class="btn btn-secondary">Log In</a>
   </div>
-</div>
+</header>
 
-<footer>
-  <img src="skillloop-logo.png" alt="SkillLoop">
-  <div class="footer-links">
-    <a href="#">Terms of Service</a>
-    <a href="#">Privacy Policy</a>
-    <a href="#">FAQ</a>
-    <a href="#">Contact</a>
+<main class="container" style="max-width: 460px; padding-top: 3rem; padding-bottom: 3rem;">
+  <div class="card">
+    <h1 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem;">Create your account</h1>
+    <p class="muted" style="margin-bottom: 1.6rem; font-size: 0.9rem;">Start building real-world life skills today.</p>
+
+    <div id="form-error" class="form-error" role="alert"></div>
+    <div id="form-success" class="form-success" role="status"></div>
+
+    <form id="signup-form" novalidate>
+      <div class="field">
+        <label for="full-name">Full name</label>
+        <input type="text" id="full-name" name="full-name" autocomplete="name" required placeholder="First Last">
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" autocomplete="email" required placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="submit-btn">Create Account</button>
+    </form>
   </div>
-  <div class="footer-copy">&copy; 2026 SkillLoop. All rights reserved.</div>
-</footer>
+</main>
 
-<script type="module">
-import { signup, login, getUser, handleAuthCallback } from '@netlify/identity';
-
-window._identitySignup = signup;
-window._identityLogin = login;
-window._identityGetUser = getUser;
-
-(async () => {
-  try {
-    const result = await handleAuthCallback();
-    if (result && (result.type === 'oauth' || result.type === 'confirmation') && result.user) {
-      window.location.href = 'dashboard.html';
-      return;
-    }
-  } catch (e) {}
-
-  const user = await getUser();
-  if (user) {
-    window.location.href = 'dashboard.html';
-  }
-})();
-</script>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/config.js"></script>
+<script src="/js/supabase-client.js"></script>
 <script>
-function setType(btn) {
-  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-function validate() {
-  const fname = document.getElementById('fname').value.trim();
-  const lname = document.getElementById('lname').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const pw = document.getElementById('password').value;
-  const btn = document.getElementById('submit-btn');
-  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const pwValid = pw.length >= 8;
-  document.getElementById('email-err').style.display = email.length > 0 && !emailValid ? 'block' : 'none';
-  document.getElementById('pw-err').style.display = pw.length > 0 && !pwValid ? 'block' : 'none';
-  if (pw.length > 0) {
-    document.getElementById('strength-wrap').style.display = 'block';
-    let s = 0;
-    if (pw.length >= 8) s++;
-    if (pw.length >= 12) s++;
-    if (/[A-Z]/.test(pw)) s++;
-    if (/[0-9]/.test(pw)) s++;
-    if (/[^A-Za-z0-9]/.test(pw)) s++;
-    const colors = ['#e24b4a','#e24b4a','#fec41d','#4ab851','#4ab851'];
-    const labels = ['Too short','Weak','Fair','Strong','Very strong'];
-    document.getElementById('strength-fill').style.width = Math.min(100, s*22) + '%';
-    document.getElementById('strength-fill').style.background = colors[Math.max(0,s-1)];
-    document.getElementById('strength-label').textContent = pw.length >= 8 ? labels[Math.max(0,s-1)] : '';
-  } else {
-    document.getElementById('strength-wrap').style.display = 'none';
+  const form = document.getElementById('signup-form');
+  const errorBox = document.getElementById('form-error');
+  const successBox = document.getElementById('form-success');
+  const submitBtn = document.getElementById('submit-btn');
+
+  function showError(msg) {
+    errorBox.textContent = msg;
+    errorBox.classList.add('visible');
+    successBox.classList.remove('visible');
   }
-  btn.disabled = !(fname && lname && emailValid && pwValid);
-}
-function togglePw() {
-  const input = document.getElementById('password');
-  const btn = document.querySelector('.pw-toggle');
-  input.type = input.type === 'password' ? 'text' : 'password';
-  btn.textContent = input.type === 'password' ? 'Show' : 'Hide';
-}
-async function handleSubmit() {
-  const fname = document.getElementById('fname').value.trim();
-  const lname = document.getElementById('lname').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const pw = document.getElementById('password').value;
-  const btn = document.getElementById('submit-btn');
-  const errEl = document.getElementById('auth-error');
 
-  btn.disabled = true;
-  btn.textContent = 'Creating account...';
-  errEl.style.display = 'none';
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorBox.classList.remove('visible');
+    successBox.classList.remove('visible');
 
-  try {
-    const user = await window._identitySignup(email, pw, { full_name: fname + ' ' + lname });
-    sessionStorage.setItem('userName', fname);
+    const fullName = document.getElementById('full-name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
 
-    try {
-      await window._identityLogin(email, pw);
-      window.location.href = 'dashboard.html';
+    if (password.length < 8) {
+      showError('Password must be at least 8 characters.');
       return;
-    } catch (loginErr) {}
-
-    document.getElementById('form-area').style.display = 'none';
-    document.getElementById('success').style.display = 'block';
-
-    if (user.emailVerified) {
-      document.getElementById('success-msg').textContent = 'Your account has been created. Taking you to your dashboard...';
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 2000);
-    } else {
-      document.getElementById('success-msg').textContent = 'Check your email to confirm your account, then log in.';
     }
-  } catch (error) {
-    errEl.textContent = error.status === 403
-      ? 'Signups are not currently allowed.'
-      : (error.message || 'An error occurred. Please try again.');
-    errEl.style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = 'Create Account';
-  }
-}
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner"></span> Creating account…';
+
+    const { data, error } = await window.supabaseClient.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName } }
+    });
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Create Account';
+
+    if (error) {
+      showError(error.message);
+      return;
+    }
+
+    // If email confirmation is required, there's no session yet.
+    if (data.session) {
+      window.location.href = '/dashboard.html';
+    } else {
+      successBox.textContent = 'Account created! Check your email to confirm, then log in.';
+      successBox.classList.add('visible');
+      form.reset();
+    }
+  });
 </script>
 </body>
 </html>

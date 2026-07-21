@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Physical Coordination — SkillLoop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .mod-header {
+    display:flex; align-items:center; gap: 1rem; padding: 0.9rem 0;
+    border-bottom: 1px solid var(--line); background:#fff;
+  }
+  .back-link { font-size: 0.85rem; font-weight: 600; color: var(--muted); text-decoration:none; }
+  .mod-hero {
+    background: #e8f6fb; border: 1px solid #bfe4f5; border-radius: var(--radius);
+    padding: 1.4rem; margin: 1.4rem 0; display:flex; align-items:center; justify-content:space-between; gap:1rem;
+  }
+  .mod-hero h1 { font-size: 1.3rem; font-weight: 800; color: #0c4d6b; }
+  .ring-wrap { position:relative; width:80px; height:80px; flex-shrink:0; }
+  .ring-wrap svg { width:100%; height:100%; }
+  .ring-pct { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Bricolage Grotesque'; font-weight:800; font-size:1.1rem; color:#0c4d6b; }
+
+  .series-block { margin-bottom: 1.6rem; }
+  .series-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.7rem; display:flex; align-items:center; gap:0.5rem; }
+  .series-num {
+    width: 26px; height:26px; border-radius:50%; background:#26a4de; color:#fff;
+    font-size:0.78rem; font-weight:800; display:flex; align-items:center; justify-content:center;
+    font-family:'Bricolage Grotesque';
+  }
+
+  .lesson-row {
+    display:flex; align-items:center; gap:0.9rem; padding: 0.9rem 1rem;
+    background:#fff; border:1px solid var(--line); border-radius: 12px; margin-bottom: 0.6rem;
+  }
+  .lesson-check {
+    width: 26px; height:26px; border-radius:8px; border: 2px solid var(--line); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; transition: background 0.15s, border-color 0.15s;
+  }
+  .lesson-check.done { background: #4ab851; border-color:#4ab851; }
+  .lesson-title { font-weight:600; font-size:0.92rem; flex:1; }
+  .lesson-meta { font-size:0.76rem; color:var(--faint); }
+  .lesson-btn {
+    padding: 0.45rem 1rem; border-radius: 999px; font-size:0.8rem; font-weight:700;
+    background: var(--track); color: var(--ink);
+  }
+  .lesson-btn.done { background:#eaf7ec; color:#256d31; }
+  .lesson-btn:disabled { opacity:0.6; cursor:not-allowed; }
+
+  .points-toast {
+    position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--ink); color:#fff;
+    padding: 0.8rem 1.2rem; border-radius: 12px; font-weight:700; font-size:0.9rem;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.2); transform: translateY(20px); opacity:0; transition: all 0.25s;
+    pointer-events:none;
+  }
+  .points-toast.show { transform: translateY(0); opacity:1; }
+</style>
+</head>
+<body>
+
+<header class="mod-header container">
+  <a href="/dashboard.html" class="back-link">&larr; Dashboard</a>
+  <span class="brand-name" style="margin-left:auto;"><span class="sk" style="color:#26a4de">Skill</span><span class="lo" style="color:#4ab851">Loop</span></span>
+</header>
+
+<main class="container" style="padding-bottom: 4rem; max-width: 760px;">
+
+  <div class="mod-hero">
+    <div>
+      <h1>Physical Coordination</h1>
+      <p style="font-size:0.85rem; color:#0c4d6b; margin-top:0.2rem;">Exercises that improve posture, coordination, balance, and body awareness.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg viewBox="0 0 80 80">
+        <circle cx="40" cy="40" r="34" fill="none" stroke="#c7e8f5" stroke-width="8"/>
+        <circle id="ring-fill" cx="40" cy="40" r="34" fill="none" stroke="#26a4de" stroke-width="8"
+                stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6"
+                transform="rotate(-90 40 40)"/>
+      </svg>
+      <div class="ring-pct" id="ring-pct">0%</div>
+    </div>
+  </div>
+
+  <div id="lessons-root">
+    <div class="muted" style="text-align:center; padding: 2rem;">Loading lessons…</div>
+  </div>
+
+</main>
+
+<div class="points-toast" id="points-toast">+10 points earned!</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/config.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+  // MVP content: 2 series x 5 lessons = 10 real, completable lessons.
+  // Additional series ship in later content passes (per product roadmap).
+  const SERIES = [
+    {
+      index: 1,
+      title: 'Series 1 — Balance & Posture Basics',
+      lessons: [
+        'Standing balance: feet together, eyes open (30 sec)',
+        'Standing balance: feet together, eyes closed (20 sec)',
+        'Posture reset: wall check-in',
+        'Single-leg stand, right side',
+        'Single-leg stand, left side',
+      ],
+    },
+    {
+      index: 2,
+      title: 'Series 2 — Coordination & Body Awareness',
+      lessons: [
+        'Cross-body toe touches (10 reps)',
+        'Marching in place with arm swings',
+        'Heel-to-toe walk, 10 steps',
+        'Seated marching with rhythm count',
+        'Full sequence review',
+      ],
+    },
+  ];
+  const TOTAL_LESSONS = SERIES.reduce((sum, s) => sum + s.lessons.length, 0);
+  const POINTS_PER_LESSON = 10;
+
+  let currentUser = null;
+  let completedSet = new Set(); // "seriesIndex-lessonIndex"
+
+  function lessonKey(seriesIdx, lessonIdx) { return `${seriesIdx}-${lessonIdx}`; }
+
+  function render() {
+    const root = document.getElementById('lessons-root');
+    root.innerHTML = '';
+    SERIES.forEach(series => {
+      const block = document.createElement('div');
+      block.className = 'series-block';
+      block.innerHTML = `
+        <div class="series-title">
+          <span class="series-num">${series.index}</span>
+          <span>${series.title}</span>
+        </div>
+      `;
+      series.lessons.forEach((title, li) => {
+        const key = lessonKey(series.index, li);
+        const done = completedSet.has(key);
+        const row = document.createElement('div');
+        row.className = 'lesson-row';
+        row.innerHTML = `
+          <div class="lesson-check ${done ? 'done' : ''}">
+            ${done ? '<svg width="14" height="14" viewBox="0 0 12 12"><path d="M2 6.5 L4.8 9 L10 3.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+          </div>
+          <span class="lesson-title">${title}</span>
+          <span class="lesson-meta">Motion video · ~3 min</span>
+          <button class="lesson-btn ${done ? 'done' : ''}" data-series="${series.index}" data-lesson="${li}" ${done ? 'disabled' : ''}>
+            ${done ? 'Completed' : 'Mark Complete'}
+          </button>
+        `;
+        block.appendChild(row);
+      });
+      root.appendChild(block);
+    });
+
+    document.querySelectorAll('.lesson-btn:not(.done)').forEach(btn => {
+      btn.addEventListener('click', onCompleteLesson);
+    });
+
+    updateRing();
+  }
+
+  function updateRing() {
+    const pct = Math.round((completedSet.size / TOTAL_LESSONS) * 100);
+    document.getElementById('ring-pct').textContent = pct + '%';
+    const circumference = 213.6;
+    const offset = circumference - (pct / 100) * circumference;
+    document.getElementById('ring-fill').style.strokeDashoffset = offset;
+  }
+
+  function showToast() {
+    const toast = document.getElementById('points-toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2200);
+  }
+
+  async function onCompleteLesson(e) {
+    const btn = e.currentTarget;
+    const seriesIdx = parseInt(btn.dataset.series, 10);
+    const lessonIdx = parseInt(btn.dataset.lesson, 10);
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+
+    const { error } = await window.supabaseClient.from('module_progress').insert({
+      user_id: currentUser.id,
+      module: 'physical_coordination',
+      series_index: seriesIdx,
+      lesson_index: lessonIdx,
+    });
+
+    if (error) {
+      console.error(error);
+      btn.disabled = false;
+      btn.textContent = 'Mark Complete';
+      alert('Could not save progress. Please try again.');
+      return;
+    }
+
+    // Award points via RPC (server-side increment — avoids race conditions)
+    await window.supabaseClient.rpc('increment_points', {
+      p_user_id: currentUser.id,
+      p_amount: POINTS_PER_LESSON,
+    });
+
+    await logActiveDay(currentUser.id);
+
+    completedSet.add(lessonKey(seriesIdx, lessonIdx));
+    render();
+    showToast();
+  }
+
+  (async function init() {
+    currentUser = await requireAuth();
+    if (!currentUser) return;
+
+    const { data, error } = await window.supabaseClient
+      .from('module_progress')
+      .select('series_index, lesson_index')
+      .eq('user_id', currentUser.id)
+      .eq('module', 'physical_coordination');
+
+    if (!error && data) {
+      data.forEach(row => completedSet.add(lessonKey(row.series_index, row.lesson_index)));
+    }
+
+    render();
+  })();
+</script>
+</body>
+</html>

@@ -4,332 +4,249 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — SkillLoop</title>
-<link rel="icon" type="image/png" href="skillloop-logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; overflow: hidden; font-family: 'Nunito Sans', sans-serif; background: #f0f4f8; color: #2d3748; }
-  h1,h2,h3,h4,h5 { font-family: 'Nunito', sans-serif; }
+  .dash-header {
+    display: flex; align-items: center; gap: 1.2rem;
+    padding: 0.9rem 0; border-bottom: 1px solid var(--line); background: #fff;
+  }
+  .dash-nav { display: flex; gap: 0.25rem; margin-left: 0.5rem; }
+  .dash-nav a {
+    padding: 0.45rem 0.9rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600;
+    color: var(--muted); text-decoration: none;
+  }
+  .dash-nav a.active { background: var(--ink); color: #fff; }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 0.9rem; }
+  .avatar-badge {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem;
+    font-family: 'Bricolage Grotesque', sans-serif;
+  }
+  .plan-chip {
+    font-size: 0.72rem; font-weight: 700; padding: 0.28rem 0.7rem; border-radius: 999px;
+    background: var(--track); color: var(--muted);
+  }
+  .plan-chip.active { background: #eaf7ec; color: #256d31; }
 
-  .app { display: grid; grid-template-columns: 1fr; height: 100vh; overflow: hidden; }
+  .top-grid {
+    display: grid; grid-template-columns: 300px 1fr; gap: 1.1rem; margin: 1.4rem 0;
+  }
+  .stat-row { display: flex; gap: 0.7rem; margin-top: 0.9rem; }
+  .stat-chip {
+    flex: 1; background: var(--track); border-radius: 12px; padding: 0.7rem 0.6rem; text-align: center;
+  }
+  .stat-chip .num { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 1.35rem; }
+  .stat-chip .lbl { font-size: 0.68rem; color: var(--muted); font-weight: 600; }
 
-  /* MAIN */
-  .main { display: grid; grid-template-rows: 64px 1fr; overflow: hidden; }
+  .module-card {
+    display: block; border-radius: var(--radius); border: 1px solid var(--line); padding: 1.1rem;
+    background: #fff; text-decoration: none; color: inherit; position: relative; overflow: hidden;
+  }
+  .module-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:5px; background: var(--mc); }
+  .module-card:hover { border-color: var(--mc); text-decoration: none; }
+  .module-top { display:flex; justify-content: space-between; align-items:center; margin-bottom: 0.5rem; }
+  .module-name { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 0.95rem; }
+  .module-bar { height: 7px; background: var(--track); border-radius: 4px; overflow:hidden; margin-top: 0.5rem; }
+  .module-bar i { display:block; height:100%; background: var(--mc); border-radius:4px; }
+  .locked-badge { font-size: 0.68rem; font-weight: 700; color: var(--faint); background: var(--track); padding: 0.2rem 0.55rem; border-radius: 999px; }
 
-  /* TOP NAV */
-  .topnav { background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 1.75rem; }
-  .topnav-links { display: flex; gap: 0.25rem; }
-  .topnav-link { padding: 0.45rem 1rem; border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700; color: #a0aec0; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
-  .topnav-link:hover { color: #2d3748; background: #f0f4f8; }
-  .topnav-link.active { color: #26a4de; border-bottom: 2px solid #26a4de; border-radius: 0; }
-  .topnav-right { display: flex; align-items: center; gap: 1rem; }
-  .notif-btn { width: 36px; height: 36px; border-radius: 10px; background: #f0f4f8; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-family: 'Nunito', sans-serif; font-weight: 700; color: #718096; position: relative; }
-  .notif-dot { width: 8px; height: 8px; background: #e24b4a; border-radius: 50%; position: absolute; top: 6px; right: 6px; border: 2px solid #fff; }
-  .avatar-wrap { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; position: relative; }
-  .avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #26a4de, #4ab851); display: flex; align-items: center; justify-content: center; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.85rem; color: #fff; }
-  .avatar-name { font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700; color: #2d3748; }
-  .avatar-arrow { font-size: 0.7rem; color: #a0aec0; transition: transform 0.2s; }
-  .avatar-wrap.open .avatar-arrow { transform: rotate(180deg); }
-  .avatar-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); min-width: 200px; padding: 0.5rem 0; z-index: 100; }
-  .avatar-wrap.open .avatar-dropdown { display: block; }
-  .dropdown-item { display: block; width: 100%; padding: 0.55rem 1rem; font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 600; color: #4a5568; background: none; border: none; text-align: left; cursor: pointer; transition: background 0.15s; text-decoration: none; }
-  .dropdown-item:hover { background: #f0f4f8; color: #2d3748; }
-  .dropdown-divider { height: 1px; background: #e2e8f0; margin: 0.3rem 0; }
-
-  /* CONTENT */
-  .content { overflow: hidden; padding: 1.5rem 1.75rem; display: grid; grid-template-rows: auto 1fr auto; gap: 1.25rem; }
-
-  /* WELCOME */
-  .welcome-row { display: flex; align-items: center; justify-content: space-between; }
-  .welcome-text h1 { font-size: 1.4rem; font-weight: 900; color: #1a202c; margin-bottom: 0.2rem; }
-  .welcome-text p { font-size: 0.85rem; color: #a0aec0; font-weight: 500; }
-  .date-badge { background: #fff; border-radius: 10px; padding: 0.5rem 1rem; font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700; color: #718096; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-
-  /* SKILL CARDS */
-  .skill-cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; }
-  .skill-card { background: #fff; border-radius: 16px; padding: 1.1rem; box-shadow: 0 2px 12px rgba(0,0,0,0.05); border: 2px solid transparent; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
-  .skill-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
-  .skill-card.blue { border-color: rgba(38,164,222,0.2); }
-  .skill-card.green { border-color: rgba(74,184,81,0.2); }
-  .skill-card.yellow { border-color: rgba(254,196,29,0.2); }
-  .skill-card.pink { border-color: rgba(201,64,152,0.2); }
-  .skill-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
-  .skill-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; font-family: 'Nunito', sans-serif; }
-  .skill-card.blue .skill-icon { background: #e8f6fb; color: #26a4de; }
-  .skill-card.green .skill-icon { background: #edf7ee; color: #4ab851; }
-  .skill-card.yellow .skill-icon { background: #fff8e6; color: #c9930a; }
-  .skill-card.pink .skill-icon { background: #f9eaf6; color: #c94098; }
-  .skill-badge { font-family: 'Nunito', sans-serif; font-size: 0.65rem; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 50px; }
-  .skill-card.blue .skill-badge { background: #e8f6fb; color: #26a4de; }
-  .skill-card.green .skill-badge { background: #edf7ee; color: #4ab851; }
-  .skill-card.yellow .skill-badge { background: #fff8e6; color: #c9930a; }
-  .skill-card.pink .skill-badge { background: #f9eaf6; color: #c94098; }
-  .skill-name { font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 800; color: #2d3748; margin-bottom: 0.5rem; line-height: 1.3; }
-  .skill-pct { font-family: 'Nunito', sans-serif; font-size: 1.6rem; font-weight: 900; color: #1a202c; line-height: 1; margin-bottom: 0.5rem; }
-  .skill-pct span { font-size: 0.9rem; font-weight: 600; color: #a0aec0; }
-  .progress-bar { height: 6px; background: #e8edf2; border-radius: 3px; overflow: hidden; margin-bottom: 0.4rem; }
-  .progress-fill { height: 100%; border-radius: 3px; }
-  .skill-level { font-size: 0.68rem; color: #a0aec0; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
-
-  /* BOTTOM ROW */
-  .bottom-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
-  .card { background: #fff; border-radius: 16px; padding: 1.1rem; box-shadow: 0 2px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 0.6rem; }
-  .card-title { font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 800; color: #2d3748; }
-  .card-sub { font-size: 0.75rem; color: #a0aec0; font-weight: 500; margin-top: -0.3rem; }
-
-  /* ACTIVITIES */
-  .activity-item { display: flex; align-items: center; gap: 0.6rem; background: #f8fafc; border-radius: 10px; padding: 0.6rem 0.75rem; }
-  .activity-item-text { font-size: 0.8rem; color: #4a5568; font-weight: 600; flex: 1; }
-  .done-badge { background: #4ab851; color: #fff; border-radius: 50px; padding: 0.2rem 0.65rem; font-family: 'Nunito', sans-serif; font-size: 0.68rem; font-weight: 800; }
-  .pending-badge { background: #fec41d; color: #7a5900; border-radius: 50px; padding: 0.2rem 0.65rem; font-family: 'Nunito', sans-serif; font-size: 0.68rem; font-weight: 800; }
-  .activity-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-
-  /* PROGRESS CARD */
-  .progress-card { align-items: center; justify-content: center; }
-  .donut-wrap { position: relative; width: 110px; height: 110px; }
-  .donut-wrap svg { width: 110px; height: 110px; transform: rotate(-90deg); }
-  .donut-pct { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .donut-num { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.5rem; color: #1a202c; line-height: 1; }
-  .donut-label { font-size: 0.65rem; color: #a0aec0; font-weight: 700; }
-  .donut-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 1rem; width: 100%; }
-  .legend-item { display: flex; align-items: center; gap: 0.4rem; }
-  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .legend-text { font-size: 0.68rem; color: #718096; font-weight: 600; }
-  .view-report-btn { width: 100%; padding: 0.55rem; border-radius: 10px; border: 2px solid #e2e8f0; background: #fff; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.8rem; color: #26a4de; cursor: pointer; transition: all 0.2s; margin-top: auto; }
-  .view-report-btn:hover { background: #e8f6fb; border-color: #26a4de; }
-
-  /* UPCOMING */
-  .upcoming-item { display: flex; align-items: center; gap: 0.65rem; padding: 0.5rem 0.6rem; border-radius: 10px; background: #f8fafc; transition: background 0.2s; cursor: pointer; }
-  .upcoming-item:hover { background: #edf7ee; }
-  .upcoming-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-  .upcoming-info { flex: 1; }
-  .upcoming-name { font-family: 'Nunito', sans-serif; font-size: 0.78rem; font-weight: 700; color: #2d3748; }
-  .upcoming-time { font-size: 0.68rem; color: #a0aec0; font-weight: 500; }
-  .upcoming-arrow { color: #a0aec0; font-size: 0.9rem; font-weight: 700; }
+  .upgrade-banner {
+    background: var(--ink); color: #fff; border-radius: var(--radius); padding: 1.2rem 1.4rem;
+    display:flex; align-items:center; justify-content: space-between; gap: 1rem; margin-bottom: 1.2rem;
+  }
+  .loading-state { text-align:center; padding: 3rem; color: var(--muted); }
 </style>
-<script type="importmap">
-{ "imports": { "@netlify/identity": "./js/identity.js", "gotrue-js": "./js/gotrue.js" } }
-</script>
 </head>
 <body>
-<div class="app">
 
-  <!-- MAIN -->
-  <div class="main">
-    <div class="topnav">
-      <div class="topnav-links">
-        <a class="topnav-link active" href="#">Dashboard</a>
-        <a class="topnav-link" href="#">Lessons</a>
-        <a class="topnav-link" href="#">Progress</a>
-        <a class="topnav-link" href="#">Parent Dashboard</a>
-        <a class="topnav-link" href="#">Therapist Mode</a>
-      </div>
-      <div class="topnav-right">
-        <button class="notif-btn">&#128276;<div class="notif-dot"></div></button>
-        <div class="avatar-wrap" id="avatar-toggle">
-          <div class="avatar" id="avatar-initials">SL</div>
-          <span class="avatar-name" id="avatar-name">My Account</span>
-          <span class="avatar-arrow">&#9662;</span>
-          <div class="avatar-dropdown" id="avatar-dropdown">
-            <button class="dropdown-item" id="logout-btn">Log Out</button>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">Terms of Service</a>
-            <a class="dropdown-item" href="#">FAQ</a>
-            <a class="dropdown-item" href="#">Privacy Policy</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="content">
-      <!-- WELCOME -->
-      <div class="welcome-row">
-        <div class="welcome-text">
-          <h1 id="welcome-msg">Welcome back!</h1>
-          <p>Here is your progress overview for today.</p>
-        </div>
-        <div class="date-badge" id="date-badge"></div>
-      </div>
-
-      <!-- SKILL CARDS -->
-      <div class="skill-cards">
-        <div class="skill-card blue">
-          <div class="skill-card-top">
-            <div class="skill-icon">PC</div>
-            <span class="skill-badge">Level 2 / 5</span>
-          </div>
-          <div class="skill-name">Physical Coordination</div>
-          <div class="skill-pct">45<span>%</span></div>
-          <div class="progress-bar"><div class="progress-fill" style="width:45%;background:#26a4de"></div></div>
-          <div class="skill-level">5 series &middot; 10 modules</div>
-        </div>
-        <div class="skill-card green">
-          <div class="skill-card-top">
-            <div class="skill-icon">IS</div>
-            <span class="skill-badge">Level 1 / 5</span>
-          </div>
-          <div class="skill-name">Independence Skills</div>
-          <div class="skill-pct">20<span>%</span></div>
-          <div class="progress-bar"><div class="progress-fill" style="width:20%;background:#4ab851"></div></div>
-          <div class="skill-level">4 series &middot; 8 modules</div>
-        </div>
-        <div class="skill-card yellow">
-          <div class="skill-card-top">
-            <div class="skill-icon">SS</div>
-            <span class="skill-badge">Level 1 / 5</span>
-          </div>
-          <div class="skill-name">Social Skills</div>
-          <div class="skill-pct">35<span>%</span></div>
-          <div class="progress-bar"><div class="progress-fill" style="width:35%;background:#fec41d"></div></div>
-          <div class="skill-level">5 series &middot; 10 modules</div>
-        </div>
-        <div class="skill-card pink">
-          <div class="skill-card-top">
-            <div class="skill-icon">EF</div>
-            <span class="skill-badge">Level 1 / 5</span>
-          </div>
-          <div class="skill-name">Executive Function</div>
-          <div class="skill-pct">15<span>%</span></div>
-          <div class="progress-bar"><div class="progress-fill" style="width:15%;background:#c94098"></div></div>
-          <div class="skill-level">4 series &middot; 8 modules</div>
-        </div>
-      </div>
-
-      <!-- BOTTOM ROW -->
-      <div class="bottom-row">
-
-        <div class="card">
-          <div class="card-title">Today's Activities</div>
-          <div class="card-sub">Complete your activities for the day</div>
-          <div class="activity-item">
-            <div class="activity-dot" style="background:#4ab851"></div>
-            <span class="activity-item-text">Complete a balance exercise</span>
-            <span class="done-badge">Done</span>
-          </div>
-          <div class="activity-item">
-            <div class="activity-dot" style="background:#fec41d"></div>
-            <span class="activity-item-text">Practice starting a conversation</span>
-            <span class="pending-badge">Pending</span>
-          </div>
-          <div class="activity-item">
-            <div class="activity-dot" style="background:#fec41d"></div>
-            <span class="activity-item-text">Daily structure builder</span>
-            <span class="pending-badge">Pending</span>
-          </div>
-        </div>
-
-        <div class="card progress-card">
-          <div class="card-title">Total Progress</div>
-          <div class="donut-wrap">
-            <svg viewBox="0 0 110 110">
-              <circle cx="55" cy="55" r="42" fill="none" stroke="#e8edf2" stroke-width="10"/>
-              <circle cx="55" cy="55" r="42" fill="none" stroke="#26a4de" stroke-width="10" stroke-dasharray="79 185" stroke-linecap="round"/>
-              <circle cx="55" cy="55" r="42" fill="none" stroke="#4ab851" stroke-width="10" stroke-dasharray="37 185" stroke-dashoffset="-79" stroke-linecap="round"/>
-              <circle cx="55" cy="55" r="42" fill="none" stroke="#fec41d" stroke-width="10" stroke-dasharray="65 185" stroke-dashoffset="-116" stroke-linecap="round"/>
-              <circle cx="55" cy="55" r="42" fill="none" stroke="#c94098" stroke-width="10" stroke-dasharray="28 185" stroke-dashoffset="-181" stroke-linecap="round"/>
-            </svg>
-            <div class="donut-pct">
-              <span class="donut-num">29%</span>
-              <span class="donut-label">Overall</span>
-            </div>
-          </div>
-          <div class="donut-legend">
-            <div class="legend-item"><div class="legend-dot" style="background:#26a4de"></div><span class="legend-text">Physical 45%</span></div>
-            <div class="legend-item"><div class="legend-dot" style="background:#4ab851"></div><span class="legend-text">Independence 20%</span></div>
-            <div class="legend-item"><div class="legend-dot" style="background:#fec41d"></div><span class="legend-text">Social 35%</span></div>
-            <div class="legend-item"><div class="legend-dot" style="background:#c94098"></div><span class="legend-text">Executive 15%</span></div>
-          </div>
-          <button class="view-report-btn">View Full Report</button>
-        </div>
-
-        <div class="card">
-          <div class="card-title">Up Next</div>
-          <div class="card-sub">Your next recommended modules</div>
-          <div class="upcoming-item">
-            <div class="upcoming-dot" style="background:#26a4de"></div>
-            <div class="upcoming-info">
-              <div class="upcoming-name">Balance and Posture — Series 3</div>
-              <div class="upcoming-time">Physical Coordination &middot; 15 min</div>
-            </div>
-            <span class="upcoming-arrow">&#8250;</span>
-          </div>
-          <div class="upcoming-item">
-            <div class="upcoming-dot" style="background:#fec41d"></div>
-            <div class="upcoming-info">
-              <div class="upcoming-name">Starting a Conversation</div>
-              <div class="upcoming-time">Social Skills &middot; 10 min</div>
-            </div>
-            <span class="upcoming-arrow">&#8250;</span>
-          </div>
-          <div class="upcoming-item">
-            <div class="upcoming-dot" style="background:#4ab851"></div>
-            <div class="upcoming-info">
-              <div class="upcoming-name">Weekly Budget Challenge</div>
-              <div class="upcoming-time">Independence Skills &middot; 20 min</div>
-            </div>
-            <span class="upcoming-arrow">&#8250;</span>
-          </div>
-          <div class="upcoming-item">
-            <div class="upcoming-dot" style="background:#c94098"></div>
-            <div class="upcoming-info">
-              <div class="upcoming-name">Daily Structure Builder</div>
-              <div class="upcoming-time">Executive Function &middot; 10 min</div>
-            </div>
-            <span class="upcoming-arrow">&#8250;</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
+<header class="dash-header container">
+  <a href="/index.html" class="brand" style="text-decoration:none;">
+    <svg width="26" height="26" viewBox="0 0 30 30" aria-hidden="true">
+      <path d="M 15.7 2.6 A 12.5 12.5 0 0 1 27.4 14.3" fill="none" stroke="#26a4de" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 27.4 15.7 A 12.5 12.5 0 0 1 15.7 27.4" fill="none" stroke="#c94098" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 14.3 27.4 A 12.5 12.5 0 0 1 2.6 15.7" fill="none" stroke="#fec41d" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 2.6 14.3 A 12.5 12.5 0 0 1 14.3 2.6" fill="none" stroke="#4ab851" stroke-width="4.4" stroke-linecap="round"/>
+    </svg>
+    <span class="brand-name"><span class="sk">Skill</span><span class="lo">Loop</span></span>
+  </a>
+  <nav class="dash-nav">
+    <a href="/dashboard.html" class="active">Dashboard</a>
+    <a href="/physical-coordination.html">Physical Coordination</a>
+  </nav>
+  <div class="header-right">
+    <span id="plan-chip" class="plan-chip">Free plan</span>
+    <div id="avatar-badge" class="avatar-badge">–</div>
+    <button class="btn btn-secondary" onclick="signOut()">Log Out</button>
   </div>
-</div>
+</header>
 
-<script type="module">
-import { getUser, logout } from '@netlify/identity';
+<main class="container" style="padding-bottom: 3rem;">
 
-async function initDashboard() {
-  const user = await getUser();
-  if (!user) {
-    window.location.href = 'login.html';
-    return;
-  }
+  <div id="loading" class="loading-state">Loading your dashboard…</div>
 
-  const fullName = (user.user_metadata && user.user_metadata.full_name)
-    || sessionStorage.getItem('userName')
-    || user.email;
-  const firstName = fullName.split(' ')[0];
+  <div id="content" style="display:none;">
 
-  document.getElementById('welcome-msg').textContent = 'Welcome back, ' + firstName + '!';
-  document.getElementById('avatar-name').textContent = user.email || firstName;
-  document.getElementById('avatar-initials').textContent = firstName.charAt(0).toUpperCase();
+    <div class="upgrade-banner" id="upgrade-banner" style="display:none;">
+      <div>
+        <strong>Unlock full access</strong>
+        <div class="muted" style="color:#c7d3e3; font-size:0.85rem; margin-top:0.2rem;">
+          Upgrade to Premium for AI feedback, all four modules, and unlimited depth.
+        </div>
+      </div>
+      <button class="btn btn-primary" id="upgrade-btn">Upgrade — $50/mo</button>
+    </div>
 
-  document.getElementById('logout-btn').addEventListener('click', async () => {
-    await logout();
-    window.location.href = 'index.html';
-  });
-}
+    <div class="top-grid">
+      <div class="card">
+        <h2 id="greeting" style="font-size: 1.15rem; font-weight: 800;">Welcome back</h2>
+        <p class="muted" style="font-size: 0.85rem; margin-top: 0.2rem;">Every module you finish closes another loop.</p>
+        <div class="stat-row">
+          <div class="stat-chip">
+            <div class="num" id="stat-points">0</div>
+            <div class="lbl">POINTS</div>
+          </div>
+          <div class="stat-chip">
+            <div class="num" id="stat-days">0</div>
+            <div class="lbl">ACTIVE DAYS</div>
+          </div>
+          <div class="stat-chip">
+            <div class="num" id="stat-lessons">0</div>
+            <div class="lbl">LESSONS DONE</div>
+          </div>
+        </div>
+        <p class="muted" style="font-size: 0.78rem; margin-top: 0.8rem;">
+          <strong id="days-remaining">16</strong> active days keeps your care team's monthly check-in on track.
+        </p>
+      </div>
 
-initDashboard();
-</script>
+      <div class="card">
+        <h2 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.8rem;">Your modules</h2>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
 
+          <a href="/physical-coordination.html" class="module-card" style="--mc:#26a4de;">
+            <div class="module-top">
+              <span class="module-name">Physical Coordination</span>
+            </div>
+            <div class="muted" style="font-size:0.78rem;">Balance, posture &amp; body awareness</div>
+            <div class="module-bar"><i id="bar-physical" style="width:0%"></i></div>
+          </a>
+
+          <div class="module-card" style="--mc:#4ab851; opacity:0.6;">
+            <div class="module-top">
+              <span class="module-name">Independence Skills</span>
+              <span class="locked-badge">Coming soon</span>
+            </div>
+            <div class="muted" style="font-size:0.78rem;">Cooking, budgeting &amp; daily routines</div>
+            <div class="module-bar"><i style="width:0%"></i></div>
+          </div>
+
+          <div class="module-card" style="--mc:#fec41d; opacity:0.6;">
+            <div class="module-top">
+              <span class="module-name">Social Skills</span>
+              <span class="locked-badge">Coming soon</span>
+            </div>
+            <div class="muted" style="font-size:0.78rem;">Conversation &amp; emotional awareness</div>
+            <div class="module-bar"><i style="width:0%"></i></div>
+          </div>
+
+          <div class="module-card" style="--mc:#c94098; opacity:0.6;">
+            <div class="module-top">
+              <span class="module-name">Executive Function</span>
+              <span class="locked-badge">Coming soon</span>
+            </div>
+            <div class="muted" style="font-size:0.78rem;">Planning, focus &amp; daily structure</div>
+            <div class="module-bar"><i style="width:0%"></i></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/config.js"></script>
+<script src="/js/supabase-client.js"></script>
 <script>
-  document.getElementById('date-badge').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  (async function init() {
+    const user = await requireAuth();
+    if (!user) return;
 
-  const avatarToggle = document.getElementById('avatar-toggle');
-  avatarToggle.addEventListener('click', function(e) {
-    e.stopPropagation();
-    this.classList.toggle('open');
-  });
-  document.addEventListener('click', function() {
-    avatarToggle.classList.remove('open');
-  });
+    // Log today as an active day just for visiting the dashboard
+    await logActiveDay(user.id);
 
-  document.querySelectorAll('.topnav-link').forEach(link => {
-    link.addEventListener('click', function(e) {
-      e.preventDefault();
-      document.querySelectorAll('.topnav-link').forEach(l => l.classList.remove('active'));
-      this.classList.add('active');
+    // Greeting + avatar initial (no hardcoded names — pulled from real account data)
+    const fullName = user.user_metadata?.full_name || '';
+    const hour = new Date().getHours();
+    const part = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
+    document.getElementById('greeting').textContent = `Good ${part}${fullName ? ', ' + fullName.split(' ')[0] : ''}`;
+    document.getElementById('avatar-badge').textContent = (fullName || user.email).charAt(0).toUpperCase();
+
+    // Profile (points)
+    let { data: profile } = await window.supabaseClient
+      .from('profiles').select('points').eq('id', user.id).single();
+    document.getElementById('stat-points').textContent = profile?.points ?? 0;
+
+    // Active days (rolling 30-day RTM window)
+    const activeDays = await getActiveDaysThisMonth(user.id);
+    document.getElementById('stat-days').textContent = activeDays;
+    document.getElementById('days-remaining').textContent = Math.max(0, 16 - activeDays);
+
+    // Module progress — physical coordination lesson count.
+    // MVP ships 2 series x 5 lessons = 10 real lessons; this total grows as more
+    // content ships (see product roadmap), so update MVP_TOTAL_LESSONS alongside it.
+    const MVP_TOTAL_LESSONS = 10;
+    const { data: progress } = await window.supabaseClient
+      .from('module_progress').select('id').eq('user_id', user.id).eq('module', 'physical_coordination');
+    const lessonsDone = progress?.length ?? 0;
+    document.getElementById('stat-lessons').textContent = lessonsDone;
+    const pct = Math.min(100, Math.round((lessonsDone / MVP_TOTAL_LESSONS) * 100));
+    document.getElementById('bar-physical').style.width = pct + '%';
+
+    // Subscription status
+    const { data: sub } = await window.supabaseClient
+      .from('subscriptions').select('status, plan').eq('user_id', user.id).maybeSingle();
+
+    const chip = document.getElementById('plan-chip');
+    const banner = document.getElementById('upgrade-banner');
+    if (sub && sub.status === 'active') {
+      chip.textContent = (sub.plan || 'Premium') + ' plan';
+      chip.classList.add('active');
+    } else {
+      banner.style.display = 'flex';
+    }
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+  })();
+
+  document.getElementById('upgrade-btn')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Redirecting…';
+
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
+
+    const res = await fetch('/.netlify/functions/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        plan: 'premium',
+        userId: session.user.id,
+        email: session.user.email,
+      }),
     });
+    const { url, error } = await res.json();
+    if (error) {
+      alert('Something went wrong starting checkout: ' + error);
+      btn.disabled = false;
+      btn.textContent = 'Upgrade — $50/mo';
+      return;
+    }
+    window.location.href = url;
   });
 </script>
 </body>

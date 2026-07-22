@@ -43,6 +43,20 @@
   }
   .completed-banner.visible { display:block; }
   .loading-state { text-align:center; padding:3rem; color:var(--muted); }
+
+  /* ---------- Lesson cube graphics ---------- */
+  .cube { position:relative; overflow:hidden; }
+  .cube-shadow-num {
+    position:absolute; top:-0.55rem; right:-0.35rem;
+    font-family:'Bricolage Grotesque', sans-serif; font-weight:800;
+    font-size:4.4rem; line-height:1; color: rgba(22,35,58,0.055);
+    pointer-events:none; user-select:none; z-index:0;
+  }
+  .cube.done .cube-shadow-num { color: rgba(74,184,81,0.12); }
+  .cube.unlocked .cube-shadow-num { color: rgba(38,164,222,0.09); }
+  .cube-accent { position:absolute; top:8px; left:8px; width:22px; height:22px; opacity:0.9; z-index:0; pointer-events:none; }
+  .cube-num, .cube-lbl { position:relative; z-index:1; }
+  .cube.locked .cube-accent { opacity:0.35; }
 </style>
 </head>
 <body class="themed-bg">
@@ -111,12 +125,12 @@
 
     <div class="detail-card" id="detail-card" style="display:none;">
       <span class="step-tag" id="detail-step">STEP 1 OF 3 — WATCH</span>
-      <h3 style="font-weight:800; font-size:1.05rem;" id="detail-title">Lesson 1, Assignment 1 — Balance Basics</h3>
+      <h3 style="font-weight:800; font-size:1.05rem;" id="detail-title">Assignment</h3>
 
       <div id="video-section">
         <p class="muted" style="font-size:0.85rem; margin-top:0.3rem;">Watch the full exercise video, then continue to the quiz.</p>
         <div class="video-frame">
-          <iframe src="https://www.youtube-nocookie.com/embed/RbzV-Hjv4oU" title="Balance exercise video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <iframe id="video-iframe" src="" title="Exercise video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
         <button class="btn btn-primary" id="to-quiz-btn">I watched it — take the quiz</button>
       </div>
@@ -133,7 +147,7 @@
           Last step: in <strong>at least 3 sentences</strong>, tell us what you tried, what felt hard, and what you'll do differently next time.
         </p>
         <div class="reflect-box field">
-          <textarea id="reflection-text" placeholder="I tried the standing balance and..."></textarea>
+          <textarea id="reflection-text" placeholder="I tried this exercise and..."></textarea>
         </div>
         <button class="btn btn-green" id="submit-reflection-btn">Get feedback and complete</button>
         <div class="feedback-card" id="feedback-card">
@@ -166,6 +180,16 @@
 <script>
   const TOTAL_LESSONS = 20;
   const ASSIGNMENTS_PER_LESSON = 5;
+  const BRAND_COLORS = ['#26a4de', '#c94098', '#fec41d', '#4ab851'];
+
+  // Tiny reusable brand mark (4-color loop) used as a corner accent on every lesson cube
+  const MINI_MARK_SVG = `
+    <svg class="cube-accent" viewBox="0 0 30 30" aria-hidden="true">
+      <path d="M 15.7 2.6 A 12.5 12.5 0 0 1 27.4 14.3" fill="none" stroke="#26a4de" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 27.4 15.7 A 12.5 12.5 0 0 1 15.7 27.4" fill="none" stroke="#c94098" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 14.3 27.4 A 12.5 12.5 0 0 1 2.6 15.7" fill="none" stroke="#fec41d" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 2.6 14.3 A 12.5 12.5 0 0 1 14.3 2.6" fill="none" stroke="#4ab851" stroke-width="4.4" stroke-linecap="round"/>
+    </svg>`;
 
   const INTRO_SLIDES = [
     { h: 'Welcome to Physical Coordination', p: 'This module builds balance, posture, and body awareness through short guided exercises you can do at home — no equipment needed.' },
@@ -173,17 +197,69 @@
     { h: 'Earn as you go', p: 'Every completed assignment earns 1 star for the upcoming Avatar Shop, fills your progress wheel, and counts toward your active days.' },
   ];
 
-  const MCQ = [
-    { q: 'Before starting a balance exercise, you should:', opts: ['Clear the space around you', 'Close your eyes right away', 'Stand on a soft pillow', 'Hold your breath'], correct: 0 },
-    { q: 'Good standing posture means:', opts: ['Shoulders tense, looking down', 'Shoulders relaxed, eyes forward', 'Leaning to one side', 'Knees locked as stiff as possible'], correct: 1 },
-    { q: 'If you start to feel wobbly mid-exercise, the best move is to:', opts: ['Jump to catch yourself', 'Freeze and hold your breath', 'Lightly touch a wall or chair for support', 'Close your eyes to focus'], correct: 2 },
-    { q: 'How should you breathe during balance work?', opts: ['Hold your breath the whole time', 'Fast, short breaths', 'Only through your mouth', 'Slow and steady'], correct: 3 },
-    { q: 'What builds balance fastest over time?', opts: ['One long session a month', 'A little practice most days', 'Only practicing when you feel like it', 'Watching videos without practicing'], correct: 1 },
+  // Lesson 1 — all 5 assignments fully built out, each with its own video and quiz.
+  const LESSON_1_ASSIGNMENTS = [
+    {
+      title: 'Standing Balance Basics',
+      videoId: 'RbzV-Hjv4oU',
+      mcq: [
+        { q: 'Before starting a balance exercise, you should:', opts: ['Clear the space around you', 'Close your eyes right away', 'Stand on a soft pillow', 'Hold your breath'], correct: 0 },
+        { q: 'Good standing posture means:', opts: ['Shoulders tense, looking down', 'Shoulders relaxed, eyes forward', 'Leaning to one side', 'Knees locked as stiff as possible'], correct: 1 },
+        { q: 'If you start to feel wobbly mid-exercise, the best move is to:', opts: ['Jump to catch yourself', 'Freeze and hold your breath', 'Lightly touch a wall or chair for support', 'Close your eyes to focus'], correct: 2 },
+        { q: 'How should you breathe during balance work?', opts: ['Hold your breath the whole time', 'Fast, short breaths', 'Only through your mouth', 'Slow and steady'], correct: 3 },
+        { q: 'What builds balance fastest over time?', opts: ['One long session a month', 'A little practice most days', 'Only practicing when you feel like it', 'Watching videos without practicing'], correct: 1 },
+      ],
+    },
+    {
+      title: 'Core Stability Foundations',
+      videoId: 'zhgnhyRVPPI',
+      mcq: [
+        { q: 'Your core mainly helps you with:', opts: ['Stability and control of movement', 'Only how your stomach looks', 'Running speed only', 'Nothing related to balance'], correct: 0 },
+        { q: 'When engaging your core, you should feel your midsection:', opts: ['Completely relaxed', 'Gently braced, like before a light push', 'Sucked in as far as possible', 'Twisted to one side'], correct: 1 },
+        { q: 'A sign you are pushing too hard during a core exercise is:', opts: ['Slight muscle fatigue', 'Sharp pain', 'Slightly faster breathing', 'Feeling focused'], correct: 1 },
+        { q: 'Between core exercises, it helps to:', opts: ['Skip resting entirely', 'Take a short breather and reset your posture', 'Immediately double the reps', 'Hold your breath longer'], correct: 1 },
+        { q: 'Why do we build core stability before harder balance moves?', opts: ['It has nothing to do with balance', 'A stable core supports everything else you do', 'It only matters for sports', 'It makes videos longer'], correct: 1 },
+      ],
+    },
+    {
+      title: 'Coordinated Movement Patterns',
+      videoId: '4o1iRDFm8Ww',
+      mcq: [
+        { q: 'Coordinated movement means your body parts are:', opts: ['Moving randomly', 'Working together smoothly toward one goal', 'All moving as fast as possible', 'Staying completely still'], correct: 1 },
+        { q: 'If a movement pattern feels confusing at first, the best approach is:', opts: ['Give up right away', 'Slow it down and break it into smaller steps', 'Speed it up to get through it', 'Skip to the next assignment'], correct: 1 },
+        { q: 'Practicing the same movement pattern repeatedly helps your:', opts: ['Muscles forget the motion', 'Brain and body build a reliable pattern', 'Balance get worse', 'Focus decrease'], correct: 1 },
+        { q: 'Which is a good sign you are ready to move on?', opts: ['You can do the movement smoothly and consistently', 'You did it once, fast, and fell over', 'You feel dizzy every time', 'You skipped watching the video'], correct: 0 },
+        { q: 'Why do we warm up before coordination drills?', opts: ["It doesn't matter at all", 'It helps your body move safely and effectively', 'It makes the workout longer for no reason', 'Only athletes need to warm up'], correct: 1 },
+      ],
+    },
+    {
+      title: 'Balance Under Movement',
+      videoId: 'fPF6qScY8Dk',
+      mcq: [
+        { q: 'Balance while moving (dynamic balance) is different from standing balance because:', opts: ["It isn't different at all", 'Your body has to adjust while shifting weight', 'It only uses your arms', 'It requires no core stability'], correct: 1 },
+        { q: 'If you feel unsteady while practicing a moving balance drill, you should:', opts: ['Push through no matter what', 'Slow down or pause near something stable', 'Speed up to finish faster', 'Ignore it completely'], correct: 1 },
+        { q: 'Keeping your eyes focused on a fixed point ahead helps with:', opts: ['Nothing useful', 'Steadying your balance while moving', 'Making you dizzier', 'Slowing your reaction time'], correct: 1 },
+        { q: 'A good pace for practicing a new moving-balance drill is:', opts: ['As fast as possible immediately', 'Slow and controlled at first', 'Only in short, panicked bursts', 'However fast feels chaotic'], correct: 1 },
+        { q: 'Why does practicing moving balance matter for daily life?', opts: ['It only matters for gymnasts', 'Most real-world balance happens while moving, like walking', 'Standing still is all that matters', 'It has no practical use'], correct: 1 },
+      ],
+    },
+    {
+      title: 'Full Sequence Review',
+      videoId: 'Ez2GeaMa4c8',
+      mcq: [
+        { q: 'This final assignment in the lesson focuses on:', opts: ['Learning something completely new', 'Putting together everything practiced so far', 'Skipping ahead without review', 'Resting only'], correct: 1 },
+        { q: 'When reviewing a full sequence, it is normal to:', opts: ['Get every part perfect immediately', 'Need a bit more practice on some parts than others', 'Never make small mistakes', 'Feel nothing at all'], correct: 1 },
+        { q: 'If part of the sequence feels shaky, the best plan is to:', opts: ['Avoid that part forever', 'Go back and practice that specific part again', 'Quit the module', 'Speed through it and hope for the best'], correct: 1 },
+        { q: 'Completing a full review helps you:', opts: ['Forget everything you learned', 'See how far your coordination has come', 'Nothing in particular', 'Only prepare for a test'], correct: 1 },
+        { q: 'After finishing this review, the next step is:', opts: ['Stop practicing skills forever', 'Move on to new lessons as they become available', 'Repeat this exact video 50 times', 'Delete your progress'], correct: 1 },
+      ],
+    },
   ];
 
   let currentUser = null;
   let completedSet = new Set(); // "lesson-assignment"
   let selectedLesson = null;
+  let selectedAssignment = null;
   let quizPassed = false;
 
   const key = (l, a) => l + '-' + a;
@@ -218,7 +294,7 @@
     renderSlide();
   }
 
-  // ---------- Lesson grid ----------
+  // ---------- Lesson grid (with shadow number + brand mark accent) ----------
   function lessonDoneCount(lesson) {
     let n = 0;
     for (let a = 1; a <= ASSIGNMENTS_PER_LESSON; a++) if (completedSet.has(key(lesson, a))) n++;
@@ -231,10 +307,16 @@
     for (let l = 1; l <= TOTAL_LESSONS; l++) {
       const unlocked = l === 1; // content ships lesson-by-lesson; only Lesson 1 is live
       const done = lessonDoneCount(l);
+      const stateClass = done === ASSIGNMENTS_PER_LESSON ? 'done' : unlocked ? 'unlocked' : 'locked';
       const cube = document.createElement('button');
-      cube.className = 'cube ' + (done === ASSIGNMENTS_PER_LESSON ? 'done' : unlocked ? 'unlocked' : 'locked') + (selectedLesson === l ? ' selected' : '');
-      cube.innerHTML = '<span class="cube-num">' + l + '</span><span class="cube-lbl">' + (unlocked ? done + '/' + ASSIGNMENTS_PER_LESSON : 'Coming soon') + '</span>';
-      if (unlocked) cube.addEventListener('click', () => { selectedLesson = l; renderLessons(); renderAssignments(); });
+      cube.className = 'cube ' + stateClass + (selectedLesson === l ? ' selected' : '');
+      cube.innerHTML = `
+        <span class="cube-shadow-num">${l}</span>
+        ${MINI_MARK_SVG}
+        <span class="cube-num">${l}</span>
+        <span class="cube-lbl">${unlocked ? done + '/' + ASSIGNMENTS_PER_LESSON : 'Coming soon'}</span>
+      `;
+      if (unlocked) cube.addEventListener('click', () => { selectedLesson = l; selectedAssignment = null; renderLessons(); renderAssignments(); });
       else cube.disabled = true;
       grid.appendChild(cube);
     }
@@ -249,12 +331,12 @@
     grid.innerHTML = '';
 
     for (let a = 1; a <= ASSIGNMENTS_PER_LESSON; a++) {
-      const live = selectedLesson === 1 && a === 1; // first assignment of first lesson is live
+      const live = selectedLesson === 1; // all 5 assignments in Lesson 1 are live
       const done = completedSet.has(key(selectedLesson, a));
       const cube = document.createElement('button');
       cube.className = 'cube ' + (done ? 'done' : live ? 'unlocked' : 'locked');
       cube.innerHTML = '<span class="cube-num">' + a + '</span><span class="cube-lbl">' + (done ? 'Complete' : live ? 'Start' : 'Coming soon') + '</span>';
-      if (live) cube.addEventListener('click', openAssignmentOne);
+      if (live) cube.addEventListener('click', () => openAssignment(a));
       else cube.disabled = true;
       grid.appendChild(cube);
     }
@@ -262,12 +344,19 @@
     panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  // ---------- Assignment 1 flow ----------
-  function openAssignmentOne() {
-    const done = completedSet.has(key(1, 1));
+  // ---------- Assignment flow (data-driven across all 5) ----------
+  function openAssignment(a) {
+    selectedAssignment = a;
+    const spec = LESSON_1_ASSIGNMENTS[a - 1];
+    const done = completedSet.has(key(1, a));
     const card = document.getElementById('detail-card');
     card.style.display = 'block';
+    document.getElementById('detail-title').textContent = 'Lesson 1, Assignment ' + a + ' — ' + spec.title;
+    document.getElementById('video-iframe').src = 'https://www.youtube-nocookie.com/embed/' + spec.videoId;
     document.getElementById('completed-banner').classList.toggle('visible', done);
+    document.getElementById('reflection-text').value = '';
+    document.getElementById('feedback-card').classList.remove('visible');
+    quizPassed = false;
 
     if (done) {
       document.getElementById('video-section').style.display = 'block';
@@ -276,6 +365,7 @@
       document.getElementById('to-quiz-btn').style.display = 'none';
       document.getElementById('detail-step').textContent = 'COMPLETED';
     } else {
+      document.getElementById('to-quiz-btn').style.display = 'inline-flex';
       showStep('video');
     }
     card.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -293,8 +383,9 @@
   document.getElementById('to-quiz-btn').addEventListener('click', () => showStep('quiz'));
 
   function renderMcq() {
+    const spec = LESSON_1_ASSIGNMENTS[selectedAssignment - 1];
     const root = document.getElementById('mcq-root');
-    root.innerHTML = MCQ.map((item, qi) => `
+    root.innerHTML = spec.mcq.map((item, qi) => `
       <div class="q-block">
         <div class="q-text"><span class="q-num">${qi + 1}.</span>${item.q}</div>
         ${item.opts.map((o, oi) => `
@@ -306,8 +397,9 @@
   }
 
   document.getElementById('grade-quiz-btn').addEventListener('click', () => {
+    const spec = LESSON_1_ASSIGNMENTS[selectedAssignment - 1];
     let answered = 0, correct = 0;
-    MCQ.forEach((item, qi) => {
+    spec.mcq.forEach((item, qi) => {
       const sel = document.querySelector('input[name="mcq-' + qi + '"]:checked');
       if (sel) {
         answered++;
@@ -319,7 +411,7 @@
       }
     });
     const result = document.getElementById('quiz-result');
-    if (answered < MCQ.length) { result.textContent = 'Answer all ' + MCQ.length + ' questions first.'; result.style.color = 'var(--danger)'; return; }
+    if (answered < spec.mcq.length) { result.textContent = 'Answer all ' + spec.mcq.length + ' questions first.'; result.style.color = 'var(--danger)'; return; }
     if (correct >= 4) {
       quizPassed = true;
       result.textContent = 'Nice — ' + correct + '/5 correct. Moving to your reflection.';
@@ -332,6 +424,7 @@
   });
 
   document.getElementById('submit-reflection-btn').addEventListener('click', async (e) => {
+    const spec = LESSON_1_ASSIGNMENTS[selectedAssignment - 1];
     const btn = e.currentTarget;
     const text = document.getElementById('reflection-text').value.trim();
     const sentences = (text.match(/[.!?]+(\s|$)/g) || []).length;
@@ -352,7 +445,7 @@
       const res = await fetch('/.netlify/functions/grade-reflection', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, lessonTitle: 'Balance Basics' }),
+        body: JSON.stringify({ text, lessonTitle: spec.title }),
       });
       grade = await res.json();
     } catch (err) {
@@ -368,12 +461,13 @@
       return;
     }
 
-    // Persist: reflection, progress row, star, active day
+    const a = selectedAssignment;
+
     await window.supabaseClient.from('reflections').insert({
       user_id: currentUser.id,
       module: 'physical_coordination',
       lesson_index: 1,
-      assignment_index: 1,
+      assignment_index: a,
       reflection_text: text,
       ai_feedback: grade.feedback,
       ai_score: grade.score,
@@ -383,13 +477,13 @@
       user_id: currentUser.id,
       module: 'physical_coordination',
       series_index: 1,   // lesson cube number
-      lesson_index: 1,   // assignment number within the lesson
+      lesson_index: a,   // assignment number within the lesson
     });
 
     if (!progErr) {
       await window.supabaseClient.rpc('increment_stars', { p_user_id: currentUser.id, p_amount: 1 });
       await logActiveDay(currentUser.id);
-      completedSet.add(key(1, 1));
+      completedSet.add(key(1, a));
     }
 
     btn.disabled = false;
@@ -403,11 +497,11 @@
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 2200);
 
-    // Refresh counters + grids
     document.getElementById('done-count').textContent = completedSet.size;
     const { data: profile } = await window.supabaseClient.from('profiles').select('stars').eq('id', currentUser.id).single();
     document.getElementById('stars-count').textContent = profile?.stars ?? 0;
     renderLessons();
+    renderAssignments();
   });
 
   // ---------- Init ----------

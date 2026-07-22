@@ -57,6 +57,24 @@
   .cube-accent { position:absolute; top:8px; left:8px; width:22px; height:22px; opacity:0.9; z-index:0; pointer-events:none; }
   .cube-num, .cube-lbl { position:relative; z-index:1; }
   .cube.locked .cube-accent { opacity:0.35; }
+
+  /* ---------- Lesson grid backdrop figure ---------- */
+  .lessons-panel { position: relative; }
+  .lessons-bg-figure {
+    position: absolute;
+    top: -1.2rem; left: 50%;
+    transform: translateX(-50%);
+    width: min(520px, 88%);
+    height: auto;
+    z-index: 0;
+    pointer-events: none;
+    user-select: none;
+  }
+  .lessons-panel > .panel-title,
+  .lessons-panel > .cube-grid {
+    position: relative;
+    z-index: 1;
+  }
 </style>
 </head>
 <body class="themed-bg">
@@ -119,8 +137,30 @@
       </div>
     </div>
 
-    <h2 class="panel-title">Lessons</h2>
-    <div class="cube-grid" id="lesson-grid"></div>
+    <div class="lessons-panel">
+      <svg class="lessons-bg-figure" viewBox="0 0 400 500" aria-hidden="true" focusable="false">
+        <g fill="rgba(22,35,58,0.055)">
+          <!-- head -->
+          <circle cx="200" cy="55" r="30"/>
+          <!-- torso -->
+          <rect x="175" y="86" width="50" height="118" rx="25"/>
+          <!-- arms spread wide for balance -->
+          <rect x="60" y="118" width="150" height="26" rx="13" transform="rotate(-9 210 131)"/>
+          <rect x="190" y="118" width="150" height="26" rx="13" transform="rotate(9 190 131)"/>
+          <!-- standing leg -->
+          <rect x="196" y="196" width="34" height="210" rx="17" transform="rotate(6 213 196)"/>
+          <!-- foot of standing leg -->
+          <ellipse cx="240" cy="404" rx="26" ry="12" transform="rotate(6 240 404)"/>
+          <!-- raised, bent leg trailing behind for balance -->
+          <rect x="150" y="196" width="32" height="120" rx="16" transform="rotate(-48 166 200)"/>
+          <rect x="108" y="248" width="30" height="90" rx="15" transform="rotate(28 123 252)"/>
+          <ellipse cx="150" cy="330" rx="22" ry="11" transform="rotate(70 150 330)"/>
+        </g>
+      </svg>
+
+      <h2 class="panel-title">Lessons</h2>
+      <div class="cube-grid" id="lesson-grid"></div>
+    </div>
 
     <div class="assignment-panel" id="assignment-panel" style="display:none;">
       <h2 class="panel-title" id="assignment-title">Lesson 1 — Assignments</h2>

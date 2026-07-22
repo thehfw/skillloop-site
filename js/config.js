@@ -10,9 +10,7 @@
 // ============================================================
 
 window.SKILLLOOP_CONFIG = {
-  SUPABASE_URL: 'https://vrnkegfqwaskgzceohbq.supabase.co/rest/v1/
-',
-  SUPABASE_ANON_KEY: 'sb_publishable_ioc5pumt7N1L5fnmu8pH8w_z11AyqpH
-',
+  SUPABASE_URL: 'https://YOUR-PROJECT-REF.supabase.co',
+  SUPABASE_ANON_KEY: 'YOUR-SUPABASE-ANON-PUBLIC-KEY',
   STRIPE_PUBLISHABLE_KEY: 'pk_test_YOUR_STRIPE_PUBLISHABLE_KEY',
 };

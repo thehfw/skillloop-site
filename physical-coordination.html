@@ -8,229 +8,432 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <style>
-  .mod-header {
-    display:flex; align-items:center; gap: 1rem; padding: 0.9rem 0;
-    border-bottom: 1px solid var(--line); background:#fff;
-  }
-  .back-link { font-size: 0.85rem; font-weight: 600; color: var(--muted); text-decoration:none; }
   .mod-hero {
-    background: #e8f6fb; border: 1px solid #bfe4f5; border-radius: var(--radius);
-    padding: 1.4rem; margin: 1.4rem 0; display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    background: linear-gradient(135deg, rgba(38,164,222,0.12), rgba(38,164,222,0.03));
+    border: 1px solid #bfe4f5; border-radius: var(--radius);
+    padding: 1.3rem 1.4rem; margin-bottom: 1.4rem;
+    display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;
   }
-  .mod-hero h1 { font-size: 1.3rem; font-weight: 800; color: #0c4d6b; }
-  .ring-wrap { position:relative; width:80px; height:80px; flex-shrink:0; }
-  .ring-wrap svg { width:100%; height:100%; }
-  .ring-pct { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Bricolage Grotesque'; font-weight:800; font-size:1.1rem; color:#0c4d6b; }
+  .mod-hero h1 { font-size:1.35rem; font-weight:800; color:#0c4d6b; }
+  .mod-hero p { font-size:0.85rem; color:#0c4d6b; margin-top:0.2rem; max-width:520px; }
+  .hero-stats { display:flex; gap:0.7rem; }
 
-  .series-block { margin-bottom: 1.6rem; }
-  .series-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.7rem; display:flex; align-items:center; gap:0.5rem; }
-  .series-num {
-    width: 26px; height:26px; border-radius:50%; background:#26a4de; color:#fff;
-    font-size:0.78rem; font-weight:800; display:flex; align-items:center; justify-content:center;
-    font-family:'Bricolage Grotesque';
-  }
+  .panel-title { font-size:1rem; font-weight:800; margin: 1.4rem 0 0.8rem; }
+  .assignment-panel { margin-top: 1.2rem; }
 
-  .lesson-row {
-    display:flex; align-items:center; gap:0.9rem; padding: 0.9rem 1rem;
-    background:#fff; border:1px solid var(--line); border-radius: 12px; margin-bottom: 0.6rem;
-  }
-  .lesson-check {
-    width: 26px; height:26px; border-radius:8px; border: 2px solid var(--line); flex-shrink:0;
-    display:flex; align-items:center; justify-content:center; transition: background 0.15s, border-color 0.15s;
-  }
-  .lesson-check.done { background: #4ab851; border-color:#4ab851; }
-  .lesson-title { font-weight:600; font-size:0.92rem; flex:1; }
-  .lesson-meta { font-size:0.76rem; color:var(--faint); }
-  .lesson-btn {
-    padding: 0.45rem 1rem; border-radius: 999px; font-size:0.8rem; font-weight:700;
-    background: var(--track); color: var(--ink);
-  }
-  .lesson-btn.done { background:#eaf7ec; color:#256d31; }
-  .lesson-btn:disabled { opacity:0.6; cursor:not-allowed; }
+  .detail-card { background:#fff; border:1px solid var(--line); border-radius: var(--radius); padding: 1.4rem; margin-top: 1.2rem; }
+  .video-frame { position:relative; width:100%; max-width:720px; aspect-ratio:16/9; border-radius:14px; overflow:hidden; border:1px solid var(--line); margin: 0.8rem 0 1.2rem; }
+  .video-frame iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
 
-  .points-toast {
-    position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--ink); color:#fff;
-    padding: 0.8rem 1.2rem; border-radius: 12px; font-weight:700; font-size:0.9rem;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.2); transform: translateY(20px); opacity:0; transition: all 0.25s;
-    pointer-events:none;
+  .step-tag {
+    display:inline-block; font-size:0.66rem; font-weight:800; letter-spacing:0.08em;
+    color:#0c4d6b; background:#e8f6fb; border-radius:999px; padding:0.25rem 0.7rem; margin-bottom:0.5rem;
   }
-  .points-toast.show { transform: translateY(0); opacity:1; }
+  .quiz-result { font-weight:800; margin-top:0.6rem; }
+  .reflect-box textarea { width:100%; min-height:110px; resize:vertical; }
+  .feedback-card {
+    background:#f2fbf3; border:1px solid #b9e3bf; border-radius:12px; padding:0.9rem 1rem; margin-top:0.9rem;
+    font-size:0.88rem; display:none;
+  }
+  .feedback-card.visible { display:block; }
+  .feedback-score { font-weight:800; color:#256d31; margin-bottom:0.25rem; }
+  .completed-banner {
+    background:#f2fbf3; border:1.5px solid var(--green); color:#256d31; border-radius:12px;
+    padding:0.8rem 1rem; font-weight:700; font-size:0.9rem; margin-top:1rem; display:none;
+  }
+  .completed-banner.visible { display:block; }
+  .loading-state { text-align:center; padding:3rem; color:var(--muted); }
 </style>
 </head>
-<body>
+<body class="themed-bg">
 
-<header class="mod-header container">
-  <a href="/dashboard.html" class="back-link">&larr; Dashboard</a>
-  <img src="/assets/skillloop-logo.png" alt="SkillLoop" class="brand-logo-img brand-logo-img--sm" style="margin-left:auto;">
-</header>
+<aside class="sidebar" aria-label="Main navigation">
+  <a href="/dashboard.html" class="sidebar-logo">
+    <img src="/assets/skillloop-logo.png" alt="SkillLoop">
+  </a>
+  <div class="side-section">
+    <div class="side-label">Menu</div>
+    <a class="side-link" href="/dashboard.html">Dashboard</a>
+  </div>
+  <div class="side-section">
+    <div class="side-label">Modules</div>
+    <a class="side-link active" href="/physical-coordination.html">
+      <span class="side-dot" style="background:#26a4de"></span> Physical Coordination
+    </a>
+    <span class="side-link locked"><span class="side-dot" style="background:#4ab851"></span> Independence <span class="side-chip">SOON</span></span>
+    <span class="side-link locked"><span class="side-dot" style="background:#fec41d"></span> Social Skills <span class="side-chip">SOON</span></span>
+    <span class="side-link locked"><span class="side-dot" style="background:#c94098"></span> Executive Function <span class="side-chip">SOON</span></span>
+  </div>
+  <div class="side-section">
+    <div class="side-label">Coming Soon</div>
+    <span class="side-link locked">Avatar Shop <span class="side-chip">SOON</span></span>
+    <span class="side-link locked">Game Mode <span class="side-chip">SOON</span></span>
+  </div>
+  <div class="side-section">
+    <div class="side-label">Legal</div>
+    <a class="side-link" href="/terms.html">Terms of Service</a>
+    <a class="side-link" href="/privacy.html">Privacy Policy</a>
+    <a class="side-link" href="/faq.html">FAQ</a>
+  </div>
+  <div class="sidebar-bottom side-section">
+    <button class="side-link" style="width:100%;" onclick="signOut()">Log Out</button>
+  </div>
+</aside>
 
-<main class="container" style="padding-bottom: 4rem; max-width: 760px;">
+<main class="app-main">
+  <div id="loading" class="loading-state">Loading module…</div>
 
-  <div class="mod-hero">
-    <div>
-      <h1>Physical Coordination</h1>
-      <p style="font-size:0.85rem; color:#0c4d6b; margin-top:0.2rem;">Exercises that improve posture, coordination, balance, and body awareness.</p>
+  <div id="content" style="display:none;">
+    <div class="mod-hero">
+      <div>
+        <h1>Physical Coordination</h1>
+        <p>Exercises that improve posture, coordination, balance, and body awareness — 20 lessons, 5 assignments each.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-chip">
+          <div class="num" id="done-count">0</div>
+          <div class="lbl">DONE / 100</div>
+        </div>
+        <div class="stat-chip">
+          <div class="num"><span class="star-glyph">&#9733;</span> <span id="stars-count">0</span></div>
+          <div class="lbl">STARS</div>
+        </div>
+      </div>
     </div>
-    <div class="ring-wrap">
-      <svg viewBox="0 0 80 80">
-        <circle cx="40" cy="40" r="34" fill="none" stroke="#c7e8f5" stroke-width="8"/>
-        <circle id="ring-fill" cx="40" cy="40" r="34" fill="none" stroke="#26a4de" stroke-width="8"
-                stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6"
-                transform="rotate(-90 40 40)"/>
-      </svg>
-      <div class="ring-pct" id="ring-pct">0%</div>
+
+    <h2 class="panel-title">Lessons</h2>
+    <div class="cube-grid" id="lesson-grid"></div>
+
+    <div class="assignment-panel" id="assignment-panel" style="display:none;">
+      <h2 class="panel-title" id="assignment-title">Lesson 1 — Assignments</h2>
+      <div class="cube-grid" id="assignment-grid" style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); max-width:640px;"></div>
+    </div>
+
+    <div class="detail-card" id="detail-card" style="display:none;">
+      <span class="step-tag" id="detail-step">STEP 1 OF 3 — WATCH</span>
+      <h3 style="font-weight:800; font-size:1.05rem;" id="detail-title">Lesson 1, Assignment 1 — Balance Basics</h3>
+
+      <div id="video-section">
+        <p class="muted" style="font-size:0.85rem; margin-top:0.3rem;">Watch the full exercise video, then continue to the quiz.</p>
+        <div class="video-frame">
+          <iframe src="https://www.youtube-nocookie.com/embed/RbzV-Hjv4oU" title="Balance exercise video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <button class="btn btn-primary" id="to-quiz-btn">I watched it — take the quiz</button>
+      </div>
+
+      <div id="quiz-section" style="display:none;">
+        <p class="muted" style="font-size:0.85rem; margin:0.3rem 0 0.9rem;">Answer all 5. You need at least 4 correct to move on — you can retry.</p>
+        <div id="mcq-root"></div>
+        <button class="btn btn-primary" id="grade-quiz-btn">Check my answers</button>
+        <div class="quiz-result" id="quiz-result"></div>
+      </div>
+
+      <div id="reflect-section" style="display:none;">
+        <p class="muted" style="font-size:0.85rem; margin:0.3rem 0 0.7rem;">
+          Last step: in <strong>at least 3 sentences</strong>, tell us what you tried, what felt hard, and what you'll do differently next time.
+        </p>
+        <div class="reflect-box field">
+          <textarea id="reflection-text" placeholder="I tried the standing balance and..."></textarea>
+        </div>
+        <button class="btn btn-green" id="submit-reflection-btn">Get feedback and complete</button>
+        <div class="feedback-card" id="feedback-card">
+          <div class="feedback-score" id="feedback-score"></div>
+          <div id="feedback-text"></div>
+        </div>
+      </div>
+
+      <div class="completed-banner" id="completed-banner">
+        Assignment complete — 1 star earned. It now counts toward your progress wheel and today's active day.
+      </div>
     </div>
   </div>
-
-  <div id="lessons-root">
-    <div class="muted" style="text-align:center; padding: 2rem;">Loading lessons…</div>
-  </div>
-
 </main>
 
-<div class="points-toast" id="points-toast">+10 points earned!</div>
+<div class="intro-overlay" id="intro-overlay" style="display:none;">
+  <div class="intro-card">
+    <div class="intro-step-dots" id="intro-dots"></div>
+    <h2 style="font-weight:800; font-size:1.2rem; margin-bottom:0.5rem;" id="intro-h"></h2>
+    <p class="muted" style="font-size:0.9rem; min-height:70px;" id="intro-p"></p>
+    <button class="btn btn-primary btn-block mt-2" id="intro-next">Next</button>
+  </div>
+</div>
+
+<div class="toast" id="star-toast">+1 star earned</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/config.js"></script>
 <script src="/js/supabase-client.js"></script>
 <script>
-  // MVP content: 2 series x 5 lessons = 10 real, completable lessons.
-  // Additional series ship in later content passes (per product roadmap).
-  const SERIES = [
-    {
-      index: 1,
-      title: 'Series 1 — Balance & Posture Basics',
-      lessons: [
-        'Standing balance: feet together, eyes open (30 sec)',
-        'Standing balance: feet together, eyes closed (20 sec)',
-        'Posture reset: wall check-in',
-        'Single-leg stand, right side',
-        'Single-leg stand, left side',
-      ],
-    },
-    {
-      index: 2,
-      title: 'Series 2 — Coordination & Body Awareness',
-      lessons: [
-        'Cross-body toe touches (10 reps)',
-        'Marching in place with arm swings',
-        'Heel-to-toe walk, 10 steps',
-        'Seated marching with rhythm count',
-        'Full sequence review',
-      ],
-    },
+  const TOTAL_LESSONS = 20;
+  const ASSIGNMENTS_PER_LESSON = 5;
+
+  const INTRO_SLIDES = [
+    { h: 'Welcome to Physical Coordination', p: 'This module builds balance, posture, and body awareness through short guided exercises you can do at home — no equipment needed.' },
+    { h: 'How it works', p: 'There are 20 lessons. Each lesson has 5 assignments: watch a short exercise video, practice it, pass a quick 5-question quiz, then write a short reflection.' },
+    { h: 'Earn as you go', p: 'Every completed assignment earns 1 star for the upcoming Avatar Shop, fills your progress wheel, and counts toward your active days.' },
   ];
-  const TOTAL_LESSONS = SERIES.reduce((sum, s) => sum + s.lessons.length, 0);
-  const POINTS_PER_LESSON = 10;
+
+  const MCQ = [
+    { q: 'Before starting a balance exercise, you should:', opts: ['Clear the space around you', 'Close your eyes right away', 'Stand on a soft pillow', 'Hold your breath'], correct: 0 },
+    { q: 'Good standing posture means:', opts: ['Shoulders tense, looking down', 'Shoulders relaxed, eyes forward', 'Leaning to one side', 'Knees locked as stiff as possible'], correct: 1 },
+    { q: 'If you start to feel wobbly mid-exercise, the best move is to:', opts: ['Jump to catch yourself', 'Freeze and hold your breath', 'Lightly touch a wall or chair for support', 'Close your eyes to focus'], correct: 2 },
+    { q: 'How should you breathe during balance work?', opts: ['Hold your breath the whole time', 'Fast, short breaths', 'Only through your mouth', 'Slow and steady'], correct: 3 },
+    { q: 'What builds balance fastest over time?', opts: ['One long session a month', 'A little practice most days', 'Only practicing when you feel like it', 'Watching videos without practicing'], correct: 1 },
+  ];
 
   let currentUser = null;
-  let completedSet = new Set(); // "seriesIndex-lessonIndex"
+  let completedSet = new Set(); // "lesson-assignment"
+  let selectedLesson = null;
+  let quizPassed = false;
 
-  function lessonKey(seriesIdx, lessonIdx) { return `${seriesIdx}-${lessonIdx}`; }
+  const key = (l, a) => l + '-' + a;
 
-  function render() {
-    const root = document.getElementById('lessons-root');
-    root.innerHTML = '';
-    SERIES.forEach(series => {
-      const block = document.createElement('div');
-      block.className = 'series-block';
-      block.innerHTML = `
-        <div class="series-title">
-          <span class="series-num">${series.index}</span>
-          <span>${series.title}</span>
-        </div>
-      `;
-      series.lessons.forEach((title, li) => {
-        const key = lessonKey(series.index, li);
-        const done = completedSet.has(key);
-        const row = document.createElement('div');
-        row.className = 'lesson-row';
-        row.innerHTML = `
-          <div class="lesson-check ${done ? 'done' : ''}">
-            ${done ? '<svg width="14" height="14" viewBox="0 0 12 12"><path d="M2 6.5 L4.8 9 L10 3.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
-          </div>
-          <span class="lesson-title">${title}</span>
-          <span class="lesson-meta">Motion video · ~3 min</span>
-          <button class="lesson-btn ${done ? 'done' : ''}" data-series="${series.index}" data-lesson="${li}" ${done ? 'disabled' : ''}>
-            ${done ? 'Completed' : 'Mark Complete'}
-          </button>
-        `;
-        block.appendChild(row);
-      });
-      root.appendChild(block);
+  // ---------- Intro slides ----------
+  function maybeShowIntro() {
+    const storageKey = 'pc_intro_seen_' + currentUser.id;
+    let seen = false;
+    try { seen = localStorage.getItem(storageKey) === '1'; } catch (e) {}
+    if (seen) return;
+
+    const overlay = document.getElementById('intro-overlay');
+    const dots = document.getElementById('intro-dots');
+    let idx = 0;
+
+    function renderSlide() {
+      document.getElementById('intro-h').textContent = INTRO_SLIDES[idx].h;
+      document.getElementById('intro-p').textContent = INTRO_SLIDES[idx].p;
+      dots.innerHTML = INTRO_SLIDES.map((_, i) => '<i class="' + (i === idx ? 'on' : '') + '"></i>').join('');
+      document.getElementById('intro-next').textContent = idx === INTRO_SLIDES.length - 1 ? 'Start the module' : 'Next';
+    }
+
+    document.getElementById('intro-next').addEventListener('click', () => {
+      if (idx < INTRO_SLIDES.length - 1) { idx += 1; renderSlide(); }
+      else {
+        overlay.style.display = 'none';
+        try { localStorage.setItem(storageKey, '1'); } catch (e) {}
+      }
     });
 
-    document.querySelectorAll('.lesson-btn:not(.done)').forEach(btn => {
-      btn.addEventListener('click', onCompleteLesson);
+    overlay.style.display = 'flex';
+    renderSlide();
+  }
+
+  // ---------- Lesson grid ----------
+  function lessonDoneCount(lesson) {
+    let n = 0;
+    for (let a = 1; a <= ASSIGNMENTS_PER_LESSON; a++) if (completedSet.has(key(lesson, a))) n++;
+    return n;
+  }
+
+  function renderLessons() {
+    const grid = document.getElementById('lesson-grid');
+    grid.innerHTML = '';
+    for (let l = 1; l <= TOTAL_LESSONS; l++) {
+      const unlocked = l === 1; // content ships lesson-by-lesson; only Lesson 1 is live
+      const done = lessonDoneCount(l);
+      const cube = document.createElement('button');
+      cube.className = 'cube ' + (done === ASSIGNMENTS_PER_LESSON ? 'done' : unlocked ? 'unlocked' : 'locked') + (selectedLesson === l ? ' selected' : '');
+      cube.innerHTML = '<span class="cube-num">' + l + '</span><span class="cube-lbl">' + (unlocked ? done + '/' + ASSIGNMENTS_PER_LESSON : 'Coming soon') + '</span>';
+      if (unlocked) cube.addEventListener('click', () => { selectedLesson = l; renderLessons(); renderAssignments(); });
+      else cube.disabled = true;
+      grid.appendChild(cube);
+    }
+  }
+
+  // ---------- Assignment grid ----------
+  function renderAssignments() {
+    const panel = document.getElementById('assignment-panel');
+    const grid = document.getElementById('assignment-grid');
+    document.getElementById('assignment-title').textContent = 'Lesson ' + selectedLesson + ' — Assignments';
+    panel.style.display = 'block';
+    grid.innerHTML = '';
+
+    for (let a = 1; a <= ASSIGNMENTS_PER_LESSON; a++) {
+      const live = selectedLesson === 1 && a === 1; // first assignment of first lesson is live
+      const done = completedSet.has(key(selectedLesson, a));
+      const cube = document.createElement('button');
+      cube.className = 'cube ' + (done ? 'done' : live ? 'unlocked' : 'locked');
+      cube.innerHTML = '<span class="cube-num">' + a + '</span><span class="cube-lbl">' + (done ? 'Complete' : live ? 'Start' : 'Coming soon') + '</span>';
+      if (live) cube.addEventListener('click', openAssignmentOne);
+      else cube.disabled = true;
+      grid.appendChild(cube);
+    }
+    document.getElementById('detail-card').style.display = 'none';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // ---------- Assignment 1 flow ----------
+  function openAssignmentOne() {
+    const done = completedSet.has(key(1, 1));
+    const card = document.getElementById('detail-card');
+    card.style.display = 'block';
+    document.getElementById('completed-banner').classList.toggle('visible', done);
+
+    if (done) {
+      document.getElementById('video-section').style.display = 'block';
+      document.getElementById('quiz-section').style.display = 'none';
+      document.getElementById('reflect-section').style.display = 'none';
+      document.getElementById('to-quiz-btn').style.display = 'none';
+      document.getElementById('detail-step').textContent = 'COMPLETED';
+    } else {
+      showStep('video');
+    }
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function showStep(step) {
+    document.getElementById('video-section').style.display = step === 'video' ? 'block' : 'none';
+    document.getElementById('quiz-section').style.display = step === 'quiz' ? 'block' : 'none';
+    document.getElementById('reflect-section').style.display = step === 'reflect' ? 'block' : 'none';
+    document.getElementById('detail-step').textContent =
+      step === 'video' ? 'STEP 1 OF 3 — WATCH' : step === 'quiz' ? 'STEP 2 OF 3 — QUIZ' : 'STEP 3 OF 3 — REFLECT';
+    if (step === 'quiz') renderMcq();
+  }
+
+  document.getElementById('to-quiz-btn').addEventListener('click', () => showStep('quiz'));
+
+  function renderMcq() {
+    const root = document.getElementById('mcq-root');
+    root.innerHTML = MCQ.map((item, qi) => `
+      <div class="q-block">
+        <div class="q-text"><span class="q-num">${qi + 1}.</span>${item.q}</div>
+        ${item.opts.map((o, oi) => `
+          <label class="q-opt" data-q="${qi}" data-o="${oi}">
+            <input type="radio" name="mcq-${qi}" value="${oi}"><span>${o}</span>
+          </label>`).join('')}
+      </div>`).join('');
+    document.getElementById('quiz-result').textContent = '';
+  }
+
+  document.getElementById('grade-quiz-btn').addEventListener('click', () => {
+    let answered = 0, correct = 0;
+    MCQ.forEach((item, qi) => {
+      const sel = document.querySelector('input[name="mcq-' + qi + '"]:checked');
+      if (sel) {
+        answered++;
+        const chosen = parseInt(sel.value, 10);
+        const lbls = document.querySelectorAll('label[data-q="' + qi + '"]');
+        lbls.forEach(l => l.classList.remove('correct', 'wrong'));
+        if (chosen === item.correct) { correct++; lbls[chosen].classList.add('correct'); }
+        else { lbls[chosen].classList.add('wrong'); lbls[item.correct].classList.add('correct'); }
+      }
     });
+    const result = document.getElementById('quiz-result');
+    if (answered < MCQ.length) { result.textContent = 'Answer all ' + MCQ.length + ' questions first.'; result.style.color = 'var(--danger)'; return; }
+    if (correct >= 4) {
+      quizPassed = true;
+      result.textContent = 'Nice — ' + correct + '/5 correct. Moving to your reflection.';
+      result.style.color = 'var(--green)';
+      setTimeout(() => showStep('reflect'), 900);
+    } else {
+      result.textContent = correct + '/5 — review the answers marked above and try again.';
+      result.style.color = 'var(--danger)';
+    }
+  });
 
-    updateRing();
-  }
-
-  function updateRing() {
-    const pct = Math.round((completedSet.size / TOTAL_LESSONS) * 100);
-    document.getElementById('ring-pct').textContent = pct + '%';
-    const circumference = 213.6;
-    const offset = circumference - (pct / 100) * circumference;
-    document.getElementById('ring-fill').style.strokeDashoffset = offset;
-  }
-
-  function showToast() {
-    const toast = document.getElementById('points-toast');
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2200);
-  }
-
-  async function onCompleteLesson(e) {
+  document.getElementById('submit-reflection-btn').addEventListener('click', async (e) => {
     const btn = e.currentTarget;
-    const seriesIdx = parseInt(btn.dataset.series, 10);
-    const lessonIdx = parseInt(btn.dataset.lesson, 10);
-    btn.disabled = true;
-    btn.textContent = 'Saving…';
+    const text = document.getElementById('reflection-text').value.trim();
+    const sentences = (text.match(/[.!?]+(\s|$)/g) || []).length;
+    const fb = document.getElementById('feedback-card');
 
-    const { error } = await window.supabaseClient.from('module_progress').insert({
-      user_id: currentUser.id,
-      module: 'physical_coordination',
-      series_index: seriesIdx,
-      lesson_index: lessonIdx,
-    });
-
-    if (error) {
-      console.error(error);
-      btn.disabled = false;
-      btn.textContent = 'Mark Complete';
-      alert('Could not save progress. Please try again.');
+    if (sentences < 3) {
+      fb.classList.add('visible');
+      document.getElementById('feedback-score').textContent = 'Almost there';
+      document.getElementById('feedback-text').textContent = 'Write at least 3 full sentences — what you tried, what felt hard, and what you will do next time.';
       return;
     }
 
-    // Award points via RPC (server-side increment — avoids race conditions)
-    await window.supabaseClient.rpc('increment_points', {
-      p_user_id: currentUser.id,
-      p_amount: POINTS_PER_LESSON,
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Getting feedback…';
+
+    let grade = null;
+    try {
+      const res = await fetch('/.netlify/functions/grade-reflection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, lessonTitle: 'Balance Basics' }),
+      });
+      grade = await res.json();
+    } catch (err) {
+      grade = { score: 4, feedback: 'Reflection saved. Feedback service was unavailable, but your work still counts.', source: 'auto' };
+    }
+
+    if (grade.incomplete) {
+      btn.disabled = false;
+      btn.textContent = 'Get feedback and complete';
+      fb.classList.add('visible');
+      document.getElementById('feedback-score').textContent = 'Almost there';
+      document.getElementById('feedback-text').textContent = grade.feedback;
+      return;
+    }
+
+    // Persist: reflection, progress row, star, active day
+    await window.supabaseClient.from('reflections').insert({
+      user_id: currentUser.id,
+      module: 'physical_coordination',
+      lesson_index: 1,
+      assignment_index: 1,
+      reflection_text: text,
+      ai_feedback: grade.feedback,
+      ai_score: grade.score,
     });
 
-    await logActiveDay(currentUser.id);
+    const { error: progErr } = await window.supabaseClient.from('module_progress').insert({
+      user_id: currentUser.id,
+      module: 'physical_coordination',
+      series_index: 1,   // lesson cube number
+      lesson_index: 1,   // assignment number within the lesson
+    });
 
-    completedSet.add(lessonKey(seriesIdx, lessonIdx));
-    render();
-    showToast();
-  }
+    if (!progErr) {
+      await window.supabaseClient.rpc('increment_stars', { p_user_id: currentUser.id, p_amount: 1 });
+      await logActiveDay(currentUser.id);
+      completedSet.add(key(1, 1));
+    }
 
+    btn.disabled = false;
+    btn.textContent = 'Get feedback and complete';
+    fb.classList.add('visible');
+    document.getElementById('feedback-score').textContent = 'Score: ' + grade.score + '/5';
+    document.getElementById('feedback-text').textContent = grade.feedback;
+    document.getElementById('completed-banner').classList.add('visible');
+
+    const toast = document.getElementById('star-toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2200);
+
+    // Refresh counters + grids
+    document.getElementById('done-count').textContent = completedSet.size;
+    const { data: profile } = await window.supabaseClient.from('profiles').select('stars').eq('id', currentUser.id).single();
+    document.getElementById('stars-count').textContent = profile?.stars ?? 0;
+    renderLessons();
+  });
+
+  // ---------- Init ----------
   (async function init() {
     currentUser = await requireAuth();
     if (!currentUser) return;
 
-    const { data, error } = await window.supabaseClient
+    const { data: ob } = await window.supabaseClient
+      .from('onboarding_responses').select('user_id').eq('user_id', currentUser.id).maybeSingle();
+    if (!ob) { window.location.href = '/onboarding.html'; return; }
+
+    const { data: rows } = await window.supabaseClient
       .from('module_progress')
       .select('series_index, lesson_index')
       .eq('user_id', currentUser.id)
       .eq('module', 'physical_coordination');
+    (rows || []).forEach(r => completedSet.add(key(r.series_index, r.lesson_index)));
 
-    if (!error && data) {
-      data.forEach(row => completedSet.add(lessonKey(row.series_index, row.lesson_index)));
-    }
+    const { data: profile } = await window.supabaseClient.from('profiles').select('stars').eq('id', currentUser.id).single();
+    document.getElementById('stars-count').textContent = profile?.stars ?? 0;
+    document.getElementById('done-count').textContent = completedSet.size;
 
-    render();
+    renderLessons();
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+    maybeShowIntro();
   })();
 </script>
 </body>

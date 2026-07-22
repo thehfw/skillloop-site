@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
+<body class="themed-bg">
 
 <header class="site-header container">
   <a href="/index.html" class="brand">
@@ -94,7 +94,7 @@
 
     // If email confirmation is required, there's no session yet.
     if (data.session) {
-      window.location.href = '/dashboard.html';
+      window.location.href = '/onboarding.html';
     } else {
       successBox.textContent = 'Account created! Check your email to confirm, then log in.';
       successBox.classList.add('visible');

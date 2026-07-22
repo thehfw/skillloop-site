@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
+<body class="themed-bg">
 
 <header class="site-header container">
   <a href="/index.html" class="brand">
@@ -72,7 +72,11 @@
       return;
     }
 
-    window.location.href = '/dashboard.html';
+    // Route: onboarding if not yet completed, otherwise dashboard
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
+    const { data: ob } = await window.supabaseClient
+      .from('onboarding_responses').select('user_id').eq('user_id', session.user.id).maybeSingle();
+    window.location.href = ob ? '/dashboard.html' : '/onboarding.html';
   });
 
   // If already logged in, skip straight to dashboard

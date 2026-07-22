@@ -61,6 +61,37 @@ async function getActiveDaysThisMonth(userId) {
   return data.length;
 }
 
+/**
+ * Current consecutive-day streak. Counts back from today; if today
+ * hasn't been logged yet, counts back from yesterday so an unopened
+ * morning doesn't zero the streak.
+ */
+async function getStreak(userId) {
+  const { data, error } = await window.supabaseClient
+    .from('activity_log')
+    .select('activity_date')
+    .eq('user_id', userId)
+    .order('activity_date', { ascending: false })
+    .limit(90);
+
+  if (error || !data || data.length === 0) return 0;
+
+  const have = new Set(data.map(r => r.activity_date));
+  const day = new Date();
+  const iso = d => d.toISOString().slice(0, 10);
+
+  // Anchor on today if logged, otherwise yesterday
+  if (!have.has(iso(day))) day.setDate(day.getDate() - 1);
+  if (!have.has(iso(day))) return 0;
+
+  let streak = 0;
+  while (have.has(iso(day))) {
+    streak += 1;
+    day.setDate(day.getDate() - 1);
+  }
+  return streak;
+}
+
 async function signOut() {
   await window.supabaseClient.auth.signOut();
   window.location.href = '/login.html';

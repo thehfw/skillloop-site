@@ -8,156 +8,169 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <style>
-  .dash-header {
-    display: flex; align-items: center; gap: 1.2rem;
-    padding: 0.9rem 0; border-bottom: 1px solid var(--line); background: #fff;
-  }
-  .dash-nav { display: flex; gap: 0.25rem; margin-left: 0.5rem; }
-  .dash-nav a {
-    padding: 0.45rem 0.9rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600;
-    color: var(--muted); text-decoration: none;
-  }
-  .dash-nav a.active { background: var(--ink); color: #fff; }
-  .header-right { margin-left: auto; display: flex; align-items: center; gap: 0.9rem; }
-  .avatar-badge {
-    width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: #fff;
-    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem;
-    font-family: 'Bricolage Grotesque', sans-serif;
-  }
-  .plan-chip {
-    font-size: 0.72rem; font-weight: 700; padding: 0.28rem 0.7rem; border-radius: 999px;
-    background: var(--track); color: var(--muted);
-  }
-  .plan-chip.active { background: #eaf7ec; color: #256d31; }
-
-  .top-grid {
-    display: grid; grid-template-columns: 300px 1fr; gap: 1.1rem; margin: 1.4rem 0;
-  }
-  .stat-row { display: flex; gap: 0.7rem; margin-top: 0.9rem; }
-  .stat-chip {
-    flex: 1; background: var(--track); border-radius: 12px; padding: 0.7rem 0.6rem; text-align: center;
-  }
-  .stat-chip .num { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 1.35rem; }
-  .stat-chip .lbl { font-size: 0.68rem; color: var(--muted); font-weight: 600; }
-
-  .module-card {
-    display: block; border-radius: var(--radius); border: 1px solid var(--line); padding: 1.1rem;
-    background: #fff; text-decoration: none; color: inherit; position: relative; overflow: hidden;
-  }
-  .module-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:5px; background: var(--mc); }
-  .module-card:hover { border-color: var(--mc); text-decoration: none; }
-  .module-top { display:flex; justify-content: space-between; align-items:center; margin-bottom: 0.5rem; }
-  .module-name { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 0.95rem; }
-  .module-bar { height: 7px; background: var(--track); border-radius: 4px; overflow:hidden; margin-top: 0.5rem; }
-  .module-bar i { display:block; height:100%; background: var(--mc); border-radius:4px; }
-  .locked-badge { font-size: 0.68rem; font-weight: 700; color: var(--faint); background: var(--track); padding: 0.2rem 0.55rem; border-radius: 999px; }
-
-  .upgrade-banner {
-    background: var(--ink); color: #fff; border-radius: var(--radius); padding: 1.2rem 1.4rem;
-    display:flex; align-items:center; justify-content: space-between; gap: 1rem; margin-bottom: 1.2rem;
-  }
-  .loading-state { text-align:center; padding: 3rem; color: var(--muted); }
+  .dash-top { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:1.3rem; }
+  .greeting h1 { font-size:1.45rem; font-weight:800; letter-spacing:-0.01em; }
+  .greeting p { color:var(--muted); font-size:0.87rem; margin-top:0.15rem; }
+  .dash-grid { display:grid; grid-template-columns: 300px 1fr; gap:1.1rem; align-items:start; }
+  @media (max-width: 1020px) { .dash-grid { grid-template-columns:1fr; } }
+  .modules-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
+  @media (max-width: 680px) { .modules-grid { grid-template-columns:1fr; } }
+  .section-title { font-size:1rem; font-weight:800; margin: 1.6rem 0 0.8rem; }
+  .days-note { font-size:0.75rem; color:var(--muted); margin-top:0.7rem; line-height:1.5; }
+  .days-note strong { color:var(--ink); }
+  .loading-state { text-align:center; padding:3rem; color:var(--muted); }
 </style>
 </head>
-<body>
+<body class="themed-bg">
 
-<header class="dash-header container">
-  <a href="/index.html" class="brand" style="text-decoration:none;">
-    <img src="/assets/skillloop-logo.png" alt="SkillLoop" class="brand-logo-img brand-logo-img--sm">
+<aside class="sidebar" aria-label="Main navigation">
+  <a href="/dashboard.html" class="sidebar-logo">
+    <img src="/assets/skillloop-logo.png" alt="SkillLoop">
   </a>
-  <nav class="dash-nav">
-    <a href="/dashboard.html" class="active">Dashboard</a>
-    <a href="/physical-coordination.html">Physical Coordination</a>
-  </nav>
-  <div class="header-right">
-    <span id="plan-chip" class="plan-chip">Free plan</span>
-    <div id="avatar-badge" class="avatar-badge">–</div>
-    <button class="btn btn-secondary" onclick="signOut()">Log Out</button>
+
+  <div class="side-section">
+    <div class="side-label">Menu</div>
+    <a class="side-link active" href="/dashboard.html">Dashboard</a>
   </div>
-</header>
 
-<main class="container" style="padding-bottom: 3rem;">
+  <div class="side-section">
+    <div class="side-label">Modules</div>
+    <a class="side-link" href="/physical-coordination.html">
+      <span class="side-dot" style="background:#26a4de"></span> Physical Coordination
+    </a>
+    <span class="side-link locked"><span class="side-dot" style="background:#4ab851"></span> Independence <span class="side-chip">SOON</span></span>
+    <span class="side-link locked"><span class="side-dot" style="background:#fec41d"></span> Social Skills <span class="side-chip">SOON</span></span>
+    <span class="side-link locked"><span class="side-dot" style="background:#c94098"></span> Executive Function <span class="side-chip">SOON</span></span>
+  </div>
 
+  <div class="side-section">
+    <div class="side-label">Coming Soon</div>
+    <span class="side-link locked">Avatar Shop <span class="side-chip">SOON</span></span>
+    <span class="side-link locked">Game Mode <span class="side-chip">SOON</span></span>
+  </div>
+
+  <div class="side-section">
+    <div class="side-label">Legal</div>
+    <a class="side-link" href="/terms.html">Terms of Service</a>
+    <a class="side-link" href="/privacy.html">Privacy Policy</a>
+    <a class="side-link" href="/faq.html">FAQ</a>
+  </div>
+
+  <div class="sidebar-bottom side-section">
+    <button class="side-link" style="width:100%;" onclick="signOut()">Log Out</button>
+  </div>
+</aside>
+
+<main class="app-main">
   <div id="loading" class="loading-state">Loading your dashboard…</div>
 
   <div id="content" style="display:none;">
 
-    <div class="upgrade-banner" id="upgrade-banner" style="display:none;">
-      <div>
-        <strong>Unlock full access</strong>
-        <div class="muted" style="color:#c7d3e3; font-size:0.85rem; margin-top:0.2rem;">
-          Upgrade to Premium for AI feedback, all four modules, and unlimited depth.
+    <div class="dash-top">
+      <div class="greeting">
+        <h1 id="greeting">Welcome back</h1>
+        <p>Every module you finish closes another loop.</p>
+      </div>
+      <div class="chip-row">
+        <div class="stat-chip">
+          <div class="num"><span class="star-glyph">&#9733;</span> <span id="stat-stars">0</span></div>
+          <div class="lbl">STARS</div>
+        </div>
+        <div class="stat-chip">
+          <div class="num" id="stat-streak">0</div>
+          <div class="lbl">DAY STREAK</div>
+        </div>
+        <div class="stat-chip">
+          <div class="num" id="stat-days">0</div>
+          <div class="lbl">ACTIVE DAYS</div>
         </div>
       </div>
-      <button class="btn btn-primary" id="upgrade-btn">Upgrade — $50/mo</button>
     </div>
 
-    <div class="top-grid">
+    <div class="dash-grid">
+
       <div class="card">
-        <h2 id="greeting" style="font-size: 1.15rem; font-weight: 800;">Welcome back</h2>
-        <p class="muted" style="font-size: 0.85rem; margin-top: 0.2rem;">Every module you finish closes another loop.</p>
-        <div class="stat-row">
-          <div class="stat-chip">
-            <div class="num" id="stat-points">0</div>
-            <div class="lbl">POINTS</div>
-          </div>
-          <div class="stat-chip">
-            <div class="num" id="stat-days">0</div>
-            <div class="lbl">ACTIVE DAYS</div>
-          </div>
-          <div class="stat-chip">
-            <div class="num" id="stat-lessons">0</div>
-            <div class="lbl">LESSONS DONE</div>
+        <h2 style="font-size:0.95rem; font-weight:800; text-align:center; margin-bottom:0.9rem;">Total Progress</h2>
+        <div class="wheel-wrap">
+          <svg viewBox="0 0 220 220" role="img" aria-label="Overall progress across all four modules">
+            <path class="wheel-track" d="M 116.14 22.21 A 88 88 0 0 1 197.79 103.86" fill="none" stroke-width="13" stroke-linecap="round"/>
+            <path class="wheel-track" d="M 197.79 116.14 A 88 88 0 0 1 116.14 197.79" fill="none" stroke-width="13" stroke-linecap="round"/>
+            <path class="wheel-track" d="M 103.86 197.79 A 88 88 0 0 1 22.21 116.14" fill="none" stroke-width="13" stroke-linecap="round"/>
+            <path class="wheel-track" d="M 22.21 103.86 A 88 88 0 0 1 103.86 22.21" fill="none" stroke-width="13" stroke-linecap="round"/>
+            <path id="arc-physical" pathLength="100" d="M 116.14 22.21 A 88 88 0 0 1 197.79 103.86" fill="none" stroke="#26a4de" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 100"/>
+            <path id="arc-executive" pathLength="100" d="M 197.79 116.14 A 88 88 0 0 1 116.14 197.79" fill="none" stroke="#c94098" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 100"/>
+            <path id="arc-social" pathLength="100" d="M 103.86 197.79 A 88 88 0 0 1 22.21 116.14" fill="none" stroke="#fec41d" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 100"/>
+            <path id="arc-independence" pathLength="100" d="M 22.21 103.86 A 88 88 0 0 1 103.86 22.21" fill="none" stroke="#4ab851" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 100"/>
+          </svg>
+          <div class="wheel-center">
+            <div class="wheel-pct" id="wheel-pct">0%</div>
+            <div class="wheel-sub">overall</div>
           </div>
         </div>
-        <p class="muted" style="font-size: 0.78rem; margin-top: 0.8rem;">
-          <strong id="days-remaining">16</strong> active days keeps your care team's monthly check-in on track.
-        </p>
+        <div class="legend-row">
+          <span class="legend-item"><span class="legend-dot" style="background:#26a4de"></span>Physical</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#4ab851"></span>Independence</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#fec41d"></span>Social</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#c94098"></span>Executive</span>
+        </div>
+        <p class="days-note"><strong id="days-remaining">16</strong> more active days this month keeps your monthly check-in on track.</p>
       </div>
 
-      <div class="card">
-        <h2 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.8rem;">Your modules</h2>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
-
+      <div>
+        <div class="modules-grid">
           <a href="/physical-coordination.html" class="module-card" style="--mc:#26a4de;">
             <div class="module-top">
               <span class="module-name">Physical Coordination</span>
+              <span class="locked-badge" id="pc-count">0 done</span>
             </div>
             <div class="muted" style="font-size:0.78rem;">Balance, posture &amp; body awareness</div>
-            <div class="module-bar"><i id="bar-physical" style="width:0%"></i></div>
+            <div class="module-bar"><i id="bar-physical"></i></div>
           </a>
 
-          <div class="module-card" style="--mc:#4ab851; opacity:0.6;">
+          <div class="module-card locked" style="--mc:#4ab851;">
             <div class="module-top">
               <span class="module-name">Independence Skills</span>
               <span class="locked-badge">Coming soon</span>
             </div>
             <div class="muted" style="font-size:0.78rem;">Cooking, budgeting &amp; daily routines</div>
-            <div class="module-bar"><i style="width:0%"></i></div>
+            <div class="module-bar"><i id="bar-independence"></i></div>
           </div>
 
-          <div class="module-card" style="--mc:#fec41d; opacity:0.6;">
+          <div class="module-card locked" style="--mc:#fec41d;">
             <div class="module-top">
               <span class="module-name">Social Skills</span>
               <span class="locked-badge">Coming soon</span>
             </div>
             <div class="muted" style="font-size:0.78rem;">Conversation &amp; emotional awareness</div>
-            <div class="module-bar"><i style="width:0%"></i></div>
+            <div class="module-bar"><i id="bar-social"></i></div>
           </div>
 
-          <div class="module-card" style="--mc:#c94098; opacity:0.6;">
+          <div class="module-card locked" style="--mc:#c94098;">
             <div class="module-top">
               <span class="module-name">Executive Function</span>
               <span class="locked-badge">Coming soon</span>
             </div>
             <div class="muted" style="font-size:0.78rem;">Planning, focus &amp; daily structure</div>
-            <div class="module-bar"><i style="width:0%"></i></div>
+            <div class="module-bar"><i id="bar-executive"></i></div>
           </div>
+        </div>
 
+        <h2 class="section-title">Coming Soon</h2>
+        <div class="coming-grid">
+          <div class="coming-card">
+            <span class="coming-tag">IN DEVELOPMENT</span>
+            <div class="coming-title"><span class="star-glyph">&#9733;</span> Avatar Economy</div>
+            <p class="muted" style="font-size:0.85rem;">Spend the stars you earn from completed lessons on outfits and accessories for your avatar. Every lesson finished = 1 star banked, ready for launch day.</p>
+          </div>
+          <div class="coming-card">
+            <span class="coming-tag">IN DEVELOPMENT</span>
+            <div class="coming-title">Game Mode</div>
+            <p class="muted" style="font-size:0.85rem;">Practice what you learn in interactive scenarios where your avatar interacts with AI characters, reinforcing skills from all four modules in a low-pressure setting.</p>
+          </div>
         </div>
       </div>
-    </div>
 
+    </div>
   </div>
 </main>
 
@@ -165,83 +178,80 @@
 <script src="/js/config.js"></script>
 <script src="/js/supabase-client.js"></script>
 <script>
+  // Assignments per module for progress math. Physical Coordination has
+  // 20 lessons x 5 assignments = 100. Other modules are not yet released,
+  // so their totals are set but their completed counts will be 0 (blank).
+  const MODULE_TOTALS = {
+    physical_coordination: 100,
+    independence_skills: 100,
+    social_skills: 100,
+    executive_function: 100,
+  };
+  const ARC_IDS = {
+    physical_coordination: 'arc-physical',
+    independence_skills: 'arc-independence',
+    social_skills: 'arc-social',
+    executive_function: 'arc-executive',
+  };
+  const BAR_IDS = {
+    physical_coordination: 'bar-physical',
+    independence_skills: 'bar-independence',
+    social_skills: 'bar-social',
+    executive_function: 'bar-executive',
+  };
+
   (async function init() {
     const user = await requireAuth();
     if (!user) return;
 
-    // Log today as an active day just for visiting the dashboard
+    // First-time users must complete onboarding before the dashboard
+    const { data: ob } = await window.supabaseClient
+      .from('onboarding_responses').select('user_id').eq('user_id', user.id).maybeSingle();
+    if (!ob) { window.location.href = '/onboarding.html'; return; }
+
     await logActiveDay(user.id);
 
-    // Greeting + avatar initial (no hardcoded names — pulled from real account data)
     const fullName = user.user_metadata?.full_name || '';
     const hour = new Date().getHours();
     const part = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
-    document.getElementById('greeting').textContent = `Good ${part}${fullName ? ', ' + fullName.split(' ')[0] : ''}`;
-    document.getElementById('avatar-badge').textContent = (fullName || user.email).charAt(0).toUpperCase();
+    document.getElementById('greeting').textContent =
+      'Good ' + part + (fullName ? ', ' + fullName.split(' ')[0] : '');
 
-    // Profile (points)
-    let { data: profile } = await window.supabaseClient
-      .from('profiles').select('points').eq('id', user.id).single();
-    document.getElementById('stat-points').textContent = profile?.points ?? 0;
+    // Stars
+    const { data: profile } = await window.supabaseClient
+      .from('profiles').select('stars').eq('id', user.id).single();
+    document.getElementById('stat-stars').textContent = profile?.stars ?? 0;
 
-    // Active days (rolling 30-day RTM window)
+    // Active days + streak
     const activeDays = await getActiveDaysThisMonth(user.id);
     document.getElementById('stat-days').textContent = activeDays;
     document.getElementById('days-remaining').textContent = Math.max(0, 16 - activeDays);
+    document.getElementById('stat-streak').textContent = await getStreak(user.id);
 
-    // Module progress — physical coordination lesson count.
-    // MVP ships 2 series x 5 lessons = 10 real lessons; this total grows as more
-    // content ships (see product roadmap), so update MVP_TOTAL_LESSONS alongside it.
-    const MVP_TOTAL_LESSONS = 10;
-    const { data: progress } = await window.supabaseClient
-      .from('module_progress').select('id').eq('user_id', user.id).eq('module', 'physical_coordination');
-    const lessonsDone = progress?.length ?? 0;
-    document.getElementById('stat-lessons').textContent = lessonsDone;
-    const pct = Math.min(100, Math.round((lessonsDone / MVP_TOTAL_LESSONS) * 100));
-    document.getElementById('bar-physical').style.width = pct + '%';
+    // Per-module progress — real rows only; wheel stays blank at zero
+    const { data: rows } = await window.supabaseClient
+      .from('module_progress').select('module').eq('user_id', user.id);
+    const counts = {};
+    (rows || []).forEach(r => { counts[r.module] = (counts[r.module] || 0) + 1; });
 
-    // Subscription status
-    const { data: sub } = await window.supabaseClient
-      .from('subscriptions').select('status, plan').eq('user_id', user.id).maybeSingle();
-
-    const chip = document.getElementById('plan-chip');
-    const banner = document.getElementById('upgrade-banner');
-    if (sub && sub.status === 'active') {
-      chip.textContent = (sub.plan || 'Premium') + ' plan';
-      chip.classList.add('active');
-    } else {
-      banner.style.display = 'flex';
-    }
+    let doneSum = 0, totalSum = 0;
+    Object.keys(MODULE_TOTALS).forEach(mod => {
+      const done = counts[mod] || 0;
+      const total = MODULE_TOTALS[mod];
+      doneSum += done; totalSum += total;
+      const frac = Math.min(1, done / total);
+      document.getElementById(ARC_IDS[mod]).setAttribute('stroke-dasharray', (frac * 100) + ' 100');
+      const bar = document.getElementById(BAR_IDS[mod]);
+      if (bar) bar.style.width = (frac * 100) + '%';
+    });
+    document.getElementById('wheel-pct').textContent =
+      Math.round((doneSum / totalSum) * 100) + '%';
+    document.getElementById('pc-count').textContent =
+      (counts['physical_coordination'] || 0) + ' done';
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = 'block';
   })();
-
-  document.getElementById('upgrade-btn')?.addEventListener('click', async (e) => {
-    const btn = e.currentTarget;
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> Redirecting…';
-
-    const { data: { session } } = await window.supabaseClient.auth.getSession();
-
-    const res = await fetch('/.netlify/functions/create-checkout-session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        plan: 'premium',
-        userId: session.user.id,
-        email: session.user.email,
-      }),
-    });
-    const { url, error } = await res.json();
-    if (error) {
-      alert('Something went wrong starting checkout: ' + error);
-      btn.disabled = false;
-      btn.textContent = 'Upgrade — $50/mo';
-      return;
-    }
-    window.location.href = url;
-  });
 </script>
 </body>
 </html>

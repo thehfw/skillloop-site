@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Getting Started — SkillLoop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .quiz-shell { max-width: 640px; margin: 0 auto; padding: 2.2rem 1.2rem 4rem; }
+  .quiz-head { text-align: center; margin-bottom: 1.6rem; }
+  .quiz-head img { height: 70px; margin-bottom: 0.8rem; }
+  .quiz-head h1 { font-size: 1.45rem; font-weight: 800; }
+  .quiz-head p { color: var(--muted); font-size: 0.9rem; max-width: 480px; margin: 0.4rem auto 0; }
+  .progress-line { height: 8px; background: var(--track); border-radius: 4px; overflow: hidden; margin: 1.1rem 0 1.4rem; }
+  .progress-line i { display: block; height: 100%; background: var(--blue); width: 0%; border-radius: 4px; transition: width 0.2s; }
+  .answered-count { text-align: center; font-size: 0.78rem; font-weight: 700; color: var(--muted); margin-bottom: 1rem; }
+</style>
+</head>
+<body class="themed-bg">
+
+<div class="quiz-shell">
+  <div class="quiz-head">
+    <img src="/assets/skillloop-logo.png" alt="SkillLoop">
+    <h1>Let's get to know you</h1>
+    <p>These 20 quick questions help us place you at the right starting level in each module. There are no wrong answers — pick whichever fits best.</p>
+  </div>
+
+  <div class="progress-line"><i id="prog"></i></div>
+  <div class="answered-count"><span id="answered">0</span> of 20 answered</div>
+
+  <div id="form-error" class="form-error" role="alert"></div>
+
+  <form id="quiz-form"></form>
+
+  <button class="btn btn-primary btn-block mt-2" id="submit-btn">Finish and Continue</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/config.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+  // 20 questions across the assessment domains SkillLoop's clinical team
+  // uses for placement and insurance-eligibility review:
+  // age, physical coordination, executive function, social, independence,
+  // emotional regulation, supports/diagnosis context, engagement capacity.
+  const QUESTIONS = [
+    { id: 'age', text: 'How old are you?', opts: ['12–13', '14–15', '16–17', '18+'] },
+
+    // Physical coordination
+    { id: 'pc_balance', text: 'When you stand on one foot, how long can you usually hold it?', opts: ['Under 5 seconds', '5–15 seconds', '15–30 seconds', '30+ seconds easily'] },
+    { id: 'pc_trip', text: 'How often do you trip, bump into things, or feel unsteady?', opts: ['Most days', 'A few times a week', 'Occasionally', 'Rarely or never'] },
+    { id: 'pc_hand', text: 'How does your hand feel after writing or drawing for 10 minutes?', opts: ['Very tired or sore', 'A little tired', 'Mostly fine', 'Completely fine'] },
+    { id: 'pc_sport', text: 'How comfortable are you catching or throwing a ball?', opts: ['Very uncomfortable', 'Somewhat uncomfortable', 'Fairly comfortable', 'Very comfortable'] },
+
+    // Executive function
+    { id: 'ef_tasks', text: 'When you have several things to do, what usually happens?', opts: ['I lose track and forget most of them', 'I forget one or two', 'I mostly keep track', 'I keep track easily'] },
+    { id: 'ef_start', text: 'How hard is it to START homework or chores?', opts: ['Extremely hard, I put it off a long time', 'Pretty hard', 'A little hard', 'Easy, I just start'] },
+    { id: 'ef_steps', text: 'When someone gives you 3-step directions, you...', opts: ['Usually forget most steps', 'Remember the first step only', 'Remember most steps', 'Remember all steps easily'] },
+    { id: 'ef_time', text: 'How often do you lose track of time?', opts: ['Constantly', 'Often', 'Sometimes', 'Rarely'] },
+
+    // Social skills
+    { id: 'ss_start', text: 'Starting a conversation with someone new feels...', opts: ['Nearly impossible', 'Very stressful', 'A little awkward but doable', 'Easy'] },
+    { id: 'ss_faces', text: 'How well can you tell how someone feels from their face or tone?', opts: ['I usually cannot tell', 'I often miss it', 'I usually can tell', 'I can almost always tell'] },
+    { id: 'ss_group', text: 'Being in a group of people your age feels...', opts: ['Overwhelming, I avoid it', 'Stressful but I manage', 'Mostly okay', 'Comfortable'] },
+    { id: 'ss_plans', text: 'How often do you make plans with friends on your own?', opts: ['Never', 'Rarely', 'Sometimes', 'Often'] },
+
+    // Independence / daily living
+    { id: 'in_cook', text: 'Can you safely make yourself a simple meal (not just microwave)?', opts: ['No, I have never tried', 'I have tried with lots of help', 'Yes, with a little help', 'Yes, completely on my own'] },
+    { id: 'in_money', text: 'How confident are you handling money (paying, counting change, budgeting)?', opts: ['Not at all confident', 'A little confident', 'Fairly confident', 'Very confident'] },
+    { id: 'in_morning', text: 'How much help do you need with your morning routine?', opts: ['Reminders for almost every step', 'Reminders for a few steps', 'Occasional reminders', 'None, fully independent'] },
+
+    // Emotional regulation
+    { id: 'er_frustrate', text: 'When something is frustrating, what usually happens?', opts: ['I shut down or melt down', 'I get very upset but recover', 'I get annoyed but keep going', 'I stay calm'] },
+    { id: 'er_new', text: 'New or unexpected situations make you feel...', opts: ['Very anxious', 'Somewhat anxious', 'A little unsure', 'Fine or excited'] },
+
+    // Supports & context (used by our clinical team for eligibility review)
+    { id: 'sp_iep', text: 'Do you currently have an IEP or 504 plan at school?', opts: ['Yes, an IEP', 'Yes, a 504 plan', 'No', 'Not sure / prefer not to say'] },
+    { id: 'sp_services', text: 'Are you currently working with any therapist, counselor, or coach?', opts: ['Yes, regularly', 'Yes, occasionally', 'Not right now, but I have before', 'No, never / prefer not to say'] },
+  ];
+
+  const form = document.getElementById('quiz-form');
+  const progEl = document.getElementById('prog');
+  const answeredEl = document.getElementById('answered');
+  const errorBox = document.getElementById('form-error');
+  const submitBtn = document.getElementById('submit-btn');
+  let currentUser = null;
+
+  function render() {
+    form.innerHTML = QUESTIONS.map((q, i) => `
+      <div class="q-block" id="qb-${q.id}">
+        <div class="q-text"><span class="q-num">${i + 1}.</span>${q.text}</div>
+        ${q.opts.map((opt, oi) => `
+          <label class="q-opt">
+            <input type="radio" name="${q.id}" value="${oi}">
+            <span>${opt}</span>
+          </label>
+        `).join('')}
+      </div>
+    `).join('');
+
+    form.addEventListener('change', updateProgress);
+  }
+
+  function answeredCount() {
+    return QUESTIONS.filter(q => form.querySelector(`input[name="${q.id}"]:checked`)).length;
+  }
+
+  function updateProgress() {
+    const n = answeredCount();
+    answeredEl.textContent = n;
+    progEl.style.width = (n / QUESTIONS.length * 100) + '%';
+  }
+
+  submitBtn.addEventListener('click', async () => {
+    errorBox.classList.remove('visible');
+    const n = answeredCount();
+    if (n < QUESTIONS.length) {
+      errorBox.textContent = `Please answer all questions — ${QUESTIONS.length - n} left.`;
+      errorBox.classList.add('visible');
+      // scroll to first unanswered
+      const firstMissing = QUESTIONS.find(q => !form.querySelector(`input[name="${q.id}"]:checked`));
+      if (firstMissing) document.getElementById('qb-' + firstMissing.id).scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    const answers = {};
+    QUESTIONS.forEach(q => {
+      const sel = form.querySelector(`input[name="${q.id}"]:checked`);
+      answers[q.id] = { question: q.text, choiceIndex: parseInt(sel.value, 10), choice: q.opts[parseInt(sel.value, 10)] };
+    });
+    const ageRange = answers['age'].choice;
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner"></span> Saving…';
+
+    const { error } = await window.supabaseClient
+      .from('onboarding_responses')
+      .upsert({ user_id: currentUser.id, answers, age_range: ageRange }, { onConflict: 'user_id' });
+
+    if (error) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Finish and Continue';
+      errorBox.textContent = 'Could not save your answers: ' + error.message;
+      errorBox.classList.add('visible');
+      return;
+    }
+
+    await logActiveDay(currentUser.id);
+    window.location.href = '/dashboard.html';
+  });
+
+  (async function init() {
+    currentUser = await requireAuth();
+    if (!currentUser) return;
+
+    // Already completed? Straight to dashboard.
+    const { data } = await window.supabaseClient
+      .from('onboarding_responses').select('user_id').eq('user_id', currentUser.id).maybeSingle();
+    if (data) { window.location.href = '/dashboard.html'; return; }
+
+    render();
+  })();
+</script>
+</body>
+</html>

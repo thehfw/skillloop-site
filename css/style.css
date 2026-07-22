@@ -259,4 +259,53 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 }
 .toast.show { transform: translateY(0); opacity: 1; }
 
+/* ---------- Take a Breather ---------- */
+.breather-btn {
+  position: relative; display: block; width: 100%;
+  border-radius: 14px; padding: 2px; margin-top: 0.3rem;
+  background: transparent; z-index: 0; overflow: hidden; cursor: pointer;
+}
+.breather-btn::before {
+  content: ''; position: absolute; inset: -40%;
+  background: conic-gradient(from 0deg, #26a4de, #c94098, #fec41d, #4ab851, #26a4de);
+  animation: breather-spin 5s linear infinite; z-index: 0;
+}
+.breather-btn-inner {
+  position: relative; z-index: 1; background: #fff; border-radius: 12px;
+  padding: 0.6rem 0.7rem; text-align: center;
+  font-weight: 800; font-size: 0.76rem; color: var(--ink); line-height: 1.35;
+}
+@keyframes breather-spin { to { transform: rotate(360deg); } }
+
+.breather-overlay {
+  position: fixed; inset: 0; z-index: 150;
+  background: #eef7fb;
+  display: none; align-items: center; justify-content: center;
+  flex-direction: column; padding: 2rem 1.2rem;
+  transition: background 0.22s ease;
+}
+.breather-overlay.flash-close { background: var(--pink) !important; transition: none; }
+
+.end-break-btn {
+  position: absolute; top: 1.2rem; right: 1.2rem;
+  background: #fff; border: 1.5px solid var(--line); border-radius: 999px;
+  padding: 0.5rem 1.1rem; font-weight: 800; font-size: 0.8rem; color: var(--ink);
+}
+.end-break-btn:hover { border-color: var(--pink); color: var(--pink); }
+
+.breath-scene { width: 100%; max-width: 480px; text-align: center; }
+.breath-label {
+  font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800;
+  font-size: 1.5rem; color: var(--ink); margin-top: 1.2rem; min-height: 2.2rem;
+}
+.breath-sub { color: var(--muted); font-size: 0.9rem; margin-top: 0.3rem; }
+
+.breath-sun-wrap { width: 220px; height: 220px; margin: 0 auto; }
+.breath-sun-group { transform-origin: center; transition: transform 3.6s ease-in-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .breather-btn::before { animation: none; }
+  .breath-sun-group { transition: none; }
+}
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+

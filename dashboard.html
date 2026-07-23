@@ -265,10 +265,72 @@
   </div>
 </div>
 
+
+<div class="help-widget">
+  <button class="help-fab" id="help-fab" type="button" aria-haspopup="true" aria-label="Get help">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/>
+      <line x1="12" y1="17" x2="12" y2="17"/>
+    </svg>
+  </button>
+
+  <div class="help-panel" id="help-panel" role="menu">
+    <div class="help-panel-head">
+      <strong>Get Help</strong>
+      <p>Pick whichever works best for you.</p>
+    </div>
+
+    <button class="help-option" id="help-assistant-btn" type="button" role="menuitem">
+      <span class="help-option-icon" style="background:#e8f6fb; color:#26a4de;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </span>
+      <span>
+        Ask SkillLoop Assistant
+        <div class="help-option-sub">Get an instant answer</div>
+      </span>
+    </button>
+    <div class="help-assistant-note" id="help-assistant-note">
+      Our AI assistant is still in development. In the meantime, try the FAQ or email our team below — both are answered by real people.
+    </div>
+
+    <button class="help-option" id="help-faq-btn" type="button" role="menuitem">
+      <span class="help-option-icon" style="background:#fff8e6; color:#8a6a00;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/>
+          <line x1="12" y1="17" x2="12" y2="17"/>
+        </svg>
+      </span>
+      <span>
+        Browse the FAQ
+        <div class="help-option-sub">Common questions answered</div>
+      </span>
+    </button>
+
+    <button class="help-option" id="help-email-btn" type="button" role="menuitem">
+      <span class="help-option-icon" style="background:#edf7ee; color:#4ab851;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16v16H4z" opacity="0"/>
+          <path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2z"/>
+          <path d="m2 7 10 6 10-6"/>
+        </svg>
+      </span>
+      <span>
+        Email our team
+        <div class="help-option-sub">help@skillloop.org</div>
+      </span>
+    </button>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/config.js"></script>
 <script src="/js/supabase-client.js"></script>
 <script src="/js/breathing.js"></script>
+<script src="/js/get-help.js"></script>
 <script>
   // Assignments per module for progress math. Physical Coordination has
   // 20 lessons x 5 assignments = 100. Other modules are not yet released,

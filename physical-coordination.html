@@ -332,8 +332,18 @@
         <div class="help-option-sub">Get an instant answer</div>
       </span>
     </button>
-    <div class="help-assistant-note" id="help-assistant-note">
-      Our AI assistant is still in development. In the meantime, try the FAQ or email our team below — both are answered by real people.
+    <div class="help-assistant-chat" id="help-assistant-chat">
+      <div class="help-chat-log" id="help-chat-log"></div>
+      <div class="help-chat-typing" id="help-chat-typing" style="display:none;">SkillLoop Assistant is typing…</div>
+      <div class="help-chat-row">
+        <input type="text" class="help-chat-input" id="help-chat-input" placeholder="Ask a question..." maxlength="300">
+        <button class="help-chat-send" id="help-chat-send" type="button" aria-label="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <button class="help-option" id="help-faq-btn" type="button" role="menuitem">

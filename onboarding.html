@@ -24,11 +24,11 @@
   <div class="quiz-head">
     <img src="/assets/skillloop-logo.png" alt="SkillLoop">
     <h1>Let's get to know you</h1>
-    <p>These 20 quick questions help us place you at the right starting level in each module. There are no wrong answers — pick whichever fits best.</p>
+    <p>These 21 quick questions help us place you at the right starting level in each module. There are no wrong answers — pick whichever fits best.</p>
   </div>
 
   <div class="progress-line"><i id="prog"></i></div>
-  <div class="answered-count"><span id="answered">0</span> of 20 answered</div>
+  <div class="answered-count"><span id="answered">0</span> of 21 answered</div>
 
   <div id="form-error" class="form-error" role="alert"></div>
 
@@ -79,6 +79,7 @@
     { id: 'sp_iep', text: 'Do you currently have an IEP or 504 plan at school?', opts: ['Yes, an IEP', 'Yes, a 504 plan', 'No', 'Not sure / prefer not to say'] },
     { id: 'sp_services', text: 'Are you currently working with any therapist, counselor, or coach?', opts: ['Yes, regularly', 'Yes, occasionally', 'Not right now, but I have before', 'No, never / prefer not to say'] },
   ];
+  const TOTAL_ITEMS = QUESTIONS.length + 1; // +1 for the guardian email question below
 
   const form = document.getElementById('quiz-form');
   const progEl = document.getElementById('prog');
@@ -98,30 +99,47 @@
           </label>
         `).join('')}
       </div>
-    `).join('');
+    `).join('') + `
+      <div class="q-block" id="qb-guardian_email">
+        <div class="q-text"><span class="q-num">${QUESTIONS.length + 1}.</span>Enter a parent or guardian email to monitor and track progress, and receive email notifications. We may use this to reach out if we recommend meeting with a BCBA or clinician.</div>
+        <input type="email" id="guardian-email-input" class="q-email-input" placeholder="parent@example.com" required
+               style="width:100%; padding:0.7rem 0.9rem; border:1.5px solid var(--line); border-radius:10px; font-size:0.9rem; font-family:inherit;">
+      </div>
+    `;
 
     form.addEventListener('change', updateProgress);
+    document.getElementById('guardian-email-input').addEventListener('input', updateProgress);
+  }
+
+  function guardianEmailValid() {
+    const val = document.getElementById('guardian-email-input')?.value.trim() || '';
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
   }
 
   function answeredCount() {
-    return QUESTIONS.filter(q => form.querySelector(`input[name="${q.id}"]:checked`)).length;
+    const mcqDone = QUESTIONS.filter(q => form.querySelector(`input[name="${q.id}"]:checked`)).length;
+    return mcqDone + (guardianEmailValid() ? 1 : 0);
   }
 
   function updateProgress() {
     const n = answeredCount();
     answeredEl.textContent = n;
-    progEl.style.width = (n / QUESTIONS.length * 100) + '%';
+    progEl.style.width = (n / TOTAL_ITEMS * 100) + '%';
   }
 
   submitBtn.addEventListener('click', async () => {
     errorBox.classList.remove('visible');
     const n = answeredCount();
-    if (n < QUESTIONS.length) {
-      errorBox.textContent = `Please answer all questions — ${QUESTIONS.length - n} left.`;
+    if (n < TOTAL_ITEMS) {
+      errorBox.textContent = `Please answer all questions — ${TOTAL_ITEMS - n} left.`;
       errorBox.classList.add('visible');
       // scroll to first unanswered
       const firstMissing = QUESTIONS.find(q => !form.querySelector(`input[name="${q.id}"]:checked`));
-      if (firstMissing) document.getElementById('qb-' + firstMissing.id).scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (firstMissing) {
+        document.getElementById('qb-' + firstMissing.id).scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        document.getElementById('qb-guardian_email').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
 
@@ -131,6 +149,8 @@
       answers[q.id] = { question: q.text, choiceIndex: parseInt(sel.value, 10), choice: q.opts[parseInt(sel.value, 10)] };
     });
     const ageRange = answers['age'].choice;
+    const guardianEmail = document.getElementById('guardian-email-input').value.trim();
+    answers['guardian_email'] = { question: 'Parent or guardian email', choice: guardianEmail };
 
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="spinner"></span> Saving…';
@@ -146,6 +166,14 @@
       errorBox.classList.add('visible');
       return;
     }
+
+    // Save the guardian email to the profile too, so it's directly usable
+    // for progress notifications and clinical outreach (not just buried
+    // in the quiz answers jsonb).
+    await window.supabaseClient
+      .from('profiles')
+      .update({ guardian_email: guardianEmail })
+      .eq('id', currentUser.id);
 
     await logActiveDay(currentUser.id);
     window.location.href = '/dashboard.html';

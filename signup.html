@@ -34,6 +34,15 @@
         <input type="text" id="full-name" name="full-name" autocomplete="name" required placeholder="First Last">
       </div>
       <div class="field">
+        <label for="birthdate">Date of birth</label>
+        <input type="date" id="birthdate" name="birthdate" required>
+      </div>
+      <div class="field" id="guardian-field" style="display:none; background:#fff8e6; border:1.5px solid #fde8a8; border-radius:12px; padding:0.8rem 0.9rem;">
+        <label for="guardian-email" style="margin-bottom:0.3rem;">Have a parent or guardian enter their email to verify consent to use the platform</label>
+        <input type="email" id="guardian-email" name="guardian-email" placeholder="parent@example.com">
+        <p class="muted" style="font-size:0.76rem; margin-top:0.4rem;">Since you're under 13, a parent or guardian needs to provide this before your account can be created.</p>
+      </div>
+      <div class="field">
         <label for="email">Email</label>
         <input type="email" id="email" name="email" autocomplete="email" required placeholder="you@example.com">
       </div>
@@ -54,6 +63,9 @@
   const errorBox = document.getElementById('form-error');
   const successBox = document.getElementById('form-success');
   const submitBtn = document.getElementById('submit-btn');
+  const birthdateInput = document.getElementById('birthdate');
+  const guardianField = document.getElementById('guardian-field');
+  const guardianEmailInput = document.getElementById('guardian-email');
 
   function showError(msg) {
     errorBox.textContent = msg;
@@ -61,17 +73,47 @@
     successBox.classList.remove('visible');
   }
 
+  function calcAge(birthdateStr) {
+    const dob = new Date(birthdateStr);
+    if (isNaN(dob.getTime())) return null;
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+    return age;
+  }
+
+  function isUnder13() {
+    const age = calcAge(birthdateInput.value);
+    return age !== null && age < 13;
+  }
+
+  birthdateInput.addEventListener('change', () => {
+    guardianField.style.display = isUnder13() ? 'block' : 'none';
+    guardianEmailInput.required = isUnder13();
+  });
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     errorBox.classList.remove('visible');
     successBox.classList.remove('visible');
 
     const fullName = document.getElementById('full-name').value.trim();
+    const birthdate = birthdateInput.value;
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
+    const guardianEmail = guardianEmailInput.value.trim();
 
+    if (!birthdate) {
+      showError('Please enter your date of birth.');
+      return;
+    }
     if (password.length < 8) {
       showError('Password must be at least 8 characters.');
+      return;
+    }
+    if (isUnder13() && !guardianEmail) {
+      showError('A parent or guardian email is required to create an account for someone under 13.');
       return;
     }
 
@@ -81,7 +123,13 @@
     const { data, error } = await window.supabaseClient.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName } }
+      options: {
+        data: {
+          full_name: fullName,
+          birthdate: birthdate,
+          guardian_email: guardianEmail || null,
+        }
+      }
     });
 
     submitBtn.disabled = false;
@@ -99,6 +147,7 @@
       successBox.textContent = 'Account created! Check your email to confirm, then log in.';
       successBox.classList.add('visible');
       form.reset();
+      guardianField.style.display = 'none';
     }
   });
 </script>

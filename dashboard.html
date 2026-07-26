@@ -340,6 +340,27 @@
   </div>
 </div>
 
+
+<div class="consent-overlay" id="consent-overlay">
+  <div class="consent-card">
+    <img src="/assets/skillloop-logo.png" alt="SkillLoop" class="consent-logo">
+    <h2 class="consent-title">Before you get started</h2>
+    <p class="consent-body">
+      SkillLoop collects your account details, your onboarding answers, and your activity on the
+      platform — including completed lessons, quiz results, streaks, and written reflections — so we
+      can personalize your starting level and track your progress. If you're working with a partnered
+      care team, some of this activity (like the days you've used SkillLoop) may be shared with that
+      team, including for insurance documentation your family has agreed to. We never sell your data or
+      show ads. Full details are in our
+      <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.
+    </p>
+    <p class="consent-sub">
+      If you are under 13, a parent or guardian should be the one reviewing and accepting this on your behalf.
+    </p>
+    <button class="btn btn-primary btn-block" id="consent-allow-btn" type="button">Allow</button>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/config.js"></script>
 <script src="/js/supabase-client.js"></script>
@@ -376,6 +397,13 @@
     const { data: ob } = await window.supabaseClient
       .from('onboarding_responses').select('user_id').eq('user_id', user.id).maybeSingle();
     if (!ob) { window.location.href = '/onboarding.html'; return; }
+
+    // Show the data consent overlay once, right after onboarding, before first dashboard view
+    const { data: consentProfile } = await window.supabaseClient
+      .from('profiles').select('data_consent_given').eq('id', user.id).single();
+    if (!consentProfile?.data_consent_given) {
+      document.getElementById('consent-overlay').style.display = 'flex';
+    }
 
     await logActiveDay(user.id);
 
@@ -420,6 +448,20 @@
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = 'block';
   })();
+
+  document.getElementById('consent-allow-btn').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Saving…';
+
+    const { data: { user } } = await window.supabaseClient.auth.getUser();
+    await window.supabaseClient
+      .from('profiles')
+      .update({ data_consent_given: true, data_consent_at: new Date().toISOString() })
+      .eq('id', user.id);
+
+    document.getElementById('consent-overlay').style.display = 'none';
+  });
 </script>
 </body>
 </html>

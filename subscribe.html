@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subscribe — SkillLoop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .sub-shell { max-width: 780px; margin: 0 auto; padding: 2.2rem 1.2rem 4rem; }
+  .sub-head { text-align: center; margin-bottom: 2rem; }
+  .sub-head img { height: 60px; margin-bottom: 0.9rem; }
+  .sub-head h1 { font-size: 1.55rem; font-weight: 800; }
+  .sub-head p { color: var(--muted); font-size: 0.9rem; margin-top: 0.4rem; }
+
+  .plans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+  @media (max-width: 640px) { .plans-grid { grid-template-columns: 1fr; } }
+
+  .plan-card {
+    background: #fff; border: 2px solid var(--line); border-radius: var(--radius);
+    padding: 1.6rem; position: relative; text-align: left;
+  }
+  .plan-card.selectable { border-color: var(--pink); box-shadow: 0 14px 32px rgba(201,64,152,0.12); }
+  .plan-card.disabled { opacity: 0.62; }
+
+  .plan-badge {
+    position: absolute; top: -12px; left: 1.4rem;
+    font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em;
+    padding: 0.3rem 0.7rem; border-radius: 999px;
+  }
+  .plan-badge.available { background: var(--pink); color: #fff; }
+  .plan-badge.soon { background: var(--track); color: var(--muted); }
+
+  .plan-name { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 1.05rem; margin-top: 0.5rem; }
+  .plan-amount { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 2rem; margin: 0.5rem 0; }
+  .plan-amount span { font-size: 0.9rem; font-weight: 600; color: var(--muted); }
+  .plan-list { list-style: none; margin: 0.9rem 0 1.3rem; font-size: 0.85rem; color: var(--muted); }
+  .plan-list li { padding: 0.28rem 0; }
+
+  .plan-btn {
+    width: 100%; padding: 0.75rem; border-radius: 999px; font-weight: 800; font-size: 0.9rem;
+  }
+  .plan-btn.primary { background: var(--pink); color: #fff; }
+  .plan-btn.primary:hover { background: #b02f85; }
+  .plan-btn.locked { background: var(--track); color: var(--faint); cursor: not-allowed; }
+
+  .sub-note {
+    margin-top: 1.6rem; font-size: 0.8rem; color: var(--muted); text-align: center;
+  }
+</style>
+</head>
+<body class="themed-bg">
+<div class="sub-shell">
+  <a href="/dashboard.html" class="btn btn-secondary" style="margin-bottom:1.2rem;">&larr; Back to Dashboard</a>
+
+  <div class="sub-head">
+    <img src="/assets/skillloop-logo.png" alt="SkillLoop">
+    <h1>Choose your plan</h1>
+    <p>Cancel anytime. Families working through a partnered care team may already have access at no direct cost — check with your team before subscribing.</p>
+  </div>
+
+  <div class="plans-grid">
+
+    <div class="plan-card selectable">
+      <span class="plan-badge available">AVAILABLE NOW</span>
+      <div class="plan-name">Standard</div>
+      <div class="plan-amount">$25<span>/month</span></div>
+      <ul class="plan-list">
+        <li>Access to all four modules</li>
+        <li>Limited depth per lesson series</li>
+        <li>Stars, streaks, and progress tracking</li>
+        <li>Great for exploring SkillLoop</li>
+      </ul>
+      <button class="plan-btn primary" id="select-standard-btn" type="button">Select Standard — $25/mo</button>
+    </div>
+
+    <div class="plan-card disabled">
+      <span class="plan-badge soon">COMING SOON</span>
+      <div class="plan-name">Premium</div>
+      <div class="plan-amount">$50<span>/month</span></div>
+      <ul class="plan-list">
+        <li>Full platform access, unlimited depth</li>
+        <li>Parent progress dashboard</li>
+        <li>AI feedback on reflections and journals</li>
+      </ul>
+      <button class="plan-btn locked" type="button" disabled>Coming Soon</button>
+    </div>
+
+  </div>
+
+  <p class="sub-note" id="sub-note"></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/config.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+  (async function init() {
+    const user = await requireAuth();
+    if (!user) return;
+  })();
+
+  document.getElementById('select-standard-btn').addEventListener('click', () => {
+    document.getElementById('sub-note').textContent =
+      'Checkout is being connected right now — payment isn\u2019t enabled yet, so nothing was charged. Check back soon.';
+  });
+</script>
+</body>
+</html>

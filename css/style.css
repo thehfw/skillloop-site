@@ -262,27 +262,23 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 /* ---------- Take a Breather ---------- */
 .breather-btn {
   position: relative; display: block; width: 100%;
-  border-radius: 14px; padding: 2px; margin-top: 0.3rem;
-  background: transparent; z-index: 0; overflow: hidden; cursor: pointer;
-}
-.breather-btn::before {
-  content: ''; position: absolute; inset: 0;
-  border-radius: 14px; padding: 2px;
-  background: conic-gradient(from 0deg,
-    #26a4de, #6b7de0, #c94098, #f0a52a, #fec41d, #a3d33e, #4ab851, #2fa5b8, #26a4de);
-  animation: breather-spin 9s linear infinite;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  z-index: 0;
+  border-radius: 12px; padding: 0; margin-top: 0.25rem;
+  background: transparent; cursor: pointer;
 }
 .breather-btn-inner {
-  position: relative; z-index: 1; background: #fff; border-radius: 12px;
-  padding: 0.6rem 0.7rem; text-align: center;
-  font-weight: 800; font-size: 0.76rem; color: var(--ink); line-height: 1.35;
+  background: #fff; border-radius: 11px;
+  padding: 0.42rem 0.55rem; text-align: center;
+  font-weight: 800; font-size: 0.68rem; color: var(--ink); line-height: 1.25;
+  border: 2px solid #26a4de;
+  animation: breather-glow 6s ease-in-out infinite;
 }
-@keyframes breather-spin { to { transform: rotate(360deg); } }
+@keyframes breather-glow {
+  0%   { border-color: #26a4de; box-shadow: 0 0 7px 1.5px rgba(38,164,222,0.55); }
+  25%  { border-color: #c94098; box-shadow: 0 0 7px 1.5px rgba(201,64,152,0.55); }
+  50%  { border-color: #fec41d; box-shadow: 0 0 7px 1.5px rgba(254,196,29,0.55); }
+  75%  { border-color: #4ab851; box-shadow: 0 0 7px 1.5px rgba(74,184,81,0.55); }
+  100% { border-color: #26a4de; box-shadow: 0 0 7px 1.5px rgba(38,164,222,0.55); }
+}
 
 .breather-overlay {
   position: fixed; inset: 0; z-index: 150;
@@ -311,7 +307,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 .breath-sun-group { transform-origin: center; transition: transform 3.6s ease-in-out; }
 
 @media (prefers-reduced-motion: reduce) {
-  .breather-btn::before { animation: none; }
+  .breather-btn-inner { animation: none; }
   .breath-sun-group { transition: none; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }

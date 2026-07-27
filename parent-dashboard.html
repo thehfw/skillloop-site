@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent Dashboard — SkillLoop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .pd-shell { max-width: 860px; margin: 0 auto; padding: 2rem 1.2rem 4rem; }
+  .pd-head { text-align: center; margin-bottom: 1.6rem; }
+  .pd-head h1 { font-size: 1.5rem; font-weight: 800; }
+  .pd-head p { color: var(--muted); font-size: 0.9rem; margin-top: 0.3rem; }
+
+  .pd-summary {
+    background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 1.3rem 1.5rem; margin-bottom: 1.3rem; font-size: 0.95rem; line-height: 1.6;
+  }
+
+  .pd-grid { display: grid; grid-template-columns: 240px 1fr; gap: 1.1rem; }
+  @media (max-width: 780px) { .pd-grid { grid-template-columns: 1fr; } }
+
+  .pd-module-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.9rem; }
+  .pd-module-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .pd-module-name { font-weight: 700; font-size: 0.88rem; width: 150px; flex-shrink: 0; }
+  .pd-module-bar { flex: 1; height: 9px; background: var(--track); border-radius: 5px; overflow: hidden; }
+  .pd-module-bar i { display: block; height: 100%; border-radius: 5px; width: 0%; }
+  .pd-module-pct { font-size: 0.82rem; font-weight: 700; color: var(--muted); width: 42px; text-align: right; flex-shrink: 0; }
+
+  .loading-state { text-align: center; padding: 3rem; color: var(--muted); }
+</style>
+</head>
+<body class="themed-bg">
+
+<div class="pd-shell">
+  <a href="/dashboard.html" class="btn btn-secondary" style="margin-bottom:1.2rem;">&larr; Back to Dashboard</a>
+
+  <div id="loading" class="loading-state">Loading progress…</div>
+
+  <div id="content" style="display:none;">
+    <div class="pd-head">
+      <img src="/assets/skillloop-logo.png" alt="SkillLoop" style="height:48px; margin-bottom:0.8rem;">
+      <h1 id="pd-title">Parent Dashboard</h1>
+      <p>A plain-language look at progress on SkillLoop.</p>
+    </div>
+
+    <div class="pd-summary" id="pd-summary-text"></div>
+
+    <div class="pd-grid">
+      <div class="card text-center">
+        <h2 style="font-size:0.9rem; font-weight:800; margin-bottom:0.9rem;">Overall Progress</h2>
+        <div class="wheel-wrap" style="width:170px;">
+          <svg viewBox="0 0 220 220" role="img" aria-label="Overall progress across all four modules">
+            <path class="wheel-track" d="M 116.14 22.21 A 88 88 0 0 1 197.79 103.86" fill="none" stroke-width="13" stroke-linecap="round"/>
+            <path class="wheel-track" d="M 197.79 116.14 A 88 88 0 0 1 116.14 197.79" fill="none" stroke-width="13" stroke-linecap="round"/>
+            <path class="wheel-track" d="M 103.86 197.79 A 88 88 0 0 1 22.21 116.14" fill="none" stroke-width="13" stroke-linecap="round"/>
+            <path class="wheel-track" d="M 22.21 103.86 A 88 88 0 0 1 103.86 22.21" fill="none" stroke-width="13" stroke-linecap="round"/>
+            <path id="arc-physical" pathLength="100" d="M 116.14 22.21 A 88 88 0 0 1 197.79 103.86" fill="none" stroke="#26a4de" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 100"/>
+            <path id="arc-executive" pathLength="100" d="M 197.79 116.14 A 88 88 0 0 1 116.14 197.79" fill="none" stroke="#c94098" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 100"/>
+            <path id="arc-social" pathLength="100" d="M 103.86 197.79 A 88 88 0 0 1 22.21 116.14" fill="none" stroke="#fec41d" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 100"/>
+            <path id="arc-independence" pathLength="100" d="M 22.21 103.86 A 88 88 0 0 1 103.86 22.21" fill="none" stroke="#4ab851" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 100"/>
+          </svg>
+          <div class="wheel-center">
+            <div class="wheel-pct" id="wheel-pct">0%</div>
+            <div class="wheel-sub">overall</div>
+          </div>
+        </div>
+        <div class="chip-row" style="margin-top:1.1rem; justify-content:center;">
+          <div class="stat-chip">
+            <div class="num"><span class="star-glyph">&#9733;</span> <span id="stat-stars">0</span></div>
+            <div class="lbl">STARS</div>
+          </div>
+          <div class="stat-chip">
+            <div class="num" id="stat-streak">0</div>
+            <div class="lbl">STREAK</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 style="font-size:0.9rem; font-weight:800; margin-bottom:1rem;">Progress by Module</h2>
+        <div id="module-rows"></div>
+        <p class="muted" style="font-size:0.8rem; margin-top:0.8rem;">
+          Active days this month: <strong id="stat-days">0</strong> of 30 — this reflects how consistently SkillLoop is being used, which also supports any care-team check-ins your family has set up.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/config.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+  const MODULE_TOTALS = {
+    physical_coordination: 100,
+    independence_skills: 100,
+    social_skills: 100,
+    executive_function: 100,
+  };
+  const MODULE_META = [
+    { key: 'physical_coordination', label: 'Physical Coordination', color: '#26a4de' },
+    { key: 'independence_skills', label: 'Independence Skills', color: '#4ab851' },
+    { key: 'social_skills', label: 'Social Skills', color: '#fec41d' },
+    { key: 'executive_function', label: 'Executive Function', color: '#c94098' },
+  ];
+  const ARC_IDS = {
+    physical_coordination: 'arc-physical',
+    independence_skills: 'arc-independence',
+    social_skills: 'arc-social',
+    executive_function: 'arc-executive',
+  };
+
+  (async function init() {
+    const user = await requireAuth();
+    if (!user) return;
+
+    const { data: ob } = await window.supabaseClient
+      .from('onboarding_responses').select('user_id').eq('user_id', user.id).maybeSingle();
+    if (!ob) { window.location.href = '/onboarding.html'; return; }
+
+    const fullName = user.user_metadata?.full_name || '';
+    document.getElementById('pd-title').textContent = fullName ? fullName.split(' ')[0] + "'s Parent Dashboard" : 'Parent Dashboard';
+
+    const { data: profile } = await window.supabaseClient.from('profiles').select('stars').eq('id', user.id).single();
+    document.getElementById('stat-stars').textContent = profile?.stars ?? 0;
+
+    const activeDays = await getActiveDaysThisMonth(user.id);
+    document.getElementById('stat-days').textContent = activeDays;
+    document.getElementById('stat-streak').textContent = await getStreak(user.id);
+
+    const { data: rows } = await window.supabaseClient
+      .from('module_progress').select('module').eq('user_id', user.id);
+    const counts = {};
+    (rows || []).forEach(r => { counts[r.module] = (counts[r.module] || 0) + 1; });
+
+    let doneSum = 0, totalSum = 0;
+    const rowsEl = document.getElementById('module-rows');
+    rowsEl.innerHTML = '';
+    let bestModule = null, bestPct = -1;
+
+    MODULE_META.forEach(m => {
+      const done = counts[m.key] || 0;
+      const total = MODULE_TOTALS[m.key];
+      const pct = Math.round(Math.min(1, done / total) * 100);
+      doneSum += done; totalSum += total;
+      if (pct > bestPct) { bestPct = pct; bestModule = m.label; }
+
+      document.getElementById(ARC_IDS[m.key]).setAttribute('stroke-dasharray', (Math.min(1, done/total) * 100) + ' 100');
+
+      const row = document.createElement('div');
+      row.className = 'pd-module-row';
+      row.innerHTML = `
+        <span class="pd-module-dot" style="background:${m.color}"></span>
+        <span class="pd-module-name">${m.label}</span>
+        <span class="pd-module-bar"><i style="width:${pct}%; background:${m.color};"></i></span>
+        <span class="pd-module-pct">${pct}%</span>
+      `;
+      rowsEl.appendChild(row);
+    });
+
+    const overallPct = Math.round((doneSum / totalSum) * 100);
+    document.getElementById('wheel-pct').textContent = overallPct + '%';
+
+    const stars = profile?.stars ?? 0;
+    const name = fullName ? fullName.split(' ')[0] : 'Your teen';
+    document.getElementById('pd-summary-text').innerHTML =
+      `${name} has earned <strong>${stars} star${stars === 1 ? '' : 's'}</strong> so far and is <strong>${overallPct}% of the way</strong> through the modules currently available. ` +
+      `${bestPct > 0 ? `The strongest area right now is <strong>${bestModule}</strong>. ` : ''}` +
+      `In the last 30 days, SkillLoop has been used on <strong>${activeDays} day${activeDays === 1 ? '' : 's'}</strong>.`;
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+  })();
+</script>
+</body>
+</html>

@@ -201,12 +201,14 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 /* ---------- Lesson cubes ---------- */
 .cube-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.8rem; }
 .cube {
-  aspect-ratio: 1; border-radius: 16px; border: 1.5px solid var(--line); background: #fff;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.3rem;
+  aspect-ratio: 0.85; border-radius: 16px; border: 1.5px solid var(--line); background: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.18rem;
   font-weight: 700; transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+  padding: 0.4rem 0.3rem;
 }
-.cube .cube-num { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.5rem; font-weight: 800; }
-.cube .cube-lbl { font-size: 0.68rem; color: var(--muted); font-weight: 700; }
+.cube .cube-num { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.3rem; font-weight: 800; }
+.cube .cube-topic { font-size: 0.66rem; font-weight: 800; color: var(--ink); text-align: center; line-height: 1.15; min-height: 1.7em; }
+.cube .cube-lbl { font-size: 0.62rem; color: var(--muted); font-weight: 700; }
 .cube.unlocked { border-color: var(--blue); }
 .cube.unlocked:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(38,164,222,0.16); }
 .cube.done { border-color: var(--green); background: #f2fbf3; }

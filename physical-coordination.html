@@ -306,6 +306,13 @@
 <script src="/js/get-help.js"></script>
 <script>
   const TOTAL_LESSONS = 20;
+  const LESSON_TOPICS = [
+    'Balance & Stability', 'Core Strength', 'Fine Motor Dexterity', 'Grip Strength',
+    'Posture & Alignment', 'Hand-Eye Coordination', 'Bilateral Coordination', 'Reaction Time',
+    'Spatial Awareness', 'Rhythm & Timing', 'Agility', 'Flexibility & Mobility',
+    'Proprioception', 'Motor Planning', 'Cross-Body Coordination', 'Dynamic Balance',
+    'Endurance & Stamina', 'Fine Motor Control', 'Full-Body Integration', 'Coordination Mastery',
+  ];
   const ASSIGNMENTS_PER_LESSON = 5;
   const BRAND_COLORS = ['#26a4de', '#c94098', '#fec41d', '#4ab851'];
 
@@ -441,6 +448,7 @@
         <span class="cube-shadow-num">${l}</span>
         ${MINI_MARK_SVG}
         <span class="cube-num">${l}</span>
+        <span class="cube-topic">${LESSON_TOPICS[l - 1]}</span>
         <span class="cube-lbl">${unlocked ? done + '/' + ASSIGNMENTS_PER_LESSON : 'Coming soon'}</span>
       `;
       if (unlocked) cube.addEventListener('click', () => { selectedLesson = l; selectedAssignment = null; renderLessons(); renderAssignments(); });
@@ -453,7 +461,7 @@
   function renderAssignments() {
     const panel = document.getElementById('assignment-panel');
     const grid = document.getElementById('assignment-grid');
-    document.getElementById('assignment-title').textContent = 'Lesson ' + selectedLesson + ' — Assignments';
+    document.getElementById('assignment-title').textContent = 'Lesson ' + selectedLesson + ' — ' + LESSON_TOPICS[selectedLesson - 1] + ' — Assignments';
     panel.style.display = 'block';
     grid.innerHTML = '';
 

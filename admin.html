@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — SkillLoop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .admin-shell { max-width: 980px; margin: 0 auto; padding: 2rem 1.2rem 4rem; }
+  .admin-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.4rem; }
+  .admin-head h1 { font-size: 1.4rem; font-weight: 800; }
+  .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+  @media (max-width: 860px) { .admin-grid { grid-template-columns: 1fr; } }
+
+  .admin-section-title { font-size: 0.95rem; font-weight: 800; margin-bottom: 0.9rem; }
+  .cover-preview { width: 100%; max-width: 220px; border-radius: 10px; margin-top: 0.5rem; display: none; }
+  .cover-preview.visible { display: block; }
+
+  .mcq-block { border: 1.5px solid var(--line); border-radius: 12px; padding: 0.8rem; margin-bottom: 0.8rem; }
+  .mcq-block .field { margin-bottom: 0.6rem; }
+  .mcq-opt-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+  .mcq-opt-row input[type="text"] { flex: 1; }
+  .mcq-opt-row input[type="radio"] { accent-color: var(--green); }
+
+  .item-list { max-height: 300px; overflow-y: auto; }
+  .item-row {
+    display: flex; align-items: center; gap: 0.7rem; padding: 0.55rem 0.6rem;
+    border-radius: 10px; border: 1px solid var(--line); margin-bottom: 0.5rem; font-size: 0.85rem;
+  }
+  .item-row img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--track); }
+  .item-row .info { flex: 1; }
+  .item-row .info strong { display: block; }
+  .item-row .info span { color: var(--muted); font-size: 0.76rem; }
+  .item-row-actions { display: flex; gap: 0.4rem; }
+  .item-row-actions button { font-size: 0.74rem; font-weight: 700; padding: 0.3rem 0.6rem; border-radius: 8px; background: var(--track); }
+  .item-row-actions button.danger { color: #9c2b2a; }
+
+  .save-status { font-size: 0.82rem; margin-top: 0.6rem; display: none; }
+  .save-status.ok { color: #256d31; display: block; }
+  .save-status.err { color: #9c2b2a; display: block; }
+
+  .assignment-disabled { opacity: 0.5; pointer-events: none; }
+  .checking-state { text-align: center; padding: 4rem; color: var(--muted); }
+</style>
+</head>
+<body class="themed-bg">
+
+<div id="checking" class="checking-state">Checking access…</div>
+
+<div class="admin-shell" id="admin-content" style="display:none;">
+  <div class="admin-head">
+    <div>
+      <img src="/assets/skillloop-logo.png" alt="SkillLoop" style="height:36px; margin-bottom:0.5rem;">
+      <h1>Content Admin</h1>
+    </div>
+    <a href="/dashboard.html" class="btn btn-secondary">&larr; Back to Dashboard</a>
+  </div>
+
+  <div class="admin-grid">
+
+    <!-- LEFT: Lessons -->
+    <div class="card">
+      <div class="admin-section-title">Lesson (Topic)</div>
+
+      <div class="field">
+        <label for="l-module">Module</label>
+        <select id="l-module">
+          <option value="physical_coordination">Physical Coordination</option>
+          <option value="independence_skills">Independence Skills</option>
+          <option value="social_skills">Social Skills</option>
+          <option value="executive_function">Executive Function</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="l-number">Lesson Number (1-20)</label>
+        <input type="number" id="l-number" min="1" max="20" value="1">
+      </div>
+      <div class="field">
+        <label for="l-topic">Topic Name</label>
+        <input type="text" id="l-topic" placeholder="e.g. Grip Strength">
+      </div>
+      <div class="field">
+        <label for="l-cover">Cover Photo</label>
+        <input type="file" id="l-cover" accept="image/*">
+        <img id="l-cover-preview" class="cover-preview">
+      </div>
+      <button class="btn btn-primary btn-block" id="l-save-btn" type="button">Save Lesson</button>
+      <div class="save-status" id="l-status"></div>
+
+      <div class="admin-section-title" style="margin-top:1.4rem;">Existing Lessons</div>
+      <div class="item-list" id="lesson-list"></div>
+    </div>
+
+    <!-- RIGHT: Assignments -->
+    <div class="card" id="assignment-panel-wrap">
+      <div class="admin-section-title">Assignment <span class="muted" id="assignment-lesson-hint" style="font-weight:600;"></span></div>
+
+      <div id="assignment-form" class="assignment-disabled">
+        <div class="field">
+          <label for="a-number">Assignment Number (1-5)</label>
+          <input type="number" id="a-number" min="1" max="5" value="1">
+        </div>
+        <div class="field">
+          <label for="a-title">Title</label>
+          <input type="text" id="a-title" placeholder="e.g. Standing Balance Basics">
+        </div>
+        <div class="field">
+          <label for="a-video">Video URL (YouTube)</label>
+          <input type="text" id="a-video" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+        <div class="field">
+          <label for="a-desc">Description</label>
+          <textarea id="a-desc" rows="3" placeholder="Short description of the exercise..."></textarea>
+        </div>
+
+        <label style="font-size:0.82rem; font-weight:700; color:var(--muted); display:block; margin-bottom:0.5rem;">5-Question MCQ (blank — fill in and mark the correct answer)</label>
+        <div id="mcq-root"></div>
+
+        <div class="field">
+          <label for="a-reflect">Reflection Prompt (AI-graded)</label>
+          <textarea id="a-reflect" rows="2" placeholder="e.g. In at least 3 sentences, tell us what you tried..."></textarea>
+        </div>
+
+        <button class="btn btn-primary btn-block" id="a-save-btn" type="button">Save Assignment</button>
+        <div class="save-status" id="a-status"></div>
+      </div>
+
+      <div class="admin-section-title" style="margin-top:1.4rem;">Existing Assignments</div>
+      <div class="item-list" id="assignment-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/config.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+  const ADMIN_EMAIL = 'harrisonwebb@mac.com';
+  let selectedLessonId = null;
+  let editingLessonId = null;
+  let editingAssignmentId = null;
+
+  function buildMcqInputs() {
+    const root = document.getElementById('mcq-root');
+    root.innerHTML = '';
+    for (let q = 0; q < 5; q++) {
+      const block = document.createElement('div');
+      block.className = 'mcq-block';
+      block.innerHTML = `
+        <div class="field">
+          <label>Question ${q + 1}</label>
+          <input type="text" class="mcq-q" data-q="${q}" placeholder="Question text">
+        </div>
+        ${[0, 1, 2, 3].map(o => `
+          <div class="mcq-opt-row">
+            <input type="radio" name="mcq-correct-${q}" class="mcq-correct" data-q="${q}" data-o="${o}">
+            <input type="text" class="mcq-opt" data-q="${q}" data-o="${o}" placeholder="Option ${o + 1}">
+          </div>
+        `).join('')}
+      `;
+      root.appendChild(block);
+    }
+  }
+
+  function readMcqInputs() {
+    const questions = [];
+    for (let q = 0; q < 5; q++) {
+      const qText = document.querySelector(`.mcq-q[data-q="${q}"]`).value.trim();
+      const opts = [0, 1, 2, 3].map(o => document.querySelector(`.mcq-opt[data-q="${q}"][data-o="${o}"]`).value.trim());
+      const correctRadio = document.querySelector(`.mcq-correct[data-q="${q}"]:checked`);
+      questions.push({
+        question: qText,
+        options: opts,
+        correctIndex: correctRadio ? parseInt(correctRadio.dataset.o, 10) : null,
+      });
+    }
+    return questions;
+  }
+
+  function fillMcqInputs(mcq) {
+    buildMcqInputs();
+    if (!Array.isArray(mcq)) return;
+    mcq.forEach((item, q) => {
+      const qInput = document.querySelector(`.mcq-q[data-q="${q}"]`);
+      if (qInput) qInput.value = item.question || '';
+      (item.options || []).forEach((opt, o) => {
+        const optInput = document.querySelector(`.mcq-opt[data-q="${q}"][data-o="${o}"]`);
+        if (optInput) optInput.value = opt || '';
+      });
+      if (typeof item.correctIndex === 'number') {
+        const radio = document.querySelector(`.mcq-correct[data-q="${q}"][data-o="${item.correctIndex}"]`);
+        if (radio) radio.checked = true;
+      }
+    });
+  }
+
+  function extractYouTubeId(url) {
+    const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/);
+    return m ? m[1] : url; // fall back to raw input if it doesn't match
+  }
+
+  function showStatus(el, msg, ok) {
+    el.textContent = msg;
+    el.className = 'save-status ' + (ok ? 'ok' : 'err');
+  }
+
+  async function loadLessons() {
+    const { data: lessons } = await window.supabaseClient
+      .from('lessons').select('*').order('module').order('lesson_number');
+    const list = document.getElementById('lesson-list');
+    list.innerHTML = '';
+    (lessons || []).forEach(l => {
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.innerHTML = `
+        <img src="${l.cover_photo_url || ''}" alt="">
+        <div class="info"><strong>${l.lesson_number}. ${l.topic_name}</strong><span>${l.module}</span></div>
+        <div class="item-row-actions">
+          <button data-id="${l.id}" class="edit-lesson-btn">Edit</button>
+          <button data-id="${l.id}" class="danger delete-lesson-btn">Delete</button>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+
+    document.querySelectorAll('.edit-lesson-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lesson = lessons.find(l => l.id === parseInt(btn.dataset.id, 10));
+        editingLessonId = lesson.id;
+        document.getElementById('l-module').value = lesson.module;
+        document.getElementById('l-number').value = lesson.lesson_number;
+        document.getElementById('l-topic').value = lesson.topic_name;
+        const preview = document.getElementById('l-cover-preview');
+        if (lesson.cover_photo_url) { preview.src = lesson.cover_photo_url; preview.classList.add('visible'); }
+        selectLesson(lesson.id, lesson);
+      });
+    });
+    document.querySelectorAll('.delete-lesson-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Delete this lesson and all its assignments?')) return;
+        await window.supabaseClient.from('lessons').delete().eq('id', parseInt(btn.dataset.id, 10));
+        loadLessons();
+        if (selectedLessonId === parseInt(btn.dataset.id, 10)) {
+          selectedLessonId = null;
+          document.getElementById('assignment-form').classList.add('assignment-disabled');
+          document.getElementById('assignment-list').innerHTML = '';
+        }
+      });
+    });
+  }
+
+  function selectLesson(id, lesson) {
+    selectedLessonId = id;
+    document.getElementById('assignment-form').classList.remove('assignment-disabled');
+    document.getElementById('assignment-lesson-hint').textContent =
+      lesson ? `— Lesson ${lesson.lesson_number}: ${lesson.topic_name}` : '';
+    loadAssignments();
+  }
+
+  async function loadAssignments() {
+    const list = document.getElementById('assignment-list');
+    list.innerHTML = '';
+    if (!selectedLessonId) return;
+
+    const { data: assignments } = await window.supabaseClient
+      .from('assignments').select('*').eq('lesson_id', selectedLessonId).order('assignment_number');
+
+    (assignments || []).forEach(a => {
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.innerHTML = `
+        <div class="info"><strong>${a.assignment_number}. ${a.title}</strong><span>${a.video_url ? 'Has video' : 'No video'}</span></div>
+        <div class="item-row-actions">
+          <button data-id="${a.id}" class="edit-assignment-btn">Edit</button>
+          <button data-id="${a.id}" class="danger delete-assignment-btn">Delete</button>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+
+    document.querySelectorAll('.edit-assignment-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const a = assignments.find(x => x.id === parseInt(btn.dataset.id, 10));
+        editingAssignmentId = a.id;
+        document.getElementById('a-number').value = a.assignment_number;
+        document.getElementById('a-title').value = a.title || '';
+        document.getElementById('a-video').value = a.video_url || '';
+        document.getElementById('a-desc').value = a.description || '';
+        document.getElementById('a-reflect').value = a.reflection_prompt || '';
+        fillMcqInputs(a.mcq);
+      });
+    });
+    document.querySelectorAll('.delete-assignment-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Delete this assignment?')) return;
+        await window.supabaseClient.from('assignments').delete().eq('id', parseInt(btn.dataset.id, 10));
+        loadAssignments();
+      });
+    });
+  }
+
+  document.getElementById('l-cover').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const preview = document.getElementById('l-cover-preview');
+    preview.src = URL.createObjectURL(file);
+    preview.classList.add('visible');
+  });
+
+  document.getElementById('l-save-btn').addEventListener('click', async () => {
+    const statusEl = document.getElementById('l-status');
+    const module = document.getElementById('l-module').value;
+    const lessonNumber = parseInt(document.getElementById('l-number').value, 10);
+    const topicName = document.getElementById('l-topic').value.trim();
+    const fileInput = document.getElementById('l-cover');
+
+    if (!topicName) { showStatus(statusEl, 'Topic name is required.', false); return; }
+
+    let coverUrl = null;
+    const file = fileInput.files[0];
+    if (file) {
+      const path = `${module}/${lessonNumber}-${Date.now()}-${file.name}`;
+      const { error: uploadErr } = await window.supabaseClient.storage.from('lesson-covers').upload(path, file);
+      if (uploadErr) { showStatus(statusEl, 'Cover upload failed: ' + uploadErr.message, false); return; }
+      const { data: pub } = window.supabaseClient.storage.from('lesson-covers').getPublicUrl(path);
+      coverUrl = pub.publicUrl;
+    }
+
+    const payload = { module, lesson_number: lessonNumber, topic_name: topicName };
+    if (coverUrl) payload.cover_photo_url = coverUrl;
+
+    let error;
+    if (editingLessonId) {
+      ({ error } = await window.supabaseClient.from('lessons').update(payload).eq('id', editingLessonId));
+    } else {
+      ({ error } = await window.supabaseClient.from('lessons').upsert(payload, { onConflict: 'module,lesson_number' }));
+    }
+
+    if (error) { showStatus(statusEl, 'Save failed: ' + error.message, false); return; }
+    showStatus(statusEl, 'Lesson saved.', true);
+    editingLessonId = null;
+    loadLessons();
+  });
+
+  document.getElementById('a-save-btn').addEventListener('click', async () => {
+    const statusEl = document.getElementById('a-status');
+    if (!selectedLessonId) { showStatus(statusEl, 'Select or save a lesson first.', false); return; }
+
+    const assignmentNumber = parseInt(document.getElementById('a-number').value, 10);
+    const title = document.getElementById('a-title').value.trim();
+    const rawVideo = document.getElementById('a-video').value.trim();
+    const videoUrl = rawVideo ? extractYouTubeId(rawVideo) : null;
+    const description = document.getElementById('a-desc').value.trim();
+    const reflectionPrompt = document.getElementById('a-reflect').value.trim();
+    const mcq = readMcqInputs();
+
+    if (!title) { showStatus(statusEl, 'Title is required.', false); return; }
+
+    const payload = {
+      lesson_id: selectedLessonId,
+      assignment_number: assignmentNumber,
+      title, video_url: videoUrl, description,
+      mcq, reflection_prompt: reflectionPrompt,
+    };
+
+    let error;
+    if (editingAssignmentId) {
+      ({ error } = await window.supabaseClient.from('assignments').update(payload).eq('id', editingAssignmentId));
+    } else {
+      ({ error } = await window.supabaseClient.from('assignments').upsert(payload, { onConflict: 'lesson_id,assignment_number' }));
+    }
+
+    if (error) { showStatus(statusEl, 'Save failed: ' + error.message, false); return; }
+    showStatus(statusEl, 'Assignment saved.', true);
+    editingAssignmentId = null;
+    loadAssignments();
+  });
+
+  (async function init() {
+    const user = await requireAuth();
+    if (!user) return;
+
+    if (user.email !== ADMIN_EMAIL) {
+      window.location.href = '/dashboard.html';
+      return;
+    }
+
+    buildMcqInputs();
+    await loadLessons();
+
+    document.getElementById('checking').style.display = 'none';
+    document.getElementById('admin-content').style.display = 'block';
+  })();
+</script>
+</body>
+</html>

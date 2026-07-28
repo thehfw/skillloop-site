@@ -19,6 +19,12 @@
   .days-note { font-size:0.75rem; color:var(--muted); margin-top:0.7rem; line-height:1.5; }
   .days-note strong { color:var(--ink); }
   .loading-state { text-align:center; padding:3rem; color:var(--muted); }
+
+  .daily-task-card { margin-bottom: 1.3rem; border-left: 5px solid var(--blue); }
+  .daily-task-label { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em; color: var(--blue); margin-bottom: 0.5rem; }
+  .daily-task-text { font-size: 0.92rem; color: var(--ink); line-height: 1.55; margin-bottom: 0.9rem; }
+  .daily-task-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .daily-task-next { font-size: 0.85rem; font-weight: 700; color: var(--muted); }
 </style>
 </head>
 <body class="themed-bg">
@@ -94,6 +100,17 @@
           <div class="num" id="stat-days">0</div>
           <div class="lbl">ACTIVE DAYS</div>
         </div>
+      </div>
+    </div>
+
+    <div class="card daily-task-card" id="daily-task-card" style="display:none;">
+      <div class="daily-task-label">TODAY'S STARTING POINT</div>
+      <p class="daily-task-text" id="daily-task-text"></p>
+      <div class="daily-task-row">
+        <div>
+          <div class="daily-task-next" id="daily-task-next"></div>
+        </div>
+        <a class="btn btn-primary" id="daily-task-btn" href="/physical-coordination.html">Start Now</a>
       </div>
     </div>
 
@@ -414,6 +431,64 @@
     }
 
     await logActiveDay(user.id);
+
+    // ---------- Daily Task: personalized starting point from onboarding answers ----------
+    (async function computeDailyTask() {
+      const LESSON_1_TITLES = [
+        'Standing Balance Basics', 'Core Stability Foundations', 'Coordinated Movement Patterns',
+        'Balance Under Movement', 'Full Sequence Review',
+      ];
+      const PC_AREA_MAP = {
+        pc_balance: 'Balance & Stability', pc_trip: 'Balance & Stability',
+        pc_hand: 'Fine Motor Dexterity & Grip', pc_sport: 'Hand-Eye Coordination',
+      };
+
+      const { data: obFull } = await window.supabaseClient
+        .from('onboarding_responses').select('answers').eq('user_id', user.id).maybeSingle();
+
+      let weakestArea = 'Balance & Stability';
+      if (obFull?.answers) {
+        const sums = {}, counts = {};
+        Object.entries(obFull.answers).forEach(([id, val]) => {
+          const area = PC_AREA_MAP[id];
+          if (area && typeof val.choiceIndex === 'number') {
+            sums[area] = (sums[area] || 0) + val.choiceIndex;
+            counts[area] = (counts[area] || 0) + 1;
+          }
+        });
+        let lowestAvg = Infinity;
+        Object.keys(sums).forEach(area => {
+          const avg = sums[area] / counts[area];
+          if (avg < lowestAvg) { lowestAvg = avg; weakestArea = area; }
+        });
+      }
+
+      const { data: pcRows } = await window.supabaseClient
+        .from('module_progress').select('lesson_index')
+        .eq('user_id', user.id).eq('module', 'physical_coordination').eq('series_index', 1);
+      const doneAssignments = new Set((pcRows || []).map(r => r.lesson_index));
+      const nextAssignment = [1, 2, 3, 4, 5].find(n => !doneAssignments.has(n));
+
+      const textEl = document.getElementById('daily-task-text');
+      const nextEl = document.getElementById('daily-task-next');
+      const btnEl = document.getElementById('daily-task-btn');
+
+      if (weakestArea === 'Balance & Stability') {
+        textEl.textContent = "Your intake suggests balance is a great place to focus first — that's exactly where we're starting you.";
+      } else {
+        textEl.textContent = `Your intake flagged ${weakestArea} as an area to build on. That topic is coming soon — for now, we're starting you with Balance & Stability, our first live topic.`;
+      }
+
+      if (nextAssignment) {
+        nextEl.textContent = `Next up: Assignment ${nextAssignment} — ${LESSON_1_TITLES[nextAssignment - 1]}`;
+        btnEl.textContent = 'Start Now';
+      } else {
+        nextEl.textContent = "You've completed every live assignment in Balance & Stability! More topics unlock soon.";
+        btnEl.textContent = 'Review Lesson 1';
+      }
+
+      document.getElementById('daily-task-card').style.display = 'block';
+    })();
 
     const fullName = user.user_metadata?.full_name || '';
     const hour = new Date().getHours();

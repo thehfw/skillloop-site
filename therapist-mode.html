@@ -9,27 +9,53 @@
 <link rel="stylesheet" href="/css/style.css">
 <style>
   .tm-toolbar {
-    max-width: 860px; margin: 0 auto; padding: 1.4rem 1.2rem 0;
-    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    max-width: 1060px; margin: 0 auto; padding: 1.4rem 1.2rem 0;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
   }
-  .slip-sheet {
-    max-width: 860px; margin: 1rem auto 4rem; background: #fff;
-    border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 2rem 2.2rem;
+  .tm-toolbar-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .tm-layout {
+    max-width: 1060px; margin: 1rem auto 4rem; display: grid;
+    grid-template-columns: 260px 1fr; gap: 1.1rem; align-items: start;
   }
-  .slip-head {
-    display: flex; align-items: center; justify-content: space-between;
-    border-bottom: 2px solid var(--ink); padding-bottom: 1rem; margin-bottom: 1.2rem;
+  @media (max-width: 860px) { .tm-layout { grid-template-columns: 1fr; } }
+
+  /* ---------- Clinician access panel ---------- */
+  .clinician-panel { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 1.1rem; }
+  .clinician-panel h2 { font-size: 0.82rem; font-weight: 800; margin-bottom: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .clinician-locked-btn {
+    width: 100%; padding: 0.7rem; border-radius: 12px; background: var(--track); color: var(--ink);
+    font-weight: 700; font-size: 0.82rem; text-align: center; line-height: 1.4;
   }
+  .clinician-pw-row { display: none; margin-top: 0.7rem; }
+  .clinician-pw-row.visible { display: block; }
+  .clinician-pw-error { font-size: 0.76rem; color: #9c2b2a; margin-top: 0.4rem; display: none; }
+  .clinician-pw-error.visible { display: block; }
+
+  .roster-item {
+    display: block; width: 100%; text-align: left; padding: 0.6rem 0.65rem; border-radius: 10px;
+    border: 1px solid var(--line); margin-bottom: 0.5rem; font-size: 0.82rem;
+  }
+  .roster-item:hover { border-color: var(--blue); }
+  .roster-item.active { border-color: var(--blue); background: #e8f6fb; }
+  .roster-item strong { display: block; }
+  .roster-badge {
+    display: inline-block; font-size: 0.66rem; font-weight: 800; padding: 0.12rem 0.45rem;
+    border-radius: 999px; margin-top: 0.3rem;
+  }
+  .roster-badge.green { background: #d4edda; color: #256d31; }
+  .roster-badge.amber { background: #fff3cd; color: #8a6a00; }
+  .roster-badge.red { background: #fdeceb; color: #9c2b2a; }
+  .own-data-link { font-size: 0.8rem; text-align: center; margin-top: 0.8rem; }
+
+  /* ---------- Slip sheet (shared render target) ---------- */
+  .slip-sheet { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 2rem 2.2rem; }
+  .slip-head { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--ink); padding-bottom: 1rem; margin-bottom: 1.2rem; }
   .slip-head img { height: 34px; }
   .slip-head-right { text-align: right; font-size: 0.78rem; color: var(--muted); }
   .slip-title { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 1.3rem; margin-top: 0.3rem; }
 
   .slip-section { margin-bottom: 1.3rem; }
-  .slip-section-title {
-    font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--blue); border-bottom: 1px solid var(--line); padding-bottom: 0.3rem; margin-bottom: 0.6rem;
-  }
+  .slip-section-title { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); border-bottom: 1px solid var(--line); padding-bottom: 0.3rem; margin-bottom: 0.6rem; }
 
   .slip-info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; }
   .slip-info-item { font-size: 0.85rem; }
@@ -53,19 +79,24 @@
   .assess-row .q { color: var(--muted); flex: 1.4; }
   .assess-row .a { font-weight: 700; text-align: right; flex: 1; }
 
-  .reflection-item {
-    border: 1px solid var(--line); border-radius: 10px; padding: 0.7rem 0.9rem; margin-bottom: 0.6rem; font-size: 0.82rem;
-  }
+  .reflection-item { border: 1px solid var(--line); border-radius: 10px; padding: 0.7rem 0.9rem; margin-bottom: 0.6rem; font-size: 0.82rem; }
   .reflection-item .meta { font-size: 0.68rem; color: var(--faint); font-weight: 700; margin-bottom: 0.3rem; }
   .reflection-item .txt { color: var(--ink); margin-bottom: 0.35rem; }
   .reflection-item .fb { color: var(--muted); font-style: italic; }
 
+  .copy-toast {
+    position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--ink); color: #fff;
+    padding: 0.7rem 1.1rem; border-radius: 10px; font-weight: 700; font-size: 0.85rem;
+    opacity: 0; transform: translateY(10px); transition: all 0.2s; pointer-events: none; z-index: 200;
+  }
+  .copy-toast.show { opacity: 1; transform: translateY(0); }
+
   .loading-state { text-align: center; padding: 3rem; color: var(--muted); }
 
-  /* ---------- Print ---------- */
   @media print {
     body { background: #fff !important; }
-    .tm-toolbar, .no-print, aside.sidebar { display: none !important; }
+    .tm-toolbar, .no-print, .clinician-panel, aside.sidebar { display: none !important; }
+    .tm-layout { grid-template-columns: 1fr; max-width: 100%; margin: 0; }
     .slip-sheet { border: none; box-shadow: none; margin: 0; max-width: 100%; padding: 0; }
     @page { margin: 0.6in; }
   }
@@ -75,79 +106,55 @@
 
 <div class="tm-toolbar no-print">
   <a href="/dashboard.html" class="btn btn-secondary">&larr; Back to Dashboard</a>
-  <button class="btn btn-primary" id="print-btn" type="button">Print / Download Slip Sheet</button>
+  <div class="tm-toolbar-actions">
+    <button class="btn btn-secondary" id="copy-summary-btn" type="button">Copy Monthly Summary</button>
+    <button class="btn btn-primary" id="print-btn" type="button">Print / Download Slip Sheet</button>
+  </div>
 </div>
 
 <div id="loading" class="loading-state">Loading slip sheet…</div>
 
-<div class="slip-sheet" id="slip-sheet" style="display:none;">
+<div class="tm-layout" id="tm-layout" style="display:none;">
 
-  <div class="slip-head">
-    <div>
-      <img src="/assets/skillloop-logo.png" alt="SkillLoop">
-      <div class="slip-title">Clinical Summary — Slip Sheet</div>
+  <div class="clinician-panel no-print">
+    <h2>Clinician Access</h2>
+
+    <button class="clinician-locked-btn" id="clinician-unlock-btn" type="button">
+      Enter Clinician Window<br>(For SkillLoop Staff Only)
+    </button>
+
+    <div class="clinician-pw-row" id="clinician-pw-row">
+      <input type="password" id="clinician-password" class="field" style="width:100%; padding:0.5rem 0.7rem; border:1.5px solid var(--line); border-radius:8px; font-size:0.85rem;" placeholder="Staff password">
+      <button class="btn btn-primary btn-block mt-2" id="clinician-submit-btn" type="button">Unlock</button>
+      <div class="clinician-pw-error" id="clinician-pw-error">Incorrect password.</div>
     </div>
-    <div class="slip-head-right">
-      Generated <span id="gen-date"></span><br>
-      For clinical/care-team use
+
+    <div id="roster-root" style="margin-top:0.9rem;"></div>
+    <div class="own-data-link" id="own-data-link" style="display:none;">
+      <a href="#" id="view-own-data-link">&larr; Back to my own slip sheet</a>
     </div>
   </div>
 
-  <div class="slip-section">
-    <div class="slip-section-title">Student Information</div>
-    <div class="slip-info-grid">
-      <div class="slip-info-item"><strong>Name</strong><span id="info-name">—</span></div>
-      <div class="slip-info-item"><strong>Age Range</strong><span id="info-age">—</span></div>
-      <div class="slip-info-item"><strong>Guardian Email</strong><span id="info-guardian">—</span></div>
-    </div>
-  </div>
-
-  <div class="slip-section">
-    <div class="slip-section-title">Platform Usage Evaluation</div>
-    <div class="slip-usage-grid">
-      <div class="slip-usage-chip"><div class="n" id="u-stars">0</div><div class="l">STARS EARNED</div></div>
-      <div class="slip-usage-chip"><div class="n" id="u-streak">0</div><div class="l">DAY STREAK</div></div>
-      <div class="slip-usage-chip"><div class="n" id="u-days">0</div><div class="l">ACTIVE DAYS (30D)</div></div>
-      <div class="slip-usage-chip"><div class="n" id="u-overall">0%</div><div class="l">OVERALL PROGRESS</div></div>
-    </div>
-    <div id="slip-module-rows" style="margin-top:0.9rem;"></div>
-  </div>
-
-  <div class="slip-section">
-    <div class="slip-section-title">Onboarding Assessment Summary</div>
-    <div id="assess-root"></div>
-  </div>
-
-  <div class="slip-section">
-    <div class="slip-section-title">Reflection Responses</div>
-    <div id="reflections-root"></div>
-  </div>
+  <div class="slip-sheet" id="slip-sheet"></div>
 
 </div>
+
+<div class="copy-toast" id="copy-toast">Copied to clipboard</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/config.js"></script>
 <script src="/js/supabase-client.js"></script>
 <script>
-  const MODULE_TOTALS = {
-    physical_coordination: 100,
-    independence_skills: 100,
-    social_skills: 100,
-    executive_function: 100,
-  };
   const MODULE_META = [
     { key: 'physical_coordination', label: 'Physical Coordination', color: '#26a4de' },
     { key: 'independence_skills', label: 'Independence Skills', color: '#4ab851' },
     { key: 'social_skills', label: 'Social Skills', color: '#fec41d' },
     { key: 'executive_function', label: 'Executive Function', color: '#c94098' },
   ];
+  const MODULE_TOTALS = { physical_coordination: 100, independence_skills: 100, social_skills: 100, executive_function: 100 };
   const CATEGORY_PREFIX = [
-    ['pc_', 'Physical Coordination'],
-    ['ef_', 'Executive Function'],
-    ['ss_', 'Social Skills'],
-    ['in_', 'Independence Skills'],
-    ['er_', 'Emotional Regulation'],
-    ['sp_', 'Supports & Context'],
+    ['pc_', 'Physical Coordination'], ['ef_', 'Executive Function'], ['ss_', 'Social Skills'],
+    ['in_', 'Independence Skills'], ['er_', 'Emotional Regulation'], ['sp_', 'Supports & Context'],
   ];
   function categoryFor(id) {
     if (id === 'age') return 'Basic Info';
@@ -155,98 +162,257 @@
     const hit = CATEGORY_PREFIX.find(([p]) => id.startsWith(p));
     return hit ? hit[1] : 'Other';
   }
+  function activityBadgeClass(days) {
+    if (days >= 16) return 'green';
+    if (days >= 10) return 'amber';
+    return 'red';
+  }
 
-  document.getElementById('print-btn').addEventListener('click', () => window.print());
+  let currentUser = null;
+  let currentRecord = null; // whatever is currently rendered in the slip sheet
+  let rosterStudents = null;
 
-  (async function init() {
-    const user = await requireAuth();
-    if (!user) return;
+  // ---------- Renders one normalized record into the shared slip-sheet area ----------
+  function renderSlipSheet(record) {
+    currentRecord = record;
+    const sheet = document.getElementById('slip-sheet');
 
-    const { data: ob } = await window.supabaseClient
-      .from('onboarding_responses').select('answers, age_range').eq('user_id', user.id).maybeSingle();
-    if (!ob) { window.location.href = '/onboarding.html'; return; }
-
-    const { data: profile } = await window.supabaseClient
-      .from('profiles').select('full_name, stars, guardian_email').eq('id', user.id).single();
-
-    document.getElementById('gen-date').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    document.getElementById('info-name').textContent = profile?.full_name || user.email;
-    document.getElementById('info-age').textContent = ob.age_range || '—';
-    document.getElementById('info-guardian').textContent = profile?.guardian_email || '—';
-
-    // Usage stats
-    document.getElementById('u-stars').textContent = profile?.stars ?? 0;
-    document.getElementById('u-streak').textContent = await getStreak(user.id);
-    const activeDays = await getActiveDaysThisMonth(user.id);
-    document.getElementById('u-days').textContent = activeDays;
-
-    // Module progress
-    const { data: rows } = await window.supabaseClient
-      .from('module_progress').select('module').eq('user_id', user.id);
-    const counts = {};
-    (rows || []).forEach(r => { counts[r.module] = (counts[r.module] || 0) + 1; });
-
+    let moduleRowsHtml = '';
     let doneSum = 0, totalSum = 0;
-    const modRoot = document.getElementById('slip-module-rows');
     MODULE_META.forEach(m => {
-      const done = counts[m.key] || 0;
-      const total = MODULE_TOTALS[m.key];
-      const pct = Math.round(Math.min(1, done / total) * 100);
-      doneSum += done; totalSum += total;
-      const row = document.createElement('div');
-      row.className = 'slip-module-row';
-      row.innerHTML = `
-        <span class="dot" style="background:${m.color}"></span>
-        <span class="name">${m.label}</span>
-        <span class="bar"><i style="width:${pct}%; background:${m.color};"></i></span>
-        <span class="pct">${pct}%</span>
-      `;
-      modRoot.appendChild(row);
+      const modData = record.modules.find(x => x.key === m.key) || { done: 0, pct: 0 };
+      doneSum += modData.done; totalSum += MODULE_TOTALS[m.key];
+      moduleRowsHtml += `
+        <div class="slip-module-row">
+          <span class="dot" style="background:${m.color}"></span>
+          <span class="name">${m.label}</span>
+          <span class="bar"><i style="width:${modData.pct}%; background:${m.color};"></i></span>
+          <span class="pct">${modData.pct}%</span>
+        </div>`;
     });
-    document.getElementById('u-overall').textContent = Math.round((doneSum / totalSum) * 100) + '%';
+    const overallPct = Math.round((doneSum / totalSum) * 100);
 
-    // Onboarding assessment, grouped by category, in original answer order
-    const assessRoot = document.getElementById('assess-root');
-    const grouped = {};
-    const order = [];
-    Object.entries(ob.answers || {}).forEach(([id, val]) => {
-      const cat = categoryFor(id);
-      if (!grouped[cat]) { grouped[cat] = []; order.push(cat); }
-      grouped[cat].push(val);
-    });
-    order.forEach(cat => {
-      const block = document.createElement('div');
-      block.className = 'assess-category';
-      block.innerHTML = `<h4>${cat}</h4>` + grouped[cat].map(v => `
-        <div class="assess-row"><span class="q">${v.question}</span><span class="a">${v.choice}</span></div>
-      `).join('');
-      assessRoot.appendChild(block);
+    let assessHtml = '';
+    Object.entries(record.assessment || {}).forEach(([cat, items]) => {
+      assessHtml += `<div class="assess-category"><h4>${cat}</h4>` +
+        items.map(v => `<div class="assess-row"><span class="q">${v.question}</span><span class="a">${v.choice}</span></div>`).join('') +
+        `</div>`;
     });
 
-    // Reflections
-    const { data: reflections } = await window.supabaseClient
-      .from('reflections').select('module, lesson_index, assignment_index, reflection_text, ai_feedback, ai_score, created_at')
-      .eq('user_id', user.id).order('created_at', { ascending: true });
-
-    const reflRoot = document.getElementById('reflections-root');
-    if (!reflections || reflections.length === 0) {
-      reflRoot.innerHTML = '<p class="muted" style="font-size:0.85rem;">No written reflections submitted yet.</p>';
+    let reflectHtml = '';
+    if (!record.reflections || record.reflections.length === 0) {
+      reflectHtml = '<p class="muted" style="font-size:0.85rem;">No written reflections submitted yet.</p>';
     } else {
-      reflections.forEach(r => {
-        const item = document.createElement('div');
-        item.className = 'reflection-item';
+      record.reflections.forEach(r => {
         const dateStr = new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        item.innerHTML = `
-          <div class="meta">Lesson ${r.lesson_index}, Assignment ${r.assignment_index} — ${dateStr} — Score ${r.ai_score ?? '—'}/5</div>
-          <div class="txt">${r.reflection_text}</div>
-          <div class="fb">${r.ai_feedback || ''}</div>
-        `;
-        reflRoot.appendChild(item);
+        reflectHtml += `
+          <div class="reflection-item">
+            <div class="meta">Lesson ${r.lesson_index}, Assignment ${r.assignment_index} — ${dateStr} — Score ${r.ai_score ?? '—'}/5</div>
+            <div class="txt">${r.reflection_text}</div>
+            <div class="fb">${r.ai_feedback || ''}</div>
+          </div>`;
       });
     }
 
+    sheet.innerHTML = `
+      <div class="slip-head">
+        <div>
+          <img src="/assets/skillloop-logo.png" alt="SkillLoop">
+          <div class="slip-title">Clinical Summary — Slip Sheet</div>
+        </div>
+        <div class="slip-head-right">
+          Generated ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}<br>
+          For clinical/care-team use
+        </div>
+      </div>
+
+      <div class="slip-section">
+        <div class="slip-section-title">Student Information</div>
+        <div class="slip-info-grid">
+          <div class="slip-info-item"><strong>Name</strong><span>${record.fullName || '—'}</span></div>
+          <div class="slip-info-item"><strong>Age Range</strong><span>${record.ageRange || '—'}</span></div>
+          <div class="slip-info-item"><strong>Guardian Email</strong><span>${record.guardianEmail || '—'}</span></div>
+        </div>
+      </div>
+
+      <div class="slip-section">
+        <div class="slip-section-title">Platform Usage Evaluation</div>
+        <div class="slip-usage-grid">
+          <div class="slip-usage-chip"><div class="n">${record.stars ?? 0}</div><div class="l">STARS EARNED</div></div>
+          <div class="slip-usage-chip"><div class="n">${record.streak ?? 0}</div><div class="l">DAY STREAK</div></div>
+          <div class="slip-usage-chip"><div class="n">${record.activeDays30d ?? 0}</div><div class="l">ACTIVE DAYS (30D)</div></div>
+          <div class="slip-usage-chip"><div class="n">${overallPct}%</div><div class="l">OVERALL PROGRESS</div></div>
+        </div>
+        <div style="margin-top:0.9rem;">${moduleRowsHtml}</div>
+      </div>
+
+      <div class="slip-section">
+        <div class="slip-section-title">Onboarding Assessment Summary</div>
+        ${assessHtml || '<p class="muted" style="font-size:0.85rem;">No onboarding data.</p>'}
+      </div>
+
+      <div class="slip-section">
+        <div class="slip-section-title">Reflection Responses</div>
+        ${reflectHtml}
+      </div>
+    `;
+  }
+
+  // ---------- Own-data path (default view) ----------
+  async function loadOwnData() {
+    const { data: ob } = await window.supabaseClient
+      .from('onboarding_responses').select('answers, age_range').eq('user_id', currentUser.id).maybeSingle();
+    const { data: profile } = await window.supabaseClient
+      .from('profiles').select('full_name, stars, guardian_email').eq('id', currentUser.id).single();
+    const { data: rows } = await window.supabaseClient
+      .from('module_progress').select('module').eq('user_id', currentUser.id);
+    const { data: reflections } = await window.supabaseClient
+      .from('reflections').select('module, lesson_index, assignment_index, reflection_text, ai_feedback, ai_score, created_at')
+      .eq('user_id', currentUser.id).order('created_at', { ascending: true });
+
+    const counts = {};
+    (rows || []).forEach(r => { counts[r.module] = (counts[r.module] || 0) + 1; });
+    const modules = MODULE_META.map(m => ({
+      key: m.key, done: counts[m.key] || 0,
+      pct: Math.round(Math.min(1, (counts[m.key] || 0) / MODULE_TOTALS[m.key]) * 100),
+    }));
+
+    const grouped = {};
+    Object.entries(ob?.answers || {}).forEach(([id, val]) => {
+      const cat = categoryFor(id);
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(val);
+    });
+
+    const activeDates = await getActiveDatesThisMonth(currentUser.id);
+    const streak = await getStreak(currentUser.id);
+
+    renderSlipSheet({
+      fullName: profile?.full_name || currentUser.email,
+      ageRange: ob?.age_range,
+      guardianEmail: profile?.guardian_email,
+      stars: profile?.stars ?? 0,
+      streak,
+      activeDays30d: activeDates.length,
+      activeDates,
+      modules,
+      assessment: grouped,
+      reflections: reflections || [],
+    });
+  }
+
+  // ---------- Clinician roster path ----------
+  function renderRoster() {
+    const root = document.getElementById('roster-root');
+    root.innerHTML = '';
+    rosterStudents.forEach(s => {
+      const item = document.createElement('button');
+      item.className = 'roster-item';
+      item.innerHTML = `
+        <strong>${s.fullName || s.email || 'Unnamed'}</strong>
+        <span class="muted" style="font-size:0.74rem;">${s.email || ''}</span>
+        <span class="roster-badge ${activityBadgeClass(s.activeDays30d)}">${s.activeDays30d} active days</span>
+      `;
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.roster-item').forEach(el => el.classList.remove('active'));
+        item.classList.add('active');
+        renderSlipSheet({
+          fullName: s.fullName || s.email,
+          ageRange: s.ageRange,
+          guardianEmail: s.guardianEmail,
+          stars: s.stars,
+          streak: s.streak,
+          activeDays30d: s.activeDays30d,
+          activeDates: s.activeDates,
+          modules: s.modules,
+          assessment: s.assessment,
+          reflections: s.reflections,
+        });
+      });
+      root.appendChild(item);
+    });
+    document.getElementById('own-data-link').style.display = 'block';
+  }
+
+  document.getElementById('clinician-unlock-btn').addEventListener('click', () => {
+    document.getElementById('clinician-pw-row').classList.add('visible');
+  });
+
+  document.getElementById('clinician-submit-btn').addEventListener('click', async () => {
+    const pw = document.getElementById('clinician-password').value;
+    const errEl = document.getElementById('clinician-pw-error');
+    errEl.classList.remove('visible');
+
+    try {
+      const res = await fetch('/.netlify/functions/clinician-roster', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        errEl.textContent = data.error || 'Incorrect password.';
+        errEl.classList.add('visible');
+        return;
+      }
+      rosterStudents = data.students;
+      document.getElementById('clinician-unlock-btn').style.display = 'none';
+      document.getElementById('clinician-pw-row').style.display = 'none';
+      renderRoster();
+    } catch (err) {
+      errEl.textContent = 'Something went wrong. Try again.';
+      errEl.classList.add('visible');
+    }
+  });
+
+  document.getElementById('view-own-data-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.querySelectorAll('.roster-item').forEach(el => el.classList.remove('active'));
+    loadOwnData();
+  });
+
+  document.getElementById('print-btn').addEventListener('click', () => window.print());
+
+  document.getElementById('copy-summary-btn').addEventListener('click', async () => {
+    if (!currentRecord) return;
+    const r = currentRecord;
+    const monthName = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const doneTotal = (r.modules || []).reduce((s, m) => s + (m.done || 0), 0);
+    const totalTotal = (r.modules || []).reduce((s, m) => s + (MODULE_TOTALS[m.key] || 100), 0);
+
+    const summary = [
+      'SkillLoop — Monthly Summary',
+      `Student: ${r.fullName || '—'}`,
+      `Month: ${monthName}`,
+      `Active days this month: ${r.activeDays30d ?? 0} (qualifying: completed quiz or submitted reflection)`,
+      `Active dates: ${(r.activeDates && r.activeDates.length) ? r.activeDates.join(', ') : 'None yet'}`,
+      `Assignments completed: ${doneTotal} of ${totalTotal}`,
+      `Current streak: ${r.streak ?? 0} day(s)`,
+    ].join('\n');
+
+    try {
+      await navigator.clipboard.writeText(summary);
+    } catch {
+      // Fallback for browsers/contexts blocking clipboard API
+      window.prompt('Copy this text:', summary);
+    }
+    const toast = document.getElementById('copy-toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  });
+
+  (async function init() {
+    currentUser = await requireAuth();
+    if (!currentUser) return;
+
+    const { data: ob } = await window.supabaseClient
+      .from('onboarding_responses').select('user_id').eq('user_id', currentUser.id).maybeSingle();
+    if (!ob) { window.location.href = '/onboarding.html'; return; }
+
+    await loadOwnData();
+
     document.getElementById('loading').style.display = 'none';
-    document.getElementById('slip-sheet').style.display = 'block';
+    document.getElementById('tm-layout').style.display = 'grid';
   })();
 </script>
 </body>

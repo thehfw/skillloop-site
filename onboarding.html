@@ -175,7 +175,7 @@
       .update({ guardian_email: guardianEmail })
       .eq('id', currentUser.id);
 
-    await logActiveDay(currentUser.id);
+    await logEvent(currentUser.id, 'onboarding_completed');
     window.location.href = '/dashboard.html';
   });
 

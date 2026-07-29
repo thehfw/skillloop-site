@@ -430,7 +430,7 @@
       document.getElementById('consent-overlay').style.display = 'flex';
     }
 
-    await logActiveDay(user.id);
+    await logEvent(user.id, 'login');
 
     // ---------- Daily Task: personalized starting point from onboarding answers ----------
     (async function computeDailyTask() {

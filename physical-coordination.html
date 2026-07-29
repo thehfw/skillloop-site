@@ -492,6 +492,7 @@
     document.getElementById('reflection-text').value = '';
     document.getElementById('feedback-card').classList.remove('visible');
     quizPassed = false;
+    logEvent(currentUser.id, 'lesson_started', { module: 'physical_coordination', lessonNumber: 1, assignmentNumber: a });
 
     if (done) {
       document.getElementById('video-section').style.display = 'block';
@@ -515,7 +516,10 @@
     if (step === 'quiz') renderMcq();
   }
 
-  document.getElementById('to-quiz-btn').addEventListener('click', () => showStep('quiz'));
+  document.getElementById('to-quiz-btn').addEventListener('click', () => {
+    logEvent(currentUser.id, 'video_watched', { module: 'physical_coordination', lessonNumber: 1, assignmentNumber: selectedAssignment });
+    showStep('quiz');
+  });
 
   function renderMcq() {
     const spec = LESSON_1_ASSIGNMENTS[selectedAssignment - 1];
@@ -549,6 +553,7 @@
     if (answered < spec.mcq.length) { result.textContent = 'Answer all ' + spec.mcq.length + ' questions first.'; result.style.color = 'var(--danger)'; return; }
     if (correct >= 4) {
       quizPassed = true;
+      logEvent(currentUser.id, 'quiz_completed', { module: 'physical_coordination', lessonNumber: 1, assignmentNumber: selectedAssignment, payload: { score: correct } });
       result.textContent = 'Nice — ' + correct + '/5 correct. Moving to your reflection.';
       result.style.color = 'var(--green)';
       setTimeout(() => showStep('reflect'), 900);
@@ -617,7 +622,7 @@
 
     if (!progErr) {
       await window.supabaseClient.rpc('increment_stars', { p_user_id: currentUser.id, p_amount: 1 });
-      await logActiveDay(currentUser.id);
+      await logEvent(currentUser.id, 'reflection_submitted', { module: 'physical_coordination', lessonNumber: 1, assignmentNumber: a, payload: { ai_score: grade.score } });
       completedSet.add(key(1, a));
     }
 

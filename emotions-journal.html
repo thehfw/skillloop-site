@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emotions Journal — SkillLoop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .ej-shell { max-width: 700px; }
+  .ej-hero {
+    background: linear-gradient(135deg, rgba(201,64,152,0.10), rgba(201,64,152,0.02));
+    border: 1px solid #f0cfe4; border-radius: var(--radius); padding: 1.3rem 1.4rem; margin-bottom: 1.4rem;
+  }
+  .ej-hero h1 { font-size: 1.3rem; font-weight: 800; color: #7a2960; }
+  .ej-hero p { font-size: 0.86rem; color: #7a2960; margin-top: 0.3rem; }
+
+  .ej-compose textarea {
+    width: 100%; min-height: 140px; resize: vertical; padding: 0.9rem 1rem;
+    border: 1.5px solid var(--line); border-radius: 14px; font-size: 0.92rem; font-family: inherit; line-height: 1.5;
+  }
+  .ej-compose textarea:focus { outline: none; border-color: var(--pink); }
+  .ej-submit-row { display: flex; justify-content: flex-end; margin-top: 0.7rem; }
+
+  .ej-entry {
+    background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 1.1rem 1.3rem; margin-bottom: 1rem;
+  }
+  .ej-entry-date { font-size: 0.72rem; font-weight: 700; color: var(--faint); margin-bottom: 0.5rem; }
+  .ej-entry-text { font-size: 0.92rem; color: var(--ink); line-height: 1.55; margin-bottom: 0.8rem; white-space: pre-wrap; }
+  .ej-entry-reply {
+    background: #fbeaf6; border-radius: 12px; padding: 0.8rem 1rem; font-size: 0.86rem; color: #7a2960; line-height: 1.5;
+  }
+  .ej-entry-reply strong { display: block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; color: var(--pink); }
+
+  .loading-state { text-align: center; padding: 3rem; color: var(--muted); }
+</style>
+</head>
+<body class="themed-bg">
+
+<aside class="sidebar" aria-label="Main navigation">
+  <a href="/dashboard.html" class="sidebar-logo">
+    <img src="/assets/skillloop-logo.png" alt="SkillLoop">
+  </a>
+  <div class="side-section">
+    <div class="side-label">Menu</div>
+    <a class="side-link" href="/dashboard.html">Dashboard</a>
+  </div>
+  <div class="side-section">
+    <div class="side-label">Modules</div>
+    <a class="side-link" href="/physical-coordination.html">
+      <span class="side-dot" style="background:#26a4de"></span> Physical Coordination
+    </a>
+    <span class="side-link locked"><span class="side-dot" style="background:#4ab851"></span> Independence <span class="side-chip">SOON</span></span>
+    <span class="side-link locked"><span class="side-dot" style="background:#fec41d"></span> Social Skills <span class="side-chip">SOON</span></span>
+    <span class="side-link locked"><span class="side-dot" style="background:#c94098"></span> Executive Function <span class="side-chip">SOON</span></span>
+  </div>
+  <div class="side-section">
+    <div class="side-label">Wellbeing</div>
+    <a class="side-link active" href="/emotions-journal.html">
+      <span class="side-dot" style="background:#c94098"></span> Emotions Journal
+    </a>
+  </div>
+  <div class="side-section">
+    <div class="side-label">Legal</div>
+    <a class="side-link" href="/terms.html">Terms of Service</a>
+    <a class="side-link" href="/privacy.html">Privacy Policy</a>
+    <a class="side-link" href="/faq.html">FAQ</a>
+  </div>
+  <div class="side-section">
+    <div class="side-label">Care Team</div>
+    <a class="side-link" href="/parent-dashboard.html">Parent Dashboard</a>
+    <a class="side-link" href="/therapist-mode.html">Therapist Mode</a>
+  </div>
+  <div class="sidebar-bottom side-section">
+    <div style="display:flex; align-items:center; gap:0.4rem; padding:0 0.2rem;">
+      <button class="side-link" style="width:auto; padding-left:0.4rem; padding-right:0.4rem;" onclick="signOut()">Log Out</button>
+      <span class="muted" style="font-size:0.8rem;">|</span>
+      <a class="side-link" style="width:auto; padding-left:0.4rem; padding-right:0.4rem; color:var(--pink);" href="/subscribe.html">Subscribe</a>
+    </div>
+  </div>
+</aside>
+
+<main class="app-main">
+  <div class="ej-shell">
+    <div class="ej-hero">
+      <h1>Emotions Journal</h1>
+      <p>A private space to vent, reflect, or just get something off your chest. Write as much or as little as you want — there's no wrong way to do this.</p>
+    </div>
+
+    <div class="card ej-compose">
+      <textarea id="entry-text" placeholder="What's on your mind today?"></textarea>
+      <div class="ej-submit-row">
+        <button class="btn btn-primary" id="submit-entry-btn" type="button">Share Entry</button>
+      </div>
+    </div>
+
+    <h2 style="font-size:1rem; font-weight:800; margin:1.4rem 0 0.9rem;">Past Entries</h2>
+    <div id="entries-root"></div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/config.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+  let currentUser = null;
+
+  function renderEntries(entries) {
+    const root = document.getElementById('entries-root');
+    if (!entries || entries.length === 0) {
+      root.innerHTML = '<p class="muted" style="font-size:0.88rem;">No entries yet — your first one will show up here.</p>';
+      return;
+    }
+    root.innerHTML = entries.map(e => {
+      const dateStr = new Date(e.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+      return `
+        <div class="ej-entry">
+          <div class="ej-entry-date">${dateStr}</div>
+          <div class="ej-entry-text">${e.entry_text}</div>
+          ${e.ai_reply ? `<div class="ej-entry-reply"><strong>A note back</strong>${e.ai_reply}</div>` : ''}
+        </div>`;
+    }).join('');
+  }
+
+  async function loadEntries() {
+    const { data } = await window.supabaseClient
+      .from('emotions_journal')
+      .select('entry_text, ai_reply, created_at')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: false });
+    renderEntries(data || []);
+  }
+
+  document.getElementById('submit-entry-btn').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const textEl = document.getElementById('entry-text');
+    const text = textEl.value.trim();
+    if (!text) return;
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Sharing…';
+
+    let feedback = { studentReply: null, triageLevel: 'none', triageNote: null };
+    try {
+      const res = await fetch('/.netlify/functions/journal-feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      feedback = await res.json();
+    } catch (err) {
+      console.error('journal-feedback request failed:', err);
+    }
+
+    await window.supabaseClient.from('emotions_journal').insert({
+      user_id: currentUser.id,
+      entry_text: text,
+      ai_reply: feedback.studentReply,
+      triage_level: feedback.triageLevel || 'none',
+      triage_note: feedback.triageNote || null,
+    });
+
+    await logEvent(currentUser.id, 'journal_entry', { module: 'emotions' });
+
+    textEl.value = '';
+    btn.disabled = false;
+    btn.textContent = 'Share Entry';
+    loadEntries();
+  });
+
+  (async function init() {
+    currentUser = await requireAuth();
+    if (!currentUser) return;
+
+    const { data: ob } = await window.supabaseClient
+      .from('onboarding_responses').select('user_id').eq('user_id', currentUser.id).maybeSingle();
+    if (!ob) { window.location.href = '/onboarding.html'; return; }
+
+    await loadEntries();
+  })();
+</script>
+</body>
+</html>

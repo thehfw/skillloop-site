@@ -86,6 +86,22 @@
         </p>
       </div>
     </div>
+
+    <div class="card" style="margin-top:1.1rem;" id="reinforcement-card">
+      <h2 style="font-size:0.9rem; font-weight:800; margin-bottom:0.5rem;">Home Reinforcement</h2>
+      <p class="muted" style="font-size:0.83rem; margin-bottom:0.9rem;">A few simple ways to keep building on what your teen is working on this week.</p>
+      <div id="reinforcement-loading" class="muted" style="font-size:0.85rem;">Generating suggestions…</div>
+      <ul id="reinforcement-list" style="list-style:none; display:none;"></ul>
+    </div>
+
+    <div class="card text-center" style="margin-top:1.1rem; background:linear-gradient(135deg, rgba(38,164,222,0.08), rgba(38,164,222,0.01)); border-color:#bfe4f5;">
+      <h2 style="font-size:1.02rem; font-weight:800; margin-bottom:0.5rem;">Want to talk to someone?</h2>
+      <p class="muted" style="font-size:0.87rem; margin-bottom:1rem; max-width:480px; margin-left:auto; margin-right:auto;">
+        Request a meeting with a SkillLoop clinician to discuss your teen's progress, ask questions, or get guidance on next steps.
+      </p>
+      <button class="btn btn-primary" id="request-meeting-btn" type="button" style="padding:0.85rem 2rem; font-size:1rem;">Request Meeting with a SkillLoop Clinician</button>
+      <p class="save-status-pd" id="meeting-status" style="display:none; margin-top:0.8rem; font-size:0.85rem; font-weight:700; color:#256d31;"></p>
+    </div>
   </div>
 </div>
 
@@ -172,6 +188,65 @@
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = 'block';
+
+    // ---------- Home Reinforcement ----------
+    (async function loadReinforcement() {
+      const { data: reflections } = await window.supabaseClient
+        .from('reflections')
+        .select('reflection_texts, reflection_text, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(3);
+
+      const recentReflections = (reflections || []).map(r => ({
+        title: 'Reflection',
+        text: Array.isArray(r.reflection_texts) && r.reflection_texts.length
+          ? r.reflection_texts.map(qa => qa.answer).join(' ')
+          : (r.reflection_text || ''),
+      }));
+
+      let suggestions = [];
+      try {
+        const res = await fetch('/.netlify/functions/home-reinforcement', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ studentName: name, weakestModule: 'Physical Coordination', recentReflections }),
+        });
+        const data = await res.json();
+        suggestions = data.suggestions || [];
+      } catch (err) {
+        console.error('home-reinforcement request failed:', err);
+      }
+
+      document.getElementById('reinforcement-loading').style.display = 'none';
+      const listEl = document.getElementById('reinforcement-list');
+      listEl.style.display = 'block';
+      listEl.innerHTML = suggestions.length
+        ? suggestions.map(s => `<li style="padding:0.5rem 0; border-bottom:1px dotted var(--line); font-size:0.87rem;">• ${s}</li>`).join('')
+        : '<li class="muted" style="font-size:0.87rem;">Check back after a bit more activity for personalized suggestions.</li>';
+    })();
+
+    // ---------- Request Meeting ----------
+    document.getElementById('request-meeting-btn').addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      btn.disabled = true;
+      btn.textContent = 'Sending request…';
+
+      const { error } = await window.supabaseClient.from('meeting_requests').insert({ user_id: user.id });
+
+      const statusEl = document.getElementById('meeting-status');
+      statusEl.style.display = 'block';
+      if (error) {
+        statusEl.style.color = '#9c2b2a';
+        statusEl.textContent = 'Something went wrong — please try again or email help@skillloop.org.';
+        btn.disabled = false;
+        btn.textContent = 'Request Meeting with a SkillLoop Clinician';
+      } else {
+        statusEl.style.color = '#256d31';
+        statusEl.textContent = "Request sent! A SkillLoop clinician will reach out soon.";
+        btn.textContent = 'Request Sent';
+      }
+    });
   })();
 </script>
 </body>

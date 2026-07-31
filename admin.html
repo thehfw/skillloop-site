@@ -119,8 +119,16 @@
         <div id="mcq-root"></div>
 
         <div class="field">
-          <label for="a-reflect">Reflection Prompt (AI-graded)</label>
-          <textarea id="a-reflect" rows="2" placeholder="e.g. In at least 3 sentences, tell us what you tried..."></textarea>
+          <label for="a-reflect">Reflection Prompt 1 (AI-graded, 3-sentence minimum each)</label>
+          <textarea id="a-reflect" rows="2" placeholder="e.g. What did you try, and how did it go?"></textarea>
+        </div>
+        <div class="field">
+          <label for="a-reflect2">Reflection Prompt 2</label>
+          <textarea id="a-reflect2" rows="2" placeholder="e.g. What felt hardest, and why?"></textarea>
+        </div>
+        <div class="field">
+          <label for="a-reflect3">Reflection Prompt 3</label>
+          <textarea id="a-reflect3" rows="2" placeholder="e.g. What will you do differently next time?"></textarea>
         </div>
 
         <button class="btn btn-primary btn-block" id="a-save-btn" type="button">Save Assignment</button>
@@ -290,6 +298,8 @@
         document.getElementById('a-video').value = a.video_url || '';
         document.getElementById('a-desc').value = a.description || '';
         document.getElementById('a-reflect').value = a.reflection_prompt || '';
+        document.getElementById('a-reflect2').value = a.reflection_prompt_2 || '';
+        document.getElementById('a-reflect3').value = a.reflection_prompt_3 || '';
         fillMcqInputs(a.mcq);
       });
     });
@@ -355,6 +365,8 @@
     const videoUrl = rawVideo ? extractYouTubeId(rawVideo) : null;
     const description = document.getElementById('a-desc').value.trim();
     const reflectionPrompt = document.getElementById('a-reflect').value.trim();
+    const reflectionPrompt2 = document.getElementById('a-reflect2').value.trim();
+    const reflectionPrompt3 = document.getElementById('a-reflect3').value.trim();
     const mcq = readMcqInputs();
 
     if (!title) { showStatus(statusEl, 'Title is required.', false); return; }
@@ -363,7 +375,10 @@
       lesson_id: selectedLessonId,
       assignment_number: assignmentNumber,
       title, video_url: videoUrl, description,
-      mcq, reflection_prompt: reflectionPrompt,
+      mcq,
+      reflection_prompt: reflectionPrompt,
+      reflection_prompt_2: reflectionPrompt2,
+      reflection_prompt_3: reflectionPrompt3,
     };
 
     let error;

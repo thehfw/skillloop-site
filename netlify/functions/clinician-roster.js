@@ -92,17 +92,21 @@ exports.handler = async (event) => {
       { data: progress, error: progErr },
       { data: activity, error: actErr },
       { data: reflections, error: reflErr },
+      { data: meetingRequests, error: meetErr },
+      { data: journalFlags, error: journalErr },
       { data: usersData, error: usersErr },
     ] = await Promise.all([
       supabase.from('profiles').select('id, full_name, stars, birthdate, guardian_email, data_consent_given'),
       supabase.from('onboarding_responses').select('user_id, answers, age_range, completed_at'),
       supabase.from('module_progress').select('user_id, module'),
       supabase.from('activity_log').select('user_id, event_type, activity_date, created_at'),
-      supabase.from('reflections').select('user_id, module, lesson_index, assignment_index, reflection_text, ai_feedback, ai_score, created_at').order('created_at', { ascending: true }),
+      supabase.from('reflections').select('user_id, module, lesson_index, assignment_index, reflection_text, reflection_texts, ai_feedback, ai_score, created_at').order('created_at', { ascending: true }),
+      supabase.from('meeting_requests').select('user_id, status, created_at').order('created_at', { ascending: false }),
+      supabase.from('emotions_journal').select('user_id, triage_level, triage_note, created_at').neq('triage_level', 'none').order('created_at', { ascending: false }),
       supabase.auth.admin.listUsers({ perPage: 1000 }),
     ]);
 
-    const firstError = profilesErr || obErr || progErr || actErr || reflErr || usersErr;
+    const firstError = profilesErr || obErr || progErr || actErr || reflErr || meetErr || journalErr || usersErr;
     if (firstError) throw firstError;
 
     const emailById = {};
@@ -113,6 +117,8 @@ exports.handler = async (event) => {
       const userProgress = (progress || []).filter((r) => r.user_id === p.id);
       const userActivity = (activity || []).filter((r) => r.user_id === p.id);
       const userReflections = (reflections || []).filter((r) => r.user_id === p.id);
+      const userMeetingRequests = (meetingRequests || []).filter((r) => r.user_id === p.id);
+      const userJournalFlags = (journalFlags || []).filter((r) => r.user_id === p.id);
 
       const moduleCounts = {};
       userProgress.forEach((r) => { moduleCounts[r.module] = (moduleCounts[r.module] || 0) + 1; });
@@ -157,6 +163,8 @@ exports.handler = async (event) => {
         dataConsentGiven: !!p.data_consent_given,
         assessment: groupedAssessment,
         reflections: userReflections,
+        pendingMeetingRequest: userMeetingRequests.some((r) => r.status === 'pending'),
+        journalFlags: userJournalFlags,
       };
     });
 

@@ -205,10 +205,13 @@
     } else {
       record.reflections.forEach(r => {
         const dateStr = new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const bodyHtml = Array.isArray(r.reflection_texts) && r.reflection_texts.length
+          ? r.reflection_texts.map((qa, i) => `<div class="txt"><strong>Q${i + 1}: ${qa.question}</strong><br>${qa.answer}</div>`).join('')
+          : `<div class="txt">${r.reflection_text || ''}</div>`;
         reflectHtml += `
           <div class="reflection-item">
             <div class="meta">Lesson ${r.lesson_index}, Assignment ${r.assignment_index} — ${dateStr} — Score ${r.ai_score ?? '—'}/5</div>
-            <div class="txt">${r.reflection_text}</div>
+            ${bodyHtml}
             <div class="fb">${r.ai_feedback || ''}</div>
           </div>`;
       });
@@ -267,7 +270,7 @@
     const { data: rows } = await window.supabaseClient
       .from('module_progress').select('module').eq('user_id', currentUser.id);
     const { data: reflections } = await window.supabaseClient
-      .from('reflections').select('module, lesson_index, assignment_index, reflection_text, ai_feedback, ai_score, created_at')
+      .from('reflections').select('module, lesson_index, assignment_index, reflection_text, reflection_texts, ai_feedback, ai_score, created_at')
       .eq('user_id', currentUser.id).order('created_at', { ascending: true });
 
     const counts = {};
@@ -312,6 +315,8 @@
         <strong>${s.fullName || s.email || 'Unnamed'}</strong>
         <span class="muted" style="font-size:0.74rem;">${s.email || ''}</span>
         <span class="roster-badge ${activityBadgeClass(s.activeDays30d)}">${s.activeDays30d} active days</span>
+        ${s.pendingMeetingRequest ? '<span class="roster-badge amber" style="margin-left:0.3rem;">Meeting requested</span>' : ''}
+        ${s.journalFlags && s.journalFlags.length ? `<span class="roster-badge red" style="margin-left:0.3rem;">${s.journalFlags.length} journal flag${s.journalFlags.length > 1 ? 's' : ''}</span>` : ''}
       `;
       item.addEventListener('click', () => {
         document.querySelectorAll('.roster-item').forEach(el => el.classList.remove('active'));

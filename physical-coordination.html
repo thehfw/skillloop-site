@@ -598,7 +598,7 @@
   function openAssignment(a) {
     selectedAssignment = a;
     const spec = LESSONS_CONTENT[selectedLesson][a - 1];
-    const done = completedSet.has(key(1, a));
+    const done = completedSet.has(key(selectedLesson, a));
     const card = document.getElementById('detail-card');
     card.style.display = 'block';
     document.getElementById('detail-title').textContent = 'Lesson 1, Assignment ' + a + ' — ' + spec.title;
@@ -757,7 +757,7 @@
     if (!progErr) {
       await window.supabaseClient.rpc('increment_stars', { p_user_id: currentUser.id, p_amount: 1 });
       await logEvent(currentUser.id, 'reflection_submitted', { module: 'physical_coordination', lessonNumber: selectedLesson, assignmentNumber: a, payload: { ai_score: grade.score } });
-      completedSet.add(key(1, a));
+      completedSet.add(key(selectedLesson, a));
     }
 
     btn.disabled = false;

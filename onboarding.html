@@ -34,12 +34,27 @@
 
   <form id="quiz-form"></form>
 
+  <div class="card" style="margin: 1.4rem 0;">
+    <h2 style="font-size:0.92rem; font-weight:800; margin-bottom:0.4rem;">Optional: Upload IEP or 504 Plan</h2>
+    <p class="muted" style="font-size:0.82rem; margin-bottom:1rem;">Not required to continue — you can always add these later from the Parent Dashboard. Sharing them just helps our care team tailor support faster.</p>
+    <div class="iep-upload-grid">
+      <div id="ob-iep-box"></div>
+      <div id="ob-504-box"></div>
+    </div>
+  </div>
+
+  <p class="text-center muted" style="font-size:0.85rem; margin-bottom:0.6rem;">
+    Prefer to talk to someone first? <a href="#" id="request-meeting-link">Request a meeting with a SkillLoop clinician</a>
+  </p>
+  <p class="text-center" id="meeting-requested-note" style="display:none; font-size:0.85rem; font-weight:700; color:#256d31; margin-bottom:0.6rem;">Request sent — a clinician will reach out soon.</p>
+
   <button class="btn btn-primary btn-block mt-2" id="submit-btn">Finish and Continue</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/config.js"></script>
 <script src="/js/supabase-client.js"></script>
+<script src="/js/iep-upload.js"></script>
 <script>
   // 20 questions across the assessment domains SkillLoop's clinical team
   // uses for placement and insurance-eligibility review:
@@ -189,6 +204,17 @@
     if (data) { window.location.href = '/dashboard.html'; return; }
 
     render();
+    initIepUploadBox('ob-iep-box', 'iep', currentUser.id);
+    initIepUploadBox('ob-504-box', '504', currentUser.id);
+
+    document.getElementById('request-meeting-link').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const link = e.currentTarget;
+      link.textContent = 'Sending request…';
+      await window.supabaseClient.from('meeting_requests').insert({ user_id: currentUser.id });
+      document.getElementById('meeting-requested-note').style.display = 'block';
+      link.parentElement.style.display = 'none';
+    });
   })();
 </script>
 </body>

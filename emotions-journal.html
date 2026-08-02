@@ -72,6 +72,7 @@
     <div class="side-label">Care Team</div>
     <a class="side-link" href="/parent-dashboard.html">Parent Dashboard</a>
     <a class="side-link" href="/therapist-mode.html">Therapist Mode</a>
+    <a class="side-link" href="/parent-dashboard.html#request-meeting" style="color:var(--pink);">Request Meeting</a>
   </div>
   <div class="sidebar-bottom side-section">
     <div style="display:flex; align-items:center; gap:0.4rem; padding:0 0.2rem;">
@@ -87,6 +88,9 @@
     <div class="ej-hero">
       <h1>Emotions Journal</h1>
       <p>A private space to vent, reflect, or just get something off your chest. Write as much or as little as you want — there's no wrong way to do this.</p>
+      <p style="font-size:0.78rem; margin-top:0.6rem; opacity:0.85;">
+        Entries are reviewed to send you a supportive reply, and our care team may see a general flag (not the entry itself) if something seems like it needs a check-in. See our <a href="/privacy.html" style="color:#7a2960; text-decoration:underline;">Privacy Policy</a> for details.
+      </p>
     </div>
 
     <div class="card ej-compose">
@@ -94,6 +98,12 @@
       <div class="ej-submit-row">
         <button class="btn btn-primary" id="submit-entry-btn" type="button">Share Entry</button>
       </div>
+    </div>
+
+    <div class="text-center" id="post-submit-meeting" style="display:none; margin: 0.9rem 0;">
+      <p class="muted" style="font-size:0.85rem; margin-bottom:0.5rem;">Want to talk to someone about this?</p>
+      <button class="btn btn-secondary" id="journal-request-meeting-btn" type="button">Request a Meeting</button>
+      <p id="journal-meeting-sent" style="display:none; font-size:0.82rem; font-weight:700; color:#256d31; margin-top:0.5rem;">Request sent — someone will reach out soon.</p>
     </div>
 
     <h2 style="font-size:1rem; font-weight:800; margin:1.4rem 0 0.9rem;">Past Entries</h2>
@@ -167,7 +177,17 @@
     textEl.value = '';
     btn.disabled = false;
     btn.textContent = 'Share Entry';
+    document.getElementById('post-submit-meeting').style.display = 'block';
     loadEntries();
+  });
+
+  document.getElementById('journal-request-meeting-btn').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    await window.supabaseClient.from('meeting_requests').insert({ user_id: currentUser.id });
+    document.getElementById('journal-meeting-sent').style.display = 'block';
+    btn.style.display = 'none';
   });
 
   (async function init() {

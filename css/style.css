@@ -312,6 +312,28 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 
+/* ---------- IEP/504 upload drop zones ---------- */
+.iep-upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 620px) { .iep-upload-grid { grid-template-columns: 1fr; } }
+
+.iep-drop-zone {
+  border: 2px dashed var(--line); border-radius: 14px; padding: 1.4rem 1rem;
+  text-align: center; cursor: pointer; background: var(--track);
+  transition: border-color 0.15s, background 0.15s;
+}
+.iep-drop-zone:hover, .iep-drop-zone:focus-visible { border-color: var(--blue); background: #e8f6fb; }
+.iep-drop-zone.dragover { border-color: var(--blue); background: #e8f6fb; }
+.iep-drop-zone.has-file { border-color: var(--green); background: #f2fbf3; border-style: solid; }
+.iep-drop-icon { color: var(--faint); margin-bottom: 0.5rem; }
+.iep-drop-icon svg { width: 26px; height: 26px; margin: 0 auto; display: block; }
+.iep-drop-zone.has-file .iep-drop-icon { color: var(--green); }
+.iep-drop-label { font-weight: 800; font-size: 0.88rem; color: var(--ink); }
+.iep-drop-sub { font-size: 0.74rem; color: var(--muted); margin-top: 0.2rem; }
+.iep-drop-filename { font-size: 0.78rem; font-weight: 700; color: #256d31; margin-top: 0.5rem; word-break: break-all; }
+.iep-drop-status { font-size: 0.76rem; color: var(--muted); margin-top: 0.4rem; text-align: center; min-height: 1em; }
+.iep-drop-status.ok { color: #256d31; }
+.iep-drop-status.err { color: #9c2b2a; }
+
 /* ---------- Data consent popup ---------- */
 .consent-overlay {
   position: fixed; inset: 0; z-index: 160;

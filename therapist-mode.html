@@ -217,6 +217,26 @@
       });
     }
 
+    let docsHtml = '';
+    if (!record.documents || record.documents.length === 0) {
+      docsHtml = '<p class="muted" style="font-size:0.85rem;">No IEP or 504 documents uploaded.</p>';
+    } else {
+      docsHtml = record.documents.map(d => {
+        const dateStr = new Date(d.uploaded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const label = d.doc_type === 'iep' ? 'IEP' : '504 Plan';
+        return `
+          <div class="reflection-item" style="display:flex; align-items:center; justify-content:space-between; gap:1rem;">
+            <div>
+              <div class="meta" style="margin-bottom:0.15rem;">${label} — uploaded ${dateStr}</div>
+              <div class="txt" style="margin-bottom:0;">${d.file_name}</div>
+            </div>
+            ${d.signedUrl
+              ? `<a href="${d.signedUrl}" target="_blank" rel="noopener" class="btn btn-secondary no-print" style="flex-shrink:0;">View</a>`
+              : `<span class="muted" style="font-size:0.78rem;">Link unavailable</span>`}
+          </div>`;
+      }).join('');
+    }
+
     sheet.innerHTML = `
       <div class="slip-head">
         <div>
@@ -258,6 +278,11 @@
         <div class="slip-section-title">Reflection Responses</div>
         ${reflectHtml}
       </div>
+
+      <div class="slip-section">
+        <div class="slip-section-title">IEP / 504 Documents</div>
+        ${docsHtml}
+      </div>
     `;
   }
 
@@ -272,6 +297,15 @@
     const { data: reflections } = await window.supabaseClient
       .from('reflections').select('module, lesson_index, assignment_index, reflection_text, reflection_texts, ai_feedback, ai_score, created_at')
       .eq('user_id', currentUser.id).order('created_at', { ascending: true });
+    const { data: docs } = await window.supabaseClient
+      .from('iep_504_documents').select('doc_type, file_name, file_path, uploaded_at')
+      .eq('user_id', currentUser.id).order('uploaded_at', { ascending: false });
+
+    const documents = await Promise.all((docs || []).map(async d => {
+      const { data: signed } = await window.supabaseClient.storage
+        .from('iep-504-docs').createSignedUrl(d.file_path, 3600);
+      return { ...d, signedUrl: signed?.signedUrl || null };
+    }));
 
     const counts = {};
     (rows || []).forEach(r => { counts[r.module] = (counts[r.module] || 0) + 1; });
@@ -301,6 +335,7 @@
       modules,
       assessment: grouped,
       reflections: reflections || [],
+      documents,
     });
   }
 
@@ -317,6 +352,7 @@
         <span class="roster-badge ${activityBadgeClass(s.activeDays30d)}">${s.activeDays30d} active days</span>
         ${s.pendingMeetingRequest ? '<span class="roster-badge amber" style="margin-left:0.3rem;">Meeting requested</span>' : ''}
         ${s.journalFlags && s.journalFlags.length ? `<span class="roster-badge red" style="margin-left:0.3rem;">${s.journalFlags.length} journal flag${s.journalFlags.length > 1 ? 's' : ''}</span>` : ''}
+        ${s.documents && s.documents.length ? `<span class="roster-badge green" style="margin-left:0.3rem;">${s.documents.length} doc${s.documents.length > 1 ? 's' : ''} on file</span>` : ''}
       `;
       item.addEventListener('click', () => {
         document.querySelectorAll('.roster-item').forEach(el => el.classList.remove('active'));
@@ -332,6 +368,7 @@
           modules: s.modules,
           assessment: s.assessment,
           reflections: s.reflections,
+          documents: s.documents,
         });
       });
       root.appendChild(item);

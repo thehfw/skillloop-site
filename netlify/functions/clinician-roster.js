@@ -94,6 +94,7 @@ exports.handler = async (event) => {
       { data: reflections, error: reflErr },
       { data: meetingRequests, error: meetErr },
       { data: journalFlags, error: journalErr },
+      { data: documents, error: docsErr },
       { data: usersData, error: usersErr },
     ] = await Promise.all([
       supabase.from('profiles').select('id, full_name, stars, birthdate, guardian_email, data_consent_given'),
@@ -103,11 +104,23 @@ exports.handler = async (event) => {
       supabase.from('reflections').select('user_id, module, lesson_index, assignment_index, reflection_text, reflection_texts, ai_feedback, ai_score, created_at').order('created_at', { ascending: true }),
       supabase.from('meeting_requests').select('user_id, status, created_at').order('created_at', { ascending: false }),
       supabase.from('emotions_journal').select('user_id, triage_level, triage_note, created_at').neq('triage_level', 'none').order('created_at', { ascending: false }),
+      supabase.from('iep_504_documents').select('user_id, doc_type, file_name, file_path, uploaded_at').order('uploaded_at', { ascending: false }),
       supabase.auth.admin.listUsers({ perPage: 1000 }),
     ]);
 
-    const firstError = profilesErr || obErr || progErr || actErr || reflErr || meetErr || journalErr || usersErr;
+    const firstError = profilesErr || obErr || progErr || actErr || reflErr || meetErr || journalErr || docsErr || usersErr;
     if (firstError) throw firstError;
+
+    // Private bucket — generate short-lived signed URLs so staff can view
+    // each file without making the bucket public. Expires in 1 hour.
+    const documentsWithUrls = await Promise.all(
+      (documents || []).map(async (doc) => {
+        const { data: signed, error: signErr } = await supabase.storage
+          .from('iep-504-docs')
+          .createSignedUrl(doc.file_path, 3600);
+        return { ...doc, signedUrl: signErr ? null : signed?.signedUrl };
+      })
+    );
 
     const emailById = {};
     (usersData?.users || []).forEach((u) => { emailById[u.id] = u.email; });
@@ -119,6 +132,7 @@ exports.handler = async (event) => {
       const userReflections = (reflections || []).filter((r) => r.user_id === p.id);
       const userMeetingRequests = (meetingRequests || []).filter((r) => r.user_id === p.id);
       const userJournalFlags = (journalFlags || []).filter((r) => r.user_id === p.id);
+      const userDocuments = documentsWithUrls.filter((d) => d.user_id === p.id);
 
       const moduleCounts = {};
       userProgress.forEach((r) => { moduleCounts[r.module] = (moduleCounts[r.module] || 0) + 1; });
@@ -165,6 +179,7 @@ exports.handler = async (event) => {
         reflections: userReflections,
         pendingMeetingRequest: userMeetingRequests.some((r) => r.status === 'pending'),
         journalFlags: userJournalFlags,
+        documents: userDocuments,
       };
     });
 

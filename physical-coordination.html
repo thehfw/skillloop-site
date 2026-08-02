@@ -338,7 +338,8 @@
   ];
 
   // Lesson 1 — all 5 assignments fully built out, each with its own video and quiz.
-  const LESSON_1_ASSIGNMENTS = [
+  const LESSONS_CONTENT = {
+    1: [
     {
       title: 'Standing Balance Basics',
       videoId: 'RbzV-Hjv4oU',
@@ -419,7 +420,90 @@
         { q: 'After finishing this review, the next step is:', opts: ['Stop practicing skills forever', 'Move on to new lessons as they become available', 'Repeat this exact video 50 times', 'Delete your progress'], correct: 1 },
       ],
     },
-  ];
+    ],
+    2: [
+      {
+        title: 'Plank Fundamentals',
+        videoId: 'b_TTLmmQmXU',
+        mcq: [
+          { q: 'A good plank position keeps your body in a line from:', opts: ['Head to knees only', 'Shoulders to hips only', 'Head to heels', 'Hips to toes only'], correct: 2 },
+          { q: 'While holding a plank, your core should feel:', opts: ['Completely relaxed', 'Gently but actively engaged', 'Painfully clenched', 'Not involved at all'], correct: 1 },
+          { q: 'If your hips sag toward the floor during a plank, you should:', opts: ['Ignore it and keep going', 'Lift your hips back in line and reset', 'Speed up the exercise', 'Stop breathing'], correct: 1 },
+          { q: 'How should you breathe during a plank hold?', opts: ['Hold your breath the whole time', 'Steady, controlled breaths', 'Only quick gasps', 'It does not matter'], correct: 1 },
+          { q: 'A realistic goal when starting plank practice is:', opts: ['A perfect 5-minute hold on day one', 'Short, consistent holds that slowly increase', 'Skipping straight to advanced variations', 'Doing it only once ever'], correct: 1 },
+        ],
+        reflectQuestions: [
+          'What did you notice in your body while holding the plank?',
+          'Was there a point where it got hard to keep good form? What happened?',
+          'How long do you think you held it, and what would help you improve that next time?',
+        ],
+      },
+      {
+        title: 'Seated Core Activation',
+        videoId: 'Ges75renc9I',
+        mcq: [
+          { q: 'Seated core exercises are useful because they:', opts: ['Require no core engagement at all', 'Let you build core strength without needing to balance on your feet', 'Only work your arms', 'Are easier than every other exercise'], correct: 1 },
+          { q: 'Good seated posture for these exercises means:', opts: ['Slouched back, shoulders forward', 'Tall spine, shoulders relaxed back', 'Leaning heavily to one side', 'Legs crossed tightly'], correct: 1 },
+          { q: 'If you feel strain in your neck during a seated core exercise, you should:', opts: ['Push through the pain', 'Relax your neck and refocus the effort on your core', 'Stop breathing to power through', 'Immediately do a harder variation'], correct: 1 },
+          { q: 'Engaging your core while seated helps with:', opts: ['Nothing useful', 'Everyday posture and stability', 'Only sports performance', 'Making you taller'], correct: 1 },
+          { q: 'A good pace for a new seated core routine is:', opts: ['As many reps as possible immediately', 'Slow and controlled, focusing on form first', 'Skipping form entirely for speed', 'Only doing it once a month'], correct: 1 },
+        ],
+        reflectQuestions: [
+          'Describe how your core felt during the seated exercises compared to standing ones.',
+          'What was the most challenging part of staying in good seated posture?',
+          'How could you use seated core activation in your daily routine, like at school or home?',
+        ],
+      },
+      {
+        title: 'Standing Core Control',
+        videoId: 'pJp08smdcFk',
+        mcq: [
+          { q: 'Standing core control exercises mainly help you:', opts: ['Stay stable while upright and moving', 'Only build arm strength', 'Improve eyesight', 'Increase flexibility in your fingers'], correct: 0 },
+          { q: 'While standing and engaging your core, your knees should be:', opts: ['Locked completely straight and stiff', 'Slightly soft, not locked', 'Bent at a sharp 90-degree angle', 'Constantly shaking on purpose'], correct: 1 },
+          { q: 'If you feel wobbly during standing core work, a good first step is:', opts: ['Widen your stance slightly for more stability', 'Close your eyes to focus harder', 'Speed up the movement', 'Hold your breath tightly'], correct: 0 },
+          { q: 'A strong standing core helps with everyday tasks like:', opts: ['Nothing practical', 'Carrying bags, reaching, and staying balanced', 'Only competitive sports', 'Sitting still for long periods'], correct: 1 },
+          { q: 'What is a sign you are ready for a harder standing core variation?', opts: ['You can do the current one with steady control', 'You fell over once', 'You skipped the video', 'You feel dizzy every time'], correct: 0 },
+        ],
+        reflectQuestions: [
+          'What did you try during the standing core exercises, and how did your balance feel?',
+          'Compare this to the seated core work — which felt more natural to you, and why?',
+          'What is one everyday activity where standing core control would help you?',
+        ],
+      },
+      {
+        title: 'Rotational Core Strength',
+        videoId: 't2jel6q1GRk',
+        mcq: [
+          { q: 'Rotational core exercises focus on:', opts: ['Twisting movements through your midsection', 'Only forward bending', 'Standing perfectly still', 'Arm strength exclusively'], correct: 0 },
+          { q: 'When rotating your torso during this exercise, you should move:', opts: ['As fast and hard as possible', 'In a controlled, deliberate way', 'Only using your neck', 'With your eyes closed the whole time'], correct: 1 },
+          { q: 'Rotational core strength can help with everyday movements like:', opts: ['Reaching across your body or looking behind you', 'Nothing practical', 'Only golf and tennis', 'Sitting completely still'], correct: 0 },
+          { q: 'If a rotational movement causes sharp pain, you should:', opts: ['Push through it', 'Stop and ease back to a smaller range of motion', 'Do it faster', 'Ignore it completely'], correct: 1 },
+          { q: 'A good warm-up before rotational core work includes:', opts: ['Skipping warm-up entirely', 'Gentle movement to loosen your midsection first', 'Immediate maximum-effort twisting', 'Ice-cold stretching only'], correct: 1 },
+        ],
+        reflectQuestions: [
+          'What did the rotational movement feel like compared to the plank and standing exercises?',
+          'Was one side of your body easier to rotate than the other? Describe what you noticed.',
+          'Where in daily life might this kind of rotational strength and control be useful?',
+        ],
+      },
+      {
+        title: 'Core Endurance Challenge',
+        videoId: 'jbwg8Ya5q1o',
+        mcq: [
+          { q: 'This final assignment in the lesson focuses on:', opts: ['Learning something brand new', 'Combining everything practiced in Core Strength so far', 'Skipping ahead without review', 'Resting only'], correct: 1 },
+          { q: 'Core endurance means your muscles can:', opts: ['Only handle one quick effort', 'Sustain effort over a longer period', 'Never get tired at all', 'Work without any core engagement'], correct: 1 },
+          { q: 'If you need to pause partway through the endurance challenge, that means:', opts: ['You failed completely', 'It is a normal part of building endurance over time', 'You should never try again', 'The exercise is wrong for you'], correct: 1 },
+          { q: 'Completing this full Core Strength lesson helps you:', opts: ['Forget everything you practiced', 'See how your core stability has developed across all 5 assignments', 'Nothing in particular', 'Only prepare for a test'], correct: 1 },
+          { q: 'After finishing this lesson, a good next step is:', opts: ['Stop practicing core work entirely', 'Keep practicing and move on to new lessons as they unlock', 'Repeat this exact video 50 times in a row', 'Delete your progress'], correct: 1 },
+        ],
+        reflectQuestions: [
+          'Looking back at all 5 assignments, what part of your core strength improved the most?',
+          'Which exercise in this lesson did you find hardest, and why do you think that was?',
+          'How did it feel to complete the full Core Strength lesson from start to finish?',
+        ],
+      },
+    ],
+  };
 
   let currentUser = null;
   let completedSet = new Set(); // "lesson-assignment"
@@ -470,7 +554,7 @@
     const grid = document.getElementById('lesson-grid');
     grid.innerHTML = '';
     for (let l = 1; l <= TOTAL_LESSONS; l++) {
-      const unlocked = l === 1; // content ships lesson-by-lesson; only Lesson 1 is live
+      const unlocked = LESSONS_CONTENT[l] !== undefined; // content ships lesson-by-lesson
       const done = lessonDoneCount(l);
       const stateClass = done === ASSIGNMENTS_PER_LESSON ? 'done' : unlocked ? 'unlocked' : 'locked';
       const cube = document.createElement('button');
@@ -497,7 +581,7 @@
     grid.innerHTML = '';
 
     for (let a = 1; a <= ASSIGNMENTS_PER_LESSON; a++) {
-      const live = selectedLesson === 1; // all 5 assignments in Lesson 1 are live
+      const live = LESSONS_CONTENT[selectedLesson] !== undefined; // all 5 assignments are live if the lesson has content
       const done = completedSet.has(key(selectedLesson, a));
       const cube = document.createElement('button');
       cube.className = 'cube ' + (done ? 'done' : live ? 'unlocked' : 'locked');
@@ -513,7 +597,7 @@
   // ---------- Assignment flow (data-driven across all 5) ----------
   function openAssignment(a) {
     selectedAssignment = a;
-    const spec = LESSON_1_ASSIGNMENTS[a - 1];
+    const spec = LESSONS_CONTENT[selectedLesson][a - 1];
     const done = completedSet.has(key(1, a));
     const card = document.getElementById('detail-card');
     card.style.display = 'block';
@@ -522,7 +606,7 @@
     document.getElementById('completed-banner').classList.toggle('visible', done);
     document.getElementById('feedback-card').classList.remove('visible');
     quizPassed = false;
-    logEvent(currentUser.id, 'lesson_started', { module: 'physical_coordination', lessonNumber: 1, assignmentNumber: a });
+    logEvent(currentUser.id, 'lesson_started', { module: 'physical_coordination', lessonNumber: selectedLesson, assignmentNumber: a });
 
     if (done) {
       document.getElementById('video-section').style.display = 'block';
@@ -548,7 +632,7 @@
   }
 
   function renderReflectQuestions() {
-    const spec = LESSON_1_ASSIGNMENTS[selectedAssignment - 1];
+    const spec = LESSONS_CONTENT[selectedLesson][selectedAssignment - 1];
     const root = document.getElementById('reflect-questions-root');
     root.innerHTML = spec.reflectQuestions.map((q, i) => `
       <div class="field">
@@ -559,12 +643,12 @@
   }
 
   document.getElementById('to-quiz-btn').addEventListener('click', () => {
-    logEvent(currentUser.id, 'video_watched', { module: 'physical_coordination', lessonNumber: 1, assignmentNumber: selectedAssignment });
+    logEvent(currentUser.id, 'video_watched', { module: 'physical_coordination', lessonNumber: selectedLesson, assignmentNumber: selectedAssignment });
     showStep('quiz');
   });
 
   function renderMcq() {
-    const spec = LESSON_1_ASSIGNMENTS[selectedAssignment - 1];
+    const spec = LESSONS_CONTENT[selectedLesson][selectedAssignment - 1];
     const root = document.getElementById('mcq-root');
     root.innerHTML = spec.mcq.map((item, qi) => `
       <div class="q-block">
@@ -578,7 +662,7 @@
   }
 
   document.getElementById('grade-quiz-btn').addEventListener('click', () => {
-    const spec = LESSON_1_ASSIGNMENTS[selectedAssignment - 1];
+    const spec = LESSONS_CONTENT[selectedLesson][selectedAssignment - 1];
     let answered = 0, correct = 0;
     spec.mcq.forEach((item, qi) => {
       const sel = document.querySelector('input[name="mcq-' + qi + '"]:checked');
@@ -595,7 +679,7 @@
     if (answered < spec.mcq.length) { result.textContent = 'Answer all ' + spec.mcq.length + ' questions first.'; result.style.color = 'var(--danger)'; return; }
     if (correct >= 4) {
       quizPassed = true;
-      logEvent(currentUser.id, 'quiz_completed', { module: 'physical_coordination', lessonNumber: 1, assignmentNumber: selectedAssignment, payload: { score: correct } });
+      logEvent(currentUser.id, 'quiz_completed', { module: 'physical_coordination', lessonNumber: selectedLesson, assignmentNumber: selectedAssignment, payload: { score: correct } });
       result.textContent = 'Nice — ' + correct + '/5 correct. Moving to your reflection.';
       result.style.color = 'var(--green)';
       setTimeout(() => showStep('reflect'), 900);
@@ -606,7 +690,7 @@
   });
 
   document.getElementById('submit-reflection-btn').addEventListener('click', async (e) => {
-    const spec = LESSON_1_ASSIGNMENTS[selectedAssignment - 1];
+    const spec = LESSONS_CONTENT[selectedLesson][selectedAssignment - 1];
     const btn = e.currentTarget;
     const fb = document.getElementById('feedback-card');
 
@@ -656,7 +740,7 @@
     await window.supabaseClient.from('reflections').insert({
       user_id: currentUser.id,
       module: 'physical_coordination',
-      lesson_index: 1,
+      lesson_index: selectedLesson,
       assignment_index: a,
       reflection_texts: spec.reflectQuestions.map((q, i) => ({ question: q, answer: answers[i] })),
       ai_feedback: grade.feedback,
@@ -666,13 +750,13 @@
     const { error: progErr } = await window.supabaseClient.from('module_progress').insert({
       user_id: currentUser.id,
       module: 'physical_coordination',
-      series_index: 1,   // lesson cube number
+      series_index: selectedLesson,   // lesson cube number
       lesson_index: a,   // assignment number within the lesson
     });
 
     if (!progErr) {
       await window.supabaseClient.rpc('increment_stars', { p_user_id: currentUser.id, p_amount: 1 });
-      await logEvent(currentUser.id, 'reflection_submitted', { module: 'physical_coordination', lessonNumber: 1, assignmentNumber: a, payload: { ai_score: grade.score } });
+      await logEvent(currentUser.id, 'reflection_submitted', { module: 'physical_coordination', lessonNumber: selectedLesson, assignmentNumber: a, payload: { ai_score: grade.score } });
       completedSet.add(key(1, a));
     }
 

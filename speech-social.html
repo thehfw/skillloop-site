@@ -657,7 +657,8 @@
     const chosen = spec.options[i];
     document.querySelectorAll('.scenario-opt').forEach((btn, idx) => {
       btn.disabled = true;
-      btn.classList.add(spec.options[idx].isBest ? 'chosen-best' : idx === i ? 'chosen-other' : '');
+      if (spec.options[idx].isBest) btn.classList.add('chosen-best');
+      else if (idx === i) btn.classList.add('chosen-other');
     });
     const box = document.getElementById('scenario-reaction-box');
     box.innerHTML = `<div class="scenario-reaction ${chosen.isBest ? 'best' : 'other'}">"${chosen.reaction}"<br><br>${chosen.whyNote}</div>`;

@@ -32,6 +32,36 @@
   .quiz-result { font-weight:800; margin-top:0.6rem; }
   .reflect-box textarea { width:100%; min-height:110px; resize:vertical; }
 
+  .scenario-box {
+    background:#fff8e6; border:1.5px solid #fde8a8; border-radius:14px;
+    padding:1rem 1.2rem; font-size:0.95rem; color:#5c4600; line-height:1.55; margin:0.6rem 0 1.1rem;
+  }
+  .scenario-box strong { color:#8a6a00; }
+  .scenario-opt {
+    display:block; width:100%; text-align:left; padding:0.8rem 1rem; margin-bottom:0.6rem;
+    border:1.5px solid var(--line); border-radius:12px; font-size:0.9rem; background:#fff;
+  }
+  .scenario-opt:hover { border-color:var(--yellow); }
+  .scenario-opt.chosen-best { border-color:var(--green); background:#f2fbf3; }
+  .scenario-opt.chosen-other { border-color:#e0a800; background:#fff8e6; }
+  .scenario-opt:disabled { cursor:default; }
+  .scenario-reaction {
+    border-radius:12px; padding:0.9rem 1rem; margin-top:0.4rem; font-size:0.87rem; line-height:1.5;
+  }
+  .scenario-reaction.best { background:#f2fbf3; border:1px solid #b9e3bf; color:#256d31; }
+  .scenario-reaction.other { background:#fff8e6; border:1px solid #fde8a8; color:#8a6a00; }
+
+  .convo-log { max-height:280px; overflow-y:auto; margin-bottom:0.8rem; display:flex; flex-direction:column; gap:0.6rem; }
+  .convo-bubble { max-width:80%; padding:0.6rem 0.9rem; border-radius:14px; font-size:0.88rem; line-height:1.45; }
+  .convo-bubble.them { background:var(--track); color:var(--ink); align-self:flex-start; border-bottom-left-radius:4px; }
+  .convo-bubble.me { background:var(--yellow); color:#4a3800; align-self:flex-end; border-bottom-right-radius:4px; }
+  .convo-coaching { font-size:0.78rem; color:var(--muted); font-style:italic; align-self:flex-start; margin-top:-0.3rem; }
+  .convo-input-row { display:flex; gap:0.5rem; }
+  .convo-input {
+    flex:1; padding:0.65rem 0.9rem; border:1.5px solid var(--line); border-radius:999px; font-size:0.88rem; font-family:inherit;
+  }
+  .convo-input:focus { outline:none; border-color:var(--yellow); }
+
   /* This page uses the Social Skills yellow theme instead of the shared
      default blue — scoped to this page only, Physical Coordination is untouched. */
   .cube.unlocked { border-color: var(--yellow) !important; }
@@ -194,22 +224,23 @@
     </div>
 
     <div class="detail-card" id="detail-card" style="display:none;">
-      <span class="step-tag" id="detail-step">STEP 1 OF 3 — WATCH</span>
+      <span class="step-tag" id="detail-step">STEP 1 OF 2 — PRACTICE</span>
       <h3 style="font-weight:800; font-size:1.05rem;" id="detail-title">Assignment</h3>
 
-      <div id="video-section">
-        <p class="muted" style="font-size:0.85rem; margin-top:0.3rem;">Watch the full exercise video, then continue to the quiz.</p>
-        <div class="video-frame">
-          <iframe id="video-iframe" src="" title="Exercise video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-        <button class="btn btn-primary" id="to-quiz-btn">I watched it — take the quiz</button>
-      </div>
+      <div id="scenario-section">
+        <div class="scenario-box" id="scenario-box"></div>
 
-      <div id="quiz-section" style="display:none;">
-        <p class="muted" style="font-size:0.85rem; margin:0.3rem 0 0.9rem;">Answer all 5. You need at least 4 correct to move on — you can retry.</p>
-        <div id="mcq-root"></div>
-        <button class="btn btn-primary" id="grade-quiz-btn">Check my answers</button>
-        <div class="quiz-result" id="quiz-result"></div>
+        <div id="scenario-choice-root"></div>
+
+        <div id="scenario-open-root" style="display:none;">
+          <div class="convo-log" id="convo-log"></div>
+          <div class="convo-input-row">
+            <input type="text" id="convo-input" class="convo-input" placeholder="Type what you'd say...">
+            <button class="btn btn-primary" id="convo-send-btn">Send</button>
+          </div>
+        </div>
+
+        <button class="btn btn-green" id="to-reflect-btn" style="display:none; margin-top:1rem;">Continue to reflection</button>
       </div>
 
       <div id="reflect-section" style="display:none;">
@@ -346,17 +377,119 @@
     { h: 'Earn as you go', p: 'Every completed assignment earns 1 star for the upcoming Avatar Shop, fills your progress wheel, and counts toward your active days.' },
   ];
 
-  // Lesson 1 — all 5 assignments fully built out, each with its own video and quiz.
-  // No lessons have real content yet — all 20 are templates, shown as
-  // "Coming soon" until content is added (same pattern used for Physical
-  // Coordination lessons 8-20, which are also templates awaiting content).
-  const LESSONS_CONTENT = {};
+  // Lesson 1 — 5 leveled conversation-practice assignments (3 multiple-choice
+  // scenarios, then 2 open-ended AI roleplay scenarios). Lessons 2-20 have no
+  // content yet and show as "Coming soon."
+  const LESSONS_CONTENT = {
+    1: [
+      {
+        title: 'When Something Embarrassing Happens',
+        type: 'scenario_choice',
+        characterName: 'Scenario',
+        scenario: 'Your avatar trips and falls in the hallway in front of a few other students. What do you say?',
+        options: [
+          { text: '"Whoops — I\'m okay, thanks!" (said with a little smile)', isBest: true,
+            reaction: 'Ha, no worries, that hallway is slippery! Glad you\'re okay.',
+            whyNote: 'This works well because it\'s calm, honest, and a little light — it shows others you\'re fine without making it a bigger deal than it needs to be.' },
+          { text: 'Say nothing and rush away as fast as possible', isBest: false,
+            reaction: 'They shrug and go back to their conversation, a little confused.',
+            whyNote: 'This is a completely understandable instinct, but rushing off can sometimes make others worry more, or make the moment feel more awkward than it needs to be.' },
+          { text: '"I meant to do that." (said in a flat, awkward tone)', isBest: false,
+            reaction: 'A couple of them laugh, but it feels a little forced.',
+            whyNote: 'Humor can work, but a flat delivery can come across as covering up embarrassment rather than genuinely laughing it off.' },
+          { text: 'Get upset and snap "Stop staring at me!"', isBest: false,
+            reaction: 'They look surprised and back off, a little confused by the reaction.',
+            whyNote: 'This is a very natural feeling to have, but reacting with anger can make a small moment feel bigger and harder for others to know how to respond to.' },
+        ],
+        reflectQuestions: [
+          'Which option did you choose, and why did you think it was the best response?',
+          'Has something like this happened to you before? What did you actually say or do?',
+          'How do you think the other options might have changed how the moment felt?',
+        ],
+      },
+      {
+        title: 'Responding to an Invitation',
+        type: 'scenario_choice',
+        characterName: 'Jordan',
+        scenario: 'Jordan, someone from your class, says: "Hey, a few of us are going to the movies Saturday — want to come?" What do you say?',
+        options: [
+          { text: '"That sounds fun, I\'d love to! What time?"', isBest: true,
+            reaction: 'Awesome! We\'re thinking 2pm, I\'ll send you the details!',
+            whyNote: 'This response is warm, clearly interested, and moves the conversation forward with a natural follow-up question.' },
+          { text: '"Maybe. I\'ll think about it."', isBest: false,
+            reaction: 'Oh, okay — let me know if you decide!',
+            whyNote: 'This isn\'t wrong, but it can feel a little uncertain — if you do want to go, showing a bit more enthusiasm helps the other person know you\'re genuinely interested.' },
+          { text: '"I don\'t really like movies."', isBest: false,
+            reaction: 'Oh, okay, no worries.',
+            whyNote: 'Honesty is good, but this closes the conversation quickly — adding something like "but thanks for asking" or suggesting something else keeps the door open.' },
+          { text: 'Say nothing and just walk away', isBest: false,
+            reaction: 'Jordan looks a little confused and unsure what just happened.',
+            whyNote: 'Even if you\'re unsure how to answer, giving some kind of response — even "let me check!" — helps the other person feel heard.' },
+        ],
+        reflectQuestions: [
+          'Which response did you pick, and how do you think Jordan felt hearing it?',
+          'What is something you could say if you genuinely were not sure whether you wanted to go?',
+          'Describe a real invitation you have received before and how you responded.',
+        ],
+      },
+      {
+        title: 'A Stranger Says Hello',
+        type: 'scenario_choice',
+        characterName: 'Scenario',
+        scenario: 'Someone you don\'t know very well smiles and says "Hi!" as you pass in the hallway. What do you say?',
+        options: [
+          { text: '"Hi! How\'s it going?"', isBest: true,
+            reaction: 'Good, thanks! Just heading to class. See you around!',
+            whyNote: 'A friendly greeting back, plus a small follow-up question, is a simple and effective way to acknowledge someone warmly.' },
+          { text: 'Just nod without saying anything', isBest: false,
+            reaction: 'They nod back, a little unsure if you were being friendly or not.',
+            whyNote: 'A nod isn\'t wrong, but pairing it with even a quick "hi" makes your friendliness clearer to the other person.' },
+          { text: '"Do I know you?"', isBest: false,
+            reaction: 'Oh — sorry, I thought we had a class together! Never mind.',
+            whyNote: 'This can come across as a bit blunt, even if it\'s an honest question — a friendly "hi" first, then asking their name, usually feels warmer.' },
+          { text: 'Look at your phone and pretend not to notice', isBest: false,
+            reaction: 'They look a little disappointed and keep walking.',
+            whyNote: 'This is a common instinct when feeling shy, but it can unintentionally seem unfriendly — even a small smile back goes a long way.' },
+        ],
+        reflectQuestions: [
+          'Which response did you choose, and how easy or hard was that decision for you?',
+          'What makes it harder to respond to a stranger compared to a friend saying hi?',
+          'What is one small thing you could practice this week to make greetings feel easier?',
+        ],
+      },
+      {
+        title: 'Starting a Conversation at Lunch',
+        type: 'scenario_open',
+        characterName: 'Sam',
+        characterPersona: 'a friendly but slightly shy new student sitting down at the lunch table for the first time',
+        scenario: 'Sam, a new student, just sat down at your lunch table and doesn\'t know anyone yet. Say something to start a conversation.',
+        openingLine: '*sits down and glances around, looking a little unsure*',
+        reflectQuestions: [
+          'What did you say to start the conversation, and how did Sam respond?',
+          'Was it easy or hard to think of what to say first? What made it that way?',
+          'What is one thing you could say to a new person that you would want to try in real life?',
+        ],
+      },
+      {
+        title: 'Checking In With a Friend',
+        type: 'scenario_open',
+        characterName: 'Riley',
+        characterPersona: 'a classmate who seems a little down or distracted today, but opens up if approached kindly',
+        scenario: 'Riley, someone you know from class, seems quieter than usual today and is sitting alone. Try starting a caring conversation with them.',
+        openingLine: '*is sitting quietly, looking down at their desk*',
+        reflectQuestions: [
+          'What did you say to Riley, and how did the conversation go?',
+          'Looking back across all 5 assignments in this lesson, which scenario felt most realistic to your own life?',
+          'What is one conversation skill from this lesson you want to keep practicing?',
+        ],
+      },
+    ],
+  };
 
   let currentUser = null;
   let completedSet = new Set(); // "lesson-assignment"
   let selectedLesson = null;
   let selectedAssignment = null;
-  let quizPassed = false;
 
   const key = (l, a) => l + '-' + a;
 
@@ -441,40 +574,41 @@
     panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  // ---------- Assignment flow (data-driven across all 5) ----------
+  // ---------- Assignment flow (data-driven, scenario-based) ----------
+  let convoHistory = [];
+  let convoTurns = 0;
+
   function openAssignment(a) {
     selectedAssignment = a;
     const spec = LESSONS_CONTENT[selectedLesson][a - 1];
     const done = completedSet.has(key(selectedLesson, a));
     const card = document.getElementById('detail-card');
     card.style.display = 'block';
-    document.getElementById('detail-title').textContent = 'Lesson 1, Assignment ' + a + ' — ' + spec.title;
-    document.getElementById('video-iframe').src = 'https://www.youtube-nocookie.com/embed/' + spec.videoId;
+    document.getElementById('detail-title').textContent = 'Lesson ' + selectedLesson + ', Assignment ' + a + ' — ' + spec.title;
     document.getElementById('completed-banner').classList.toggle('visible', done);
     document.getElementById('feedback-card').classList.remove('visible');
-    quizPassed = false;
+    document.getElementById('to-reflect-btn').style.display = 'none';
+    convoHistory = [];
+    convoTurns = 0;
     logEvent(currentUser.id, 'lesson_started', { module: 'social_skills', lessonNumber: selectedLesson, assignmentNumber: a });
 
     if (done) {
-      document.getElementById('video-section').style.display = 'block';
-      document.getElementById('quiz-section').style.display = 'none';
+      document.getElementById('scenario-section').style.display = 'block';
       document.getElementById('reflect-section').style.display = 'none';
-      document.getElementById('to-quiz-btn').style.display = 'none';
       document.getElementById('detail-step').textContent = 'COMPLETED';
+      renderScenario(spec, true);
     } else {
-      document.getElementById('to-quiz-btn').style.display = 'inline-flex';
-      showStep('video');
+      showStep('scenario');
+      renderScenario(spec, false);
     }
     card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function showStep(step) {
-    document.getElementById('video-section').style.display = step === 'video' ? 'block' : 'none';
-    document.getElementById('quiz-section').style.display = step === 'quiz' ? 'block' : 'none';
+    document.getElementById('scenario-section').style.display = step === 'scenario' ? 'block' : 'none';
     document.getElementById('reflect-section').style.display = step === 'reflect' ? 'block' : 'none';
     document.getElementById('detail-step').textContent =
-      step === 'video' ? 'STEP 1 OF 3 — WATCH' : step === 'quiz' ? 'STEP 2 OF 3 — QUIZ' : 'STEP 3 OF 3 — REFLECT';
-    if (step === 'quiz') renderMcq();
+      step === 'scenario' ? 'STEP 1 OF 2 — PRACTICE' : 'STEP 2 OF 2 — REFLECT';
     if (step === 'reflect') renderReflectQuestions();
   }
 
@@ -489,52 +623,128 @@
     `).join('');
   }
 
-  document.getElementById('to-quiz-btn').addEventListener('click', () => {
-    logEvent(currentUser.id, 'video_watched', { module: 'social_skills', lessonNumber: selectedLesson, assignmentNumber: selectedAssignment });
-    showStep('quiz');
-  });
+  function renderScenario(spec, readOnly) {
+    document.getElementById('scenario-box').innerHTML =
+      `<strong>${spec.characterName || 'Scenario'}:</strong> ${spec.scenario}`;
 
-  function renderMcq() {
-    const spec = LESSONS_CONTENT[selectedLesson][selectedAssignment - 1];
-    const root = document.getElementById('mcq-root');
-    root.innerHTML = spec.mcq.map((item, qi) => `
-      <div class="q-block">
-        <div class="q-text"><span class="q-num">${qi + 1}.</span>${item.q}</div>
-        ${item.opts.map((o, oi) => `
-          <label class="q-opt" data-q="${qi}" data-o="${oi}">
-            <input type="radio" name="mcq-${qi}" value="${oi}"><span>${o}</span>
-          </label>`).join('')}
-      </div>`).join('');
-    document.getElementById('quiz-result').textContent = '';
+    const choiceRoot = document.getElementById('scenario-choice-root');
+    const openRoot = document.getElementById('scenario-open-root');
+
+    if (spec.type === 'scenario_choice') {
+      openRoot.style.display = 'none';
+      choiceRoot.style.display = 'block';
+      choiceRoot.innerHTML = spec.options.map((opt, i) => `
+        <button class="scenario-opt" data-i="${i}" ${readOnly ? 'disabled' : ''}>${opt.text}</button>
+      `).join('') + '<div id="scenario-reaction-box"></div>';
+
+      if (!readOnly) {
+        choiceRoot.querySelectorAll('.scenario-opt').forEach(btn => {
+          btn.addEventListener('click', () => handleChoice(spec, parseInt(btn.dataset.i, 10)));
+        });
+      }
+    } else {
+      choiceRoot.style.display = 'none';
+      openRoot.style.display = 'block';
+      const log = document.getElementById('convo-log');
+      log.innerHTML = `<div class="convo-bubble them">${spec.openingLine}</div>`;
+      document.getElementById('convo-input').disabled = readOnly;
+      document.getElementById('convo-send-btn').disabled = readOnly;
+      if (readOnly) document.getElementById('to-reflect-btn').style.display = 'none';
+    }
   }
 
-  document.getElementById('grade-quiz-btn').addEventListener('click', () => {
-    const spec = LESSONS_CONTENT[selectedLesson][selectedAssignment - 1];
-    let answered = 0, correct = 0;
-    spec.mcq.forEach((item, qi) => {
-      const sel = document.querySelector('input[name="mcq-' + qi + '"]:checked');
-      if (sel) {
-        answered++;
-        const chosen = parseInt(sel.value, 10);
-        const lbls = document.querySelectorAll('label[data-q="' + qi + '"]');
-        lbls.forEach(l => l.classList.remove('correct', 'wrong'));
-        if (chosen === item.correct) { correct++; lbls[chosen].classList.add('correct'); }
-        else { lbls[chosen].classList.add('wrong'); lbls[item.correct].classList.add('correct'); }
-      }
+  function handleChoice(spec, i) {
+    const chosen = spec.options[i];
+    document.querySelectorAll('.scenario-opt').forEach((btn, idx) => {
+      btn.disabled = true;
+      btn.classList.add(spec.options[idx].isBest ? 'chosen-best' : idx === i ? 'chosen-other' : '');
     });
-    const result = document.getElementById('quiz-result');
-    if (answered < spec.mcq.length) { result.textContent = 'Answer all ' + spec.mcq.length + ' questions first.'; result.style.color = 'var(--danger)'; return; }
-    if (correct >= 4) {
-      quizPassed = true;
-      logEvent(currentUser.id, 'quiz_completed', { module: 'social_skills', lessonNumber: selectedLesson, assignmentNumber: selectedAssignment, payload: { score: correct } });
-      result.textContent = 'Nice — ' + correct + '/5 correct. Moving to your reflection.';
-      result.style.color = 'var(--green)';
-      setTimeout(() => showStep('reflect'), 900);
-    } else {
-      result.textContent = correct + '/5 — review the answers marked above and try again.';
-      result.style.color = 'var(--danger)';
+    const box = document.getElementById('scenario-reaction-box');
+    box.innerHTML = `<div class="scenario-reaction ${chosen.isBest ? 'best' : 'other'}">"${chosen.reaction}"<br><br>${chosen.whyNote}</div>`;
+    logEvent(currentUser.id, 'quiz_completed', { module: 'social_skills', lessonNumber: selectedLesson, assignmentNumber: selectedAssignment, payload: { chosenBest: chosen.isBest } });
+
+    window.supabaseClient.from('conversation_practice_log').insert({
+      user_id: currentUser.id,
+      module: 'social_skills',
+      lesson_number: selectedLesson,
+      assignment_number: selectedAssignment,
+      level: 1,
+      scenario: spec.scenario,
+      chosen_option: chosen.text,
+      is_best_choice: chosen.isBest,
+      choice_reasoning: chosen.whyNote,
+    });
+
+    document.getElementById('to-reflect-btn').style.display = 'inline-flex';
+  }
+
+  document.getElementById('convo-send-btn').addEventListener('click', async () => {
+    const spec = LESSONS_CONTENT[selectedLesson][selectedAssignment - 1];
+    const input = document.getElementById('convo-input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const log = document.getElementById('convo-log');
+    log.insertAdjacentHTML('beforeend', `<div class="convo-bubble me">${text}</div>`);
+    log.scrollTop = log.scrollHeight;
+    input.value = '';
+    input.disabled = true;
+    document.getElementById('convo-send-btn').disabled = true;
+
+    convoHistory.push({ role: 'user', content: text });
+
+    let result = { characterReply: '...', coachingNote: null };
+    try {
+      const res = await fetch('/.netlify/functions/conversation-practice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scenario: spec.scenario,
+          characterName: spec.characterName,
+          characterPersona: spec.characterPersona,
+          studentMessage: text,
+          history: convoHistory,
+        }),
+      });
+      result = await res.json();
+    } catch (err) {
+      console.error('conversation-practice request failed:', err);
+    }
+
+    log.insertAdjacentHTML('beforeend', `<div class="convo-bubble them">${result.characterReply}</div>`);
+    if (result.coachingNote) log.insertAdjacentHTML('beforeend', `<div class="convo-coaching">${result.coachingNote}</div>`);
+    log.scrollTop = log.scrollHeight;
+    convoHistory.push({ role: 'assistant', content: result.characterReply });
+
+    window.supabaseClient.from('conversation_practice_log').insert({
+      user_id: currentUser.id,
+      module: 'social_skills',
+      lesson_number: selectedLesson,
+      assignment_number: selectedAssignment,
+      level: 2,
+      scenario: spec.scenario,
+      student_response: text,
+      ai_character_reply: result.characterReply,
+    });
+
+    convoTurns += 1;
+    input.disabled = false;
+    document.getElementById('convo-send-btn').disabled = false;
+    input.focus();
+
+    if (convoTurns === 1) {
+      logEvent(currentUser.id, 'quiz_completed', { module: 'social_skills', lessonNumber: selectedLesson, assignmentNumber: selectedAssignment });
+    }
+    if (convoTurns >= 2) {
+      document.getElementById('to-reflect-btn').style.display = 'inline-flex';
     }
   });
+
+  document.getElementById('convo-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('convo-send-btn').click();
+  });
+
+  document.getElementById('to-reflect-btn').addEventListener('click', () => showStep('reflect'));
 
   document.getElementById('submit-reflection-btn').addEventListener('click', async (e) => {
     const spec = LESSONS_CONTENT[selectedLesson][selectedAssignment - 1];

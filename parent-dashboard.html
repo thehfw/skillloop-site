@@ -111,6 +111,31 @@
       <button class="btn btn-primary" id="request-meeting-btn" type="button" style="padding:0.85rem 2rem; font-size:1rem;">Request Meeting with a SkillLoop Clinician</button>
       <p class="save-status-pd" id="meeting-status" style="display:none; margin-top:0.8rem; font-size:0.85rem; font-weight:700; color:#256d31;"></p>
     </div>
+
+    <div class="card" style="margin-top:1.1rem;">
+      <h2 style="font-size:0.9rem; font-weight:800; margin-bottom:0.5rem;">Weekly Clinician Check-In</h2>
+      <p class="muted" style="font-size:0.83rem; margin-bottom:1rem;">Every SkillLoop student gets a weekly check-in with a licensed clinician. Set your preferred day and time — our team will confirm and send the meeting link outside the app.</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; margin-bottom:1rem;">
+        <div class="field" style="margin-bottom:0;">
+          <label for="ws-day">Preferred day</label>
+          <select id="ws-day">
+            <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+            <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="ws-time">Preferred time</label>
+          <select id="ws-time">
+            <option>9:00 AM</option><option>10:00 AM</option><option>11:00 AM</option>
+            <option>1:00 PM</option><option>2:00 PM</option><option>3:00 PM</option>
+            <option>4:00 PM</option><option>5:00 PM</option><option>6:00 PM</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-secondary" id="ws-save-btn" type="button">Save Weekly Preference</button>
+      <p id="ws-status" style="display:none; margin-top:0.7rem; font-size:0.83rem; font-weight:700; color:#256d31;"></p>
+      <p id="ws-current" class="muted" style="font-size:0.8rem; margin-top:0.6rem;"></p>
+    </div>
   </div>
 </div>
 
@@ -259,6 +284,47 @@
         statusEl.textContent = "Request sent! A SkillLoop clinician will reach out soon.";
         btn.textContent = 'Request Sent';
       }
+    });
+
+    // ---------- Weekly Clinician Session Preference ----------
+    (async function loadWeeklySession() {
+      const { data } = await window.supabaseClient
+        .from('weekly_sessions').select('day_of_week, time_slot, status, meeting_link')
+        .eq('user_id', user.id).maybeSingle();
+      const currentEl = document.getElementById('ws-current');
+      if (data) {
+        document.getElementById('ws-day').value = data.day_of_week;
+        document.getElementById('ws-time').value = data.time_slot;
+        currentEl.textContent = `Currently set: ${data.day_of_week}s at ${data.time_slot}` +
+          (data.meeting_link ? ` — meeting link confirmed.` : ` — waiting on our team to confirm and send a link.`);
+      } else {
+        currentEl.textContent = 'No weekly time set yet.';
+      }
+    })();
+
+    document.getElementById('ws-save-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('ws-save-btn');
+      const day = document.getElementById('ws-day').value;
+      const time = document.getElementById('ws-time').value;
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+
+      const { error } = await window.supabaseClient.from('weekly_sessions').upsert({
+        user_id: user.id, day_of_week: day, time_slot: time, status: 'active', updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id' });
+
+      const statusEl = document.getElementById('ws-status');
+      statusEl.style.display = 'block';
+      if (error) {
+        statusEl.style.color = '#9c2b2a';
+        statusEl.textContent = 'Could not save — please try again.';
+      } else {
+        statusEl.style.color = '#256d31';
+        statusEl.textContent = 'Saved! Our team will confirm and send a meeting link.';
+        document.getElementById('ws-current').textContent = `Currently set: ${day}s at ${time} — waiting on our team to confirm and send a link.`;
+      }
+      btn.disabled = false;
+      btn.textContent = 'Save Weekly Preference';
     });
   })();
 </script>

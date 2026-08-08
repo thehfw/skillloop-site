@@ -353,6 +353,11 @@
         ${s.pendingMeetingRequest ? '<span class="roster-badge amber" style="margin-left:0.3rem;">Meeting requested</span>' : ''}
         ${s.journalFlags && s.journalFlags.length ? `<span class="roster-badge red" style="margin-left:0.3rem;">${s.journalFlags.length} journal flag${s.journalFlags.length > 1 ? 's' : ''}</span>` : ''}
         ${s.documents && s.documents.length ? `<span class="roster-badge green" style="margin-left:0.3rem;">${s.documents.length} doc${s.documents.length > 1 ? 's' : ''} on file</span>` : ''}
+        ${s.weeklySession
+          ? (s.weeklySession.meeting_link
+              ? `<span class="roster-badge green" style="margin-left:0.3rem;">${s.weeklySession.day_of_week}s ${s.weeklySession.time_slot} — confirmed</span>`
+              : `<span class="roster-badge amber" style="margin-left:0.3rem;">${s.weeklySession.day_of_week}s ${s.weeklySession.time_slot} — needs link</span>`)
+          : '<span class="roster-badge red" style="margin-left:0.3rem;">No weekly session set</span>'}
       `;
       item.addEventListener('click', () => {
         document.querySelectorAll('.roster-item').forEach(el => el.classList.remove('active'));

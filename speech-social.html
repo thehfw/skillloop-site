@@ -2580,6 +2580,17 @@
     `).join('');
   }
 
+  let currentChoiceOptions = []; // shuffled copy of the current assignment's options, in display order
+
+  function shuffledCopy(arr) {
+    const copy = arr.slice();
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
   function renderScenario(spec, readOnly) {
     document.getElementById('scenario-box').innerHTML =
       `<strong>${spec.characterName || 'Scenario'}:</strong> ${spec.scenario}`;
@@ -2590,7 +2601,8 @@
     if (spec.type === 'scenario_choice') {
       openRoot.style.display = 'none';
       choiceRoot.style.display = 'block';
-      choiceRoot.innerHTML = spec.options.map((opt, i) => `
+      currentChoiceOptions = shuffledCopy(spec.options);
+      choiceRoot.innerHTML = currentChoiceOptions.map((opt, i) => `
         <button class="scenario-opt" data-i="${i}" ${readOnly ? 'disabled' : ''}>${opt.text}</button>
       `).join('') + '<div id="scenario-reaction-box"></div>';
 
@@ -2611,10 +2623,10 @@
   }
 
   function handleChoice(spec, i) {
-    const chosen = spec.options[i];
+    const chosen = currentChoiceOptions[i];
     document.querySelectorAll('.scenario-opt').forEach((btn, idx) => {
       btn.disabled = true;
-      if (spec.options[idx].isBest) btn.classList.add('chosen-best');
+      if (currentChoiceOptions[idx].isBest) btn.classList.add('chosen-best');
       else if (idx === i) btn.classList.add('chosen-other');
     });
     const box = document.getElementById('scenario-reaction-box');

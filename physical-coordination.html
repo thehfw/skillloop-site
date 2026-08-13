@@ -1059,17 +1059,29 @@
     showStep('quiz');
   });
 
+  function shuffledIndices(n) {
+    const arr = Array.from({ length: n }, (_, i) => i);
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
   function renderMcq() {
     const spec = LESSONS_CONTENT[selectedLesson][selectedAssignment - 1];
     const root = document.getElementById('mcq-root');
-    root.innerHTML = spec.mcq.map((item, qi) => `
+    root.innerHTML = spec.mcq.map((item, qi) => {
+      const order = shuffledIndices(item.opts.length); // display order; values are ORIGINAL option indices
+      return `
       <div class="q-block">
         <div class="q-text"><span class="q-num">${qi + 1}.</span>${item.q}</div>
-        ${item.opts.map((o, oi) => `
+        ${order.map(oi => `
           <label class="q-opt" data-q="${qi}" data-o="${oi}">
-            <input type="radio" name="mcq-${qi}" value="${oi}"><span>${o}</span>
+            <input type="radio" name="mcq-${qi}" value="${oi}"><span>${item.opts[oi]}</span>
           </label>`).join('')}
-      </div>`).join('');
+      </div>`;
+    }).join('');
     document.getElementById('quiz-result').textContent = '';
   }
 
@@ -1083,8 +1095,10 @@
         const chosen = parseInt(sel.value, 10);
         const lbls = document.querySelectorAll('label[data-q="' + qi + '"]');
         lbls.forEach(l => l.classList.remove('correct', 'wrong'));
-        if (chosen === item.correct) { correct++; lbls[chosen].classList.add('correct'); }
-        else { lbls[chosen].classList.add('wrong'); lbls[item.correct].classList.add('correct'); }
+        const chosenLbl = document.querySelector('label[data-q="' + qi + '"][data-o="' + chosen + '"]');
+        const correctLbl = document.querySelector('label[data-q="' + qi + '"][data-o="' + item.correct + '"]');
+        if (chosen === item.correct) { correct++; chosenLbl.classList.add('correct'); }
+        else { chosenLbl.classList.add('wrong'); correctLbl.classList.add('correct'); }
       }
     });
     const result = document.getElementById('quiz-result');

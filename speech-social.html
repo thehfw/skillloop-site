@@ -81,6 +81,23 @@
   .cube.quiz-cube.done { border-color: var(--green); background: #f2fbf3; }
   .cube.quiz-cube .cube-topic { color: #7a5600; }
   .cube.quiz-cube.locked { background: #fdf6e3; }
+
+  .category-stack { display: flex; flex-direction: column; gap: 1.8rem; }
+  .category-section { }
+  .category-heading {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 0.98rem;
+    color: var(--ink); margin-bottom: 0.7rem;
+  }
+  .category-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--yellow); color: #4a3800; font-size: 0.78rem; font-weight: 800; flex-shrink: 0;
+  }
+  .category-row {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.8rem;
+  }
+  @media (max-width: 720px) { .category-row { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); } }
   .cube.unlocked:hover { box-shadow: 0 10px 22px rgba(254,196,29,0.22) !important; }
   .cube.selected { outline-color: var(--yellow) !important; }
 
@@ -124,7 +141,7 @@
     user-select: none;
   }
   .lessons-panel > .panel-title,
-  .lessons-panel > .cube-grid {
+  .lessons-panel > .category-stack {
     position: relative;
     z-index: 1;
   }
@@ -231,7 +248,7 @@
       </svg>
 
       <h2 class="panel-title">Lessons</h2>
-      <div class="cube-grid" id="lesson-grid"></div>
+      <div class="category-stack" id="lesson-grid"></div>
     </div>
 
     <div class="assignment-panel" id="assignment-panel" style="display:none;">
@@ -368,6 +385,14 @@
 <script src="/js/get-help.js"></script>
 <script>
   const TOTAL_LESSONS = 25;
+  const CATEGORIES = [
+    { title: 'Conversation Foundations', from: 1, to: 5 },
+    { title: 'Reading & Connecting', from: 6, to: 10 },
+    { title: 'Sharing & Belonging', from: 11, to: 15 },
+    { title: 'Navigating Friction', from: 16, to: 20 },
+    { title: 'Advanced Social Navigation', from: 21, to: 25 },
+  ];
+
   const LESSON_TOPICS = [
     "Starting a Conversation",
     "Active Listening",
@@ -3938,24 +3963,41 @@
   function renderLessons() {
     const grid = document.getElementById('lesson-grid');
     grid.innerHTML = '';
-    for (let l = 1; l <= TOTAL_LESSONS; l++) {
-      const unlocked = LESSONS_CONTENT[l] !== undefined; // content ships lesson-by-lesson
-      const done = lessonDoneCount(l);
-      const isQuizCube = l % 5 === 0;
-      const stateClass = done === ASSIGNMENTS_PER_LESSON ? 'done' : unlocked ? 'unlocked' : 'locked';
-      const cube = document.createElement('button');
-      cube.className = 'cube ' + stateClass + (isQuizCube ? ' quiz-cube' : '') + (selectedLesson === l ? ' selected' : '');
-      cube.innerHTML = `
-        <span class="cube-shadow-num">${l}</span>
-        ${MINI_MARK_SVG}
-        <span class="cube-num">${l}</span>
-        <span class="cube-topic">${LESSON_TOPICS[l - 1]}</span>
-        <span class="cube-lbl">${unlocked ? done + '/' + ASSIGNMENTS_PER_LESSON : 'Coming soon'}</span>
-      `;
-      if (unlocked) cube.addEventListener('click', () => { selectedLesson = l; selectedAssignment = null; renderLessons(); renderAssignments(); });
-      else cube.disabled = true;
-      grid.appendChild(cube);
-    }
+
+    CATEGORIES.forEach((cat, ci) => {
+      const section = document.createElement('div');
+      section.className = 'category-section';
+
+      const heading = document.createElement('div');
+      heading.className = 'category-heading';
+      heading.innerHTML = `<span class="category-num">${ci + 1}</span> ${cat.title}`;
+      section.appendChild(heading);
+
+      const row = document.createElement('div');
+      row.className = 'cube-grid category-row';
+
+      for (let l = cat.from; l <= cat.to; l++) {
+        const unlocked = LESSONS_CONTENT[l] !== undefined; // content ships lesson-by-lesson
+        const done = lessonDoneCount(l);
+        const isQuizCube = l % 5 === 0;
+        const stateClass = done === ASSIGNMENTS_PER_LESSON ? 'done' : unlocked ? 'unlocked' : 'locked';
+        const cube = document.createElement('button');
+        cube.className = 'cube ' + stateClass + (isQuizCube ? ' quiz-cube' : '') + (selectedLesson === l ? ' selected' : '');
+        cube.innerHTML = `
+          <span class="cube-shadow-num">${l}</span>
+          ${MINI_MARK_SVG}
+          <span class="cube-num">${l}</span>
+          <span class="cube-topic">${LESSON_TOPICS[l - 1]}</span>
+          <span class="cube-lbl">${unlocked ? done + '/' + ASSIGNMENTS_PER_LESSON : 'Coming soon'}</span>
+        `;
+        if (unlocked) cube.addEventListener('click', () => { selectedLesson = l; selectedAssignment = null; renderLessons(); renderAssignments(); });
+        else cube.disabled = true;
+        row.appendChild(cube);
+      }
+
+      section.appendChild(row);
+      grid.appendChild(section);
+    });
   }
 
   // ---------- Assignment grid ----------

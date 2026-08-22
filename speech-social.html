@@ -395,6 +395,24 @@
     "Social Confidence Mastery",
     "Advanced Social Navigation Review"
 ];
+  const ASSIGNMENTS_PER_LESSON = 5;
+  const BRAND_COLORS = ['#26a4de', '#c94098', '#fec41d', '#4ab851'];
+
+  // Tiny reusable brand mark (4-color loop) used as a corner accent on every lesson cube
+  const MINI_MARK_SVG = `
+    <svg class="cube-accent" viewBox="0 0 30 30" aria-hidden="true">
+      <path d="M 15.7 2.6 A 12.5 12.5 0 0 1 27.4 14.3" fill="none" stroke="#26a4de" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 27.4 15.7 A 12.5 12.5 0 0 1 15.7 27.4" fill="none" stroke="#c94098" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 14.3 27.4 A 12.5 12.5 0 0 1 2.6 15.7" fill="none" stroke="#fec41d" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M 2.6 14.3 A 12.5 12.5 0 0 1 14.3 2.6" fill="none" stroke="#4ab851" stroke-width="4.4" stroke-linecap="round"/>
+    </svg>`;
+
+  const INTRO_SLIDES = [
+    { h: 'Welcome to Speech & Social', p: 'This module builds real conversation and social skills through leveled practice scenarios, organized into 5 categories that get progressively harder.' },
+    { h: 'How it works', p: 'Each category has 4 lessons plus a review challenge that combines everything you just practiced. Every lesson has 5 assignments — some multiple choice, some open conversation practice — followed by a quick star rating.' },
+    { h: 'Earn as you go', p: 'Every completed assignment earns 1 star for the upcoming Avatar Shop, fills your progress wheel, and counts toward your active days.' },
+  ];
+
   const LESSONS_CONTENT = {
     "1": [
         {

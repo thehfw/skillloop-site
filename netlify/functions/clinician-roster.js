@@ -13,7 +13,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 
-const MODULE_TOTALS_PER_MODULE = 100; // 20 lessons x 5 assignments
+const MODULE_TOTALS = { physical_coordination: 100, independence_skills: 100, social_skills: 125, executive_function: 100 };
 const QUALIFYING_EVENT_TYPES = ['quiz_completed', 'reflection_submitted'];
 
 const CATEGORY_PREFIX = [
@@ -142,10 +142,10 @@ exports.handler = async (event) => {
       const modules = ['physical_coordination', 'independence_skills', 'social_skills', 'executive_function'].map((key) => ({
         key,
         done: moduleCounts[key] || 0,
-        pct: Math.round(Math.min(1, (moduleCounts[key] || 0) / MODULE_TOTALS_PER_MODULE) * 100),
+        pct: Math.round(Math.min(1, (moduleCounts[key] || 0) / MODULE_TOTALS[key]) * 100),
       }));
       const overallPct = Math.round(
-        (modules.reduce((s, m) => s + m.done, 0) / (modules.length * MODULE_TOTALS_PER_MODULE)) * 100
+        (modules.reduce((s, m) => s + m.done, 0) / modules.reduce((s, m) => s + MODULE_TOTALS[m.key], 0)) * 100
       );
 
       const { activeDays30d, activeDates, streak, lastActive } = computeActiveDaysAndStreak(userActivity);

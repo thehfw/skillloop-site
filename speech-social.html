@@ -62,6 +62,16 @@
   }
   .convo-input:focus { outline:none; border-color:var(--yellow); }
 
+  .star-rating-row { display:flex; gap:0.5rem; }
+  .star-btn {
+    width:52px; height:52px; display:flex; align-items:center; justify-content:center;
+    border-radius:12px; background:var(--track); transition: background 0.15s, transform 0.1s;
+  }
+  .star-btn svg { width:28px; height:28px; stroke:#c7cdd6; stroke-width:1.6; fill:none; transition: fill 0.15s, stroke 0.15s; }
+  .star-btn:hover { transform: translateY(-2px); }
+  .star-btn.filled { background:#fff8e6; }
+  .star-btn.filled svg { fill:var(--yellow); stroke:#e0a800; }
+
   /* This page uses the Social Skills yellow theme instead of the shared
      default blue — scoped to this page only, Physical Coordination is untouched. */
   .cube.unlocked { border-color: var(--yellow) !important; }
@@ -245,10 +255,10 @@
 
       <div id="reflect-section" style="display:none;">
         <p class="muted" style="font-size:0.85rem; margin:0.3rem 0 0.9rem;">
-          Last step: answer all 3 questions below in <strong>at least 3 sentences each</strong>.
+          Last step: rate how that felt, then submit.
         </p>
-        <div id="reflect-questions-root"></div>
-        <button class="btn btn-green" id="submit-reflection-btn">Get feedback and complete</button>
+        <div id="star-rating-root" class="star-rating-row"></div>
+        <button class="btn btn-green" id="submit-reflection-btn" style="margin-top:1.1rem;">Submit</button>
         <div class="feedback-card" id="feedback-card">
           <div class="feedback-score" id="feedback-score"></div>
           <div id="feedback-text"></div>
@@ -2566,18 +2576,33 @@
     document.getElementById('reflect-section').style.display = step === 'reflect' ? 'block' : 'none';
     document.getElementById('detail-step').textContent =
       step === 'scenario' ? 'STEP 1 OF 2 — PRACTICE' : 'STEP 2 OF 2 — REFLECT';
-    if (step === 'reflect') renderReflectQuestions();
+    if (step === 'reflect') renderStarRating();
   }
 
-  function renderReflectQuestions() {
-    const spec = LESSONS_CONTENT[selectedLesson][selectedAssignment - 1];
-    const root = document.getElementById('reflect-questions-root');
-    root.innerHTML = spec.reflectQuestions.map((q, i) => `
-      <div class="field">
-        <label>${i + 1}. ${q}</label>
-        <textarea class="reflect-q-textarea" data-qi="${i}" style="width:100%; min-height:90px; resize:vertical; padding:0.7rem 0.9rem; border:1.5px solid var(--line); border-radius:10px; font-size:0.9rem; font-family:inherit;" placeholder="At least 3 sentences..."></textarea>
-      </div>
+  let selectedStarRating = 0;
+
+  function renderStarRating() {
+    selectedStarRating = 0;
+    const root = document.getElementById('star-rating-root');
+    root.innerHTML = [1, 2, 3, 4, 5].map(n => `
+      <button class="star-btn" data-star="${n}" type="button" aria-label="${n} star${n > 1 ? 's' : ''}">
+        <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9"/></svg>
+      </button>
     `).join('');
+
+    function paint(upTo) {
+      root.querySelectorAll('.star-btn').forEach(btn => {
+        const n = parseInt(btn.dataset.star, 10);
+        btn.classList.toggle('filled', n <= upTo);
+      });
+    }
+
+    root.querySelectorAll('.star-btn').forEach(btn => {
+      const n = parseInt(btn.dataset.star, 10);
+      btn.addEventListener('click', () => { selectedStarRating = n; paint(n); });
+      btn.addEventListener('mouseenter', () => paint(n));
+      btn.addEventListener('mouseleave', () => paint(selectedStarRating));
+    });
   }
 
   let currentChoiceOptions = []; // shuffled copy of the current assignment's options, in display order
@@ -2717,50 +2742,18 @@
   document.getElementById('to-reflect-btn').addEventListener('click', () => showStep('reflect'));
 
   document.getElementById('submit-reflection-btn').addEventListener('click', async (e) => {
-    const spec = LESSONS_CONTENT[selectedLesson][selectedAssignment - 1];
     const btn = e.currentTarget;
     const fb = document.getElementById('feedback-card');
 
-    const textareas = Array.from(document.querySelectorAll('.reflect-q-textarea'));
-    const answers = textareas.map(t => t.value.trim());
-    const sentenceCounts = answers.map(a => (a.match(/[.!?]+(\s|$)/g) || []).length);
-    const shortIndex = sentenceCounts.findIndex(c => c < 3);
-
-    if (shortIndex !== -1) {
+    if (selectedStarRating < 1) {
       fb.classList.add('visible');
       document.getElementById('feedback-score').textContent = 'Almost there';
-      document.getElementById('feedback-text').textContent =
-        `Question ${shortIndex + 1} needs at least 3 full sentences before you can submit.`;
+      document.getElementById('feedback-text').textContent = 'Pick a star rating before submitting.';
       return;
     }
 
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> Getting feedback…';
-
-    const combinedText = spec.reflectQuestions
-      .map((q, i) => `Q${i + 1}: ${q}\nA${i + 1}: ${answers[i]}`)
-      .join('\n\n');
-
-    let grade = null;
-    try {
-      const res = await fetch('/.netlify/functions/grade-reflection', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: combinedText, lessonTitle: spec.title }),
-      });
-      grade = await res.json();
-    } catch (err) {
-      grade = { score: 4, feedback: 'Reflection saved. Feedback service was unavailable, but your work still counts.', source: 'auto' };
-    }
-
-    if (grade.incomplete) {
-      btn.disabled = false;
-      btn.textContent = 'Get feedback and complete';
-      fb.classList.add('visible');
-      document.getElementById('feedback-score').textContent = 'Almost there';
-      document.getElementById('feedback-text').textContent = grade.feedback;
-      return;
-    }
+    btn.innerHTML = '<span class="spinner"></span> Saving…';
 
     const a = selectedAssignment;
 
@@ -2769,9 +2762,7 @@
       module: 'social_skills',
       lesson_index: selectedLesson,
       assignment_index: a,
-      reflection_texts: spec.reflectQuestions.map((q, i) => ({ question: q, answer: answers[i] })),
-      ai_feedback: grade.feedback,
-      ai_score: grade.score,
+      self_rating: selectedStarRating,
     });
 
     const { error: progErr } = await window.supabaseClient.from('module_progress').insert({
@@ -2783,15 +2774,15 @@
 
     if (!progErr) {
       await window.supabaseClient.rpc('increment_stars', { p_user_id: currentUser.id, p_amount: 1 });
-      await logEvent(currentUser.id, 'reflection_submitted', { module: 'social_skills', lessonNumber: selectedLesson, assignmentNumber: a, payload: { ai_score: grade.score } });
+      await logEvent(currentUser.id, 'reflection_submitted', { module: 'social_skills', lessonNumber: selectedLesson, assignmentNumber: a, payload: { self_rating: selectedStarRating } });
       completedSet.add(key(selectedLesson, a));
     }
 
     btn.disabled = false;
-    btn.textContent = 'Get feedback and complete';
+    btn.textContent = 'Submit';
     fb.classList.add('visible');
-    document.getElementById('feedback-score').textContent = 'Score: ' + grade.score + '/5';
-    document.getElementById('feedback-text').textContent = grade.feedback;
+    document.getElementById('feedback-score').textContent = 'Rated ' + selectedStarRating + '/5';
+    document.getElementById('feedback-text').textContent = 'Nice work — saved.';
     document.getElementById('completed-banner').classList.add('visible');
 
     const toast = document.getElementById('star-toast');

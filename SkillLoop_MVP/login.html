@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In — SkillLoop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="themed-bg">
+
+<header class="site-header container">
+  <a href="/index.html" class="brand">
+    <img src="/assets/skillloop-logo.png" alt="SkillLoop" class="brand-logo-img">
+  </a>
+  <div class="header-actions">
+    <span class="muted">New to SkillLoop?</span>
+    <a href="/signup.html" class="btn btn-secondary">Sign Up</a>
+  </div>
+</header>
+
+<main class="container" style="max-width: 460px; padding-top: 3rem; padding-bottom: 3rem;">
+  <div class="card">
+    <h1 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem;">Welcome back</h1>
+    <p class="muted" style="margin-bottom: 1.6rem; font-size: 0.9rem;">Log in to continue your progress.</p>
+
+    <div id="form-error" class="form-error" role="alert"></div>
+
+    <form id="login-form" novalidate>
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" autocomplete="email" required placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required placeholder="Your password">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="submit-btn">Log In</button>
+    </form>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/config.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+  const form = document.getElementById('login-form');
+  const errorBox = document.getElementById('form-error');
+  const submitBtn = document.getElementById('submit-btn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorBox.classList.remove('visible');
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner"></span> Logging in…';
+
+    const { error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Log In';
+
+    if (error) {
+      errorBox.textContent = error.message === 'Invalid login credentials'
+        ? 'Incorrect email or password.'
+        : error.message;
+      errorBox.classList.add('visible');
+      return;
+    }
+
+    // Route: onboarding if not yet completed, otherwise dashboard
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
+    const { data: ob } = await window.supabaseClient
+      .from('onboarding_responses').select('user_id').eq('user_id', session.user.id).maybeSingle();
+    window.location.href = ob ? '/dashboard.html' : '/onboarding.html';
+  });
+
+  // If already logged in, skip straight to dashboard
+  window.supabaseClient.auth.getSession().then(({ data: { session } }) => {
+    if (session) window.location.href = '/dashboard.html';
+  });
+</script>
+</body>
+</html>

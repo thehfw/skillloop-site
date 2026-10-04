@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — SkillLoop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .dash-top { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:1.3rem; }
+  .greeting h1 { font-size:1.45rem; font-weight:800; letter-spacing:-0.01em; }
+  .greeting p { color:var(--muted); font-size:0.87rem; margin-top:0.15rem; }
+  .dash-grid { display:grid; grid-template-columns: 300px 1fr; gap:1.1rem; align-items:start; }
+  @media (max-width: 1020px) { .dash-grid { grid-template-columns:1fr; } }
+  .modules-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
+  @media (max-width: 680px) { .modules-grid { grid-template-columns:1fr; } }
+  .section-title { font-size:1rem; font-weight:800; margin: 1.6rem 0 0.8rem; }
+  .days-note { font-size:0.75rem; color:var(--muted); margin-top:0.7rem; line-height:1.5; }
+  .days-note strong { color:var(--ink); }
+  .loading-state { text-align:center; padding:3rem; color:var(--muted); }
+
+  .daily-task-card { margin-bottom: 1.3rem; border-left: 5px solid var(--blue); }
+  .daily-task-label { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em; color: var(--blue); margin-bottom: 0.5rem; }
+  .daily-task-text { font-size: 0.92rem; color: var(--ink); line-height: 1.55; margin-bottom: 0.9rem; }
+  .daily-task-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .daily-task-next { font-size: 0.85rem; font-weight: 700; color: var(--muted); }
+</style>
+</head>
+<body class="themed-bg">
+
+<aside class="sidebar" aria-label="Main navigation">
+  <a href="/dashboard.html" class="sidebar-logo">
+    <img src="/assets/skillloop-logo.png" alt="SkillLoop">
+  </a>
+
+  <div class="side-section">
+    <div class="side-label">Menu</div>
+    <a class="side-link active" href="/dashboard.html">Dashboard</a>
+  </div>
+
+  <div class="side-section">
+    <div class="side-label">Modules</div>
+    <a class="side-link" href="/physical-coordination.html">
+      <span class="side-dot" style="background:#26a4de"></span> Physical Coordination
+    </a>
+    <span class="side-link locked"><span class="side-dot" style="background:#4ab851"></span> Independence <span class="side-chip">SOON</span></span>
+    <a class="side-link" href="/speech-social.html">
+      <span class="side-dot" style="background:#fec41d"></span> Speech &amp; Social
+    </a>
+    <span class="side-link locked"><span class="side-dot" style="background:#c94098"></span> Executive Function <span class="side-chip">SOON</span></span>
+  </div>
+
+  <div class="side-section">
+    <div class="side-label">Coming Soon</div>
+    <span class="side-link locked">Avatar Shop <span class="side-chip">SOON</span></span>
+    <span class="side-link locked">Game Mode <span class="side-chip">SOON</span></span>
+  </div>
+
+  <div class="side-section">
+    <div class="side-label">Wellbeing</div>
+    <a class="side-link" href="/emotions-journal.html">
+      <span class="side-dot" style="background:#c94098"></span> Emotions Journal
+    </a>
+  </div>
+
+  <div class="side-section">
+    <div class="side-label">Legal</div>
+    <a class="side-link" href="/terms.html">Terms of Service</a>
+    <a class="side-link" href="/privacy.html">Privacy Policy</a>
+    <a class="side-link" href="/faq.html">FAQ</a>
+  </div>
+
+  <div class="side-section">
+    <div class="side-label">Care Team</div>
+    <a class="side-link" href="/parent-dashboard.html">Parent Dashboard</a>
+    <a class="side-link" href="/therapist-mode.html">Therapist Mode</a>
+    <a class="side-link" href="/parent-dashboard.html#request-meeting" style="color:var(--pink);">Request Meeting</a>
+  </div>
+
+  <div class="sidebar-bottom side-section">
+    <div style="display:flex; align-items:center; gap:0.4rem; padding:0 0.2rem;">
+      <button class="side-link" style="width:auto; padding-left:0.4rem; padding-right:0.4rem;" onclick="signOut()">Log Out</button>
+    </div>
+  </div>
+</aside>
+
+<main class="app-main">
+  <div id="loading" class="loading-state">Loading your dashboard…</div>
+
+  <div id="content" style="display:none;">
+
+    <div class="dash-top">
+      <div class="greeting">
+        <h1 id="greeting">Welcome back</h1>
+        <p>Every module you finish closes another loop.</p>
+      </div>
+      <div class="chip-row">
+        <div class="stat-chip">
+          <div class="num"><span class="star-glyph">&#9733;</span> <span id="stat-stars">0</span></div>
+          <div class="lbl">STARS</div>
+        </div>
+        <div class="stat-chip">
+          <div class="num" id="stat-streak">0</div>
+          <div class="lbl">DAY STREAK</div>
+        </div>
+        <div class="stat-chip">
+          <div class="num" id="stat-days">0</div>
+          <div class="lbl">ACTIVE DAYS</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card daily-task-card" id="daily-task-card" style="display:none;">
+      <div class="daily-task-label">TODAY'S STARTING POINT</div>
+      <p class="daily-task-text" id="daily-task-text"></p>
+      <div class="daily-task-row">
+        <div>
+          <div class="daily-task-next" id="daily-task-next"></div>
+        </div>
+        <a class="btn btn-primary" id="daily-task-btn" href="/physical-coordination.html">Start Now</a>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+
+      <div style="display:flex; flex-direction:column; gap:1.1rem;">
+        <div class="card">
+          <h2 style="font-size:0.95rem; font-weight:800; text-align:center; margin-bottom:0.9rem;">Total Progress</h2>
+          <div class="wheel-wrap">
+            <svg viewBox="0 0 220 220" role="img" aria-label="Overall progress across all four modules">
+              <path class="wheel-track" d="M 116.14 22.21 A 88 88 0 0 1 197.79 103.86" fill="none" stroke-width="13" stroke-linecap="round"/>
+              <path class="wheel-track" d="M 197.79 116.14 A 88 88 0 0 1 116.14 197.79" fill="none" stroke-width="13" stroke-linecap="round"/>
+              <path class="wheel-track" d="M 103.86 197.79 A 88 88 0 0 1 22.21 116.14" fill="none" stroke-width="13" stroke-linecap="round"/>
+              <path class="wheel-track" d="M 22.21 103.86 A 88 88 0 0 1 103.86 22.21" fill="none" stroke-width="13" stroke-linecap="round"/>
+              <path id="arc-physical" pathLength="100" d="M 116.14 22.21 A 88 88 0 0 1 197.79 103.86" fill="none" stroke="#26a4de" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 100"/>
+              <path id="arc-executive" pathLength="100" d="M 197.79 116.14 A 88 88 0 0 1 116.14 197.79" fill="none" stroke="#c94098" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 100"/>
+              <path id="arc-social" pathLength="100" d="M 103.86 197.79 A 88 88 0 0 1 22.21 116.14" fill="none" stroke="#fec41d" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 100"/>
+              <path id="arc-independence" pathLength="100" d="M 22.21 103.86 A 88 88 0 0 1 103.86 22.21" fill="none" stroke="#4ab851" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 100"/>
+            </svg>
+            <div class="wheel-center">
+              <div class="wheel-pct" id="wheel-pct">0%</div>
+              <div class="wheel-sub">overall</div>
+            </div>
+          </div>
+          <div class="legend-row">
+            <span class="legend-item"><span class="legend-dot" style="background:#26a4de"></span>Physical</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#4ab851"></span>Independence</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#fec41d"></span>Social</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#c94098"></span>Executive</span>
+          </div>
+          <p class="days-note"><strong id="days-remaining">16</strong> more active days this month keeps your monthly check-in on track.</p>
+        </div>
+
+        <button id="breather-btn" class="breather-card" type="button" aria-haspopup="dialog">
+          <span class="breather-card-label">Overwhelmed?<br>Take a breather here</span>
+        </button>
+      </div>
+
+      <div>
+        <div class="modules-grid">
+          <a href="/physical-coordination.html" class="module-card" style="--mc:#26a4de;">
+            <div class="module-top">
+              <span class="module-name">Physical Coordination</span>
+              <span class="locked-badge" id="pc-count">0 done</span>
+            </div>
+            <div class="muted" style="font-size:0.78rem;">Balance, posture &amp; body awareness</div>
+            <div class="module-bar"><i id="bar-physical"></i></div>
+          </a>
+
+          <div class="module-card locked" style="--mc:#4ab851;">
+            <div class="module-top">
+              <span class="module-name">Independence Skills</span>
+              <span class="locked-badge">Coming soon</span>
+            </div>
+            <div class="muted" style="font-size:0.78rem;">Cooking, budgeting &amp; daily routines</div>
+            <div class="module-bar"><i id="bar-independence"></i></div>
+          </div>
+
+          <a href="/speech-social.html" class="module-card" style="--mc:#fec41d;">
+            <div class="module-top">
+              <span class="module-name">Speech &amp; Social</span>
+              <span class="locked-badge" id="ss-count">0 done</span>
+            </div>
+            <div class="muted" style="font-size:0.78rem;">Conversation &amp; social confidence</div>
+            <div class="module-bar"><i id="bar-social"></i></div>
+          </a>
+
+          <div class="module-card locked" style="--mc:#c94098;">
+            <div class="module-top">
+              <span class="module-name">Executive Function</span>
+              <span class="locked-badge">Coming soon</span>
+            </div>
+            <div class="muted" style="font-size:0.78rem;">Planning, focus &amp; daily structure</div>
+            <div class="module-bar"><i id="bar-executive"></i></div>
+          </div>
+        </div>
+
+        <a href="/emotions-journal.html" class="card" style="display:block; text-decoration:none; margin-bottom:1.4rem; background:linear-gradient(135deg, rgba(201,64,152,0.10), rgba(201,64,152,0.02)); border-color:#f0cfe4;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+            <div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:1.05rem; color:#7a2960;">Emotions Journal</div>
+              <p class="muted" style="font-size:0.85rem; margin-top:0.25rem; color:#7a2960;">A private space to vent, reflect, or just get something off your chest.</p>
+            </div>
+            <span class="btn btn-primary" style="background:var(--pink);">Open Journal</span>
+          </div>
+        </a>
+
+        <h2 class="section-title">Coming Soon</h2>
+        <div class="coming-grid">
+          <div class="coming-card">
+            <span class="coming-tag">IN DEVELOPMENT</span>
+            <div class="coming-title"><span class="star-glyph">&#9733;</span> Avatar Economy</div>
+            <p class="muted" style="font-size:0.85rem;">Spend the stars you earn from completed lessons on outfits and accessories for your avatar. Every lesson finished = 1 star banked, ready for launch day.</p>
+          </div>
+          <div class="coming-card">
+            <span class="coming-tag">IN DEVELOPMENT</span>
+            <div class="coming-title">Game Mode</div>
+            <p class="muted" style="font-size:0.85rem;">Practice what you learn in interactive scenarios where your avatar interacts with AI characters, reinforcing skills from all four modules in a low-pressure setting.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+
+<div class="breather-overlay" id="breather-overlay" role="dialog" aria-modal="true" aria-label="Breathing exercise">
+  <button class="end-break-btn" id="end-break-btn" type="button">End Break</button>
+  <div class="breath-scene">
+    <div class="breath-sun-wrap">
+      <svg viewBox="0 0 400 240" role="img" aria-label="A smiling sun above two flowers and three happy stick figures, guiding a breathing exercise">
+        <line x1="20" y1="212" x2="380" y2="212" stroke="#cfe6d3" stroke-width="3" stroke-linecap="round"/>
+
+        <!-- Flowers -->
+        <g>
+          <line x1="70" y1="212" x2="70" y2="172" stroke="#4ab851" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="58" cy="160" r="9" fill="#c94098"/>
+          <circle cx="82" cy="160" r="9" fill="#c94098"/>
+          <circle cx="70" cy="148" r="9" fill="#c94098"/>
+          <circle cx="70" cy="172" r="9" fill="#c94098"/>
+          <circle cx="70" cy="160" r="7" fill="#fec41d"/>
+        </g>
+        <g>
+          <line x1="330" y1="212" x2="330" y2="172" stroke="#4ab851" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="318" cy="160" r="9" fill="#26a4de"/>
+          <circle cx="342" cy="160" r="9" fill="#26a4de"/>
+          <circle cx="330" cy="148" r="9" fill="#26a4de"/>
+          <circle cx="330" cy="172" r="9" fill="#26a4de"/>
+          <circle cx="330" cy="160" r="7" fill="#fec41d"/>
+        </g>
+
+        <!-- Happy stick figures -->
+        <g stroke="#16233a" stroke-width="4" stroke-linecap="round" fill="none">
+          <g>
+            <circle cx="145" cy="172" r="10" fill="#fff" stroke="#16233a" stroke-width="3"/>
+            <circle cx="141" cy="170" r="1.6" fill="#16233a" stroke="none"/>
+            <circle cx="149" cy="170" r="1.6" fill="#16233a" stroke="none"/>
+            <path d="M140 175 Q145 179 150 175" stroke="#16233a" stroke-width="2" fill="none"/>
+            <line x1="145" y1="182" x2="145" y2="205"/>
+            <line x1="145" y1="188" x2="132" y2="174"/>
+            <line x1="145" y1="188" x2="158" y2="174"/>
+            <line x1="145" y1="205" x2="135" y2="212"/>
+            <line x1="145" y1="205" x2="155" y2="212"/>
+          </g>
+          <g>
+            <circle cx="200" cy="166" r="11" fill="#fff" stroke="#16233a" stroke-width="3"/>
+            <circle cx="195" cy="164" r="1.7" fill="#16233a" stroke="none"/>
+            <circle cx="205" cy="164" r="1.7" fill="#16233a" stroke="none"/>
+            <path d="M194 169 Q200 174 206 169" stroke="#16233a" stroke-width="2" fill="none"/>
+            <line x1="200" y1="177" x2="200" y2="203"/>
+            <line x1="200" y1="184" x2="185" y2="168"/>
+            <line x1="200" y1="184" x2="215" y2="168"/>
+            <line x1="200" y1="203" x2="189" y2="212"/>
+            <line x1="200" y1="203" x2="211" y2="212"/>
+          </g>
+          <g>
+            <circle cx="255" cy="172" r="10" fill="#fff" stroke="#16233a" stroke-width="3"/>
+            <circle cx="251" cy="170" r="1.6" fill="#16233a" stroke="none"/>
+            <circle cx="259" cy="170" r="1.6" fill="#16233a" stroke="none"/>
+            <path d="M250 175 Q255 179 260 175" stroke="#16233a" stroke-width="2" fill="none"/>
+            <line x1="255" y1="182" x2="255" y2="205"/>
+            <line x1="255" y1="188" x2="242" y2="174"/>
+            <line x1="255" y1="188" x2="268" y2="174"/>
+            <line x1="255" y1="205" x2="245" y2="212"/>
+            <line x1="255" y1="205" x2="265" y2="212"/>
+          </g>
+        </g>
+
+        <!-- Sun (this whole group scales for the breathing animation) -->
+        <g id="breath-sun-group" class="breath-sun-group" style="transform-origin: 200px 80px;">
+          <g stroke="#fec41d" stroke-width="5" stroke-linecap="round">
+            <line x1="200" y1="18" x2="200" y2="4"/>
+            <line x1="245" y1="35" x2="255" y2="25"/>
+            <line x1="262" y1="80" x2="277" y2="80"/>
+            <line x1="245" y1="125" x2="255" y2="135"/>
+            <line x1="200" y1="142" x2="200" y2="156"/>
+            <line x1="155" y1="125" x2="145" y2="135"/>
+            <line x1="138" y1="80" x2="123" y2="80"/>
+            <line x1="155" y1="35" x2="145" y2="25"/>
+          </g>
+          <circle cx="200" cy="80" r="42" fill="#fec41d"/>
+          <circle cx="185" cy="72" r="5" fill="#16233a"/>
+          <circle cx="215" cy="72" r="5" fill="#16233a"/>
+          <path d="M178 92 Q200 112 222 92" stroke="#16233a" stroke-width="4" fill="none" stroke-linecap="round"/>
+        </g>
+      </svg>
+    </div>
+    <div class="breath-label" id="breath-label">Breathe In…</div>
+    <div class="breath-sub">Follow the sun. In through your nose, out through your mouth.</div>
+  </div>
+</div>
+
+
+<div class="help-widget">
+  <button class="help-fab" id="help-fab" type="button" aria-haspopup="true" aria-label="Get help">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/>
+      <line x1="12" y1="17" x2="12" y2="17"/>
+    </svg>
+  </button>
+
+  <div class="help-panel" id="help-panel" role="menu">
+    <div class="help-panel-head">
+      <strong>Get Help</strong>
+      <p>Pick whichever works best for you.</p>
+    </div>
+
+    <button class="help-option" id="help-assistant-btn" type="button" role="menuitem">
+      <span class="help-option-icon" style="background:#e8f6fb; color:#26a4de;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </span>
+      <span>
+        Ask SkillLoop Assistant
+        <div class="help-option-sub">Get an instant answer</div>
+      </span>
+    </button>
+    <div class="help-assistant-chat" id="help-assistant-chat">
+      <div class="help-chat-log" id="help-chat-log"></div>
+      <div class="help-chat-typing" id="help-chat-typing" style="display:none;">SkillLoop Assistant is typing…</div>
+      <div class="help-chat-row">
+        <input type="text" class="help-chat-input" id="help-chat-input" placeholder="Ask a question..." maxlength="300">
+        <button class="help-chat-send" id="help-chat-send" type="button" aria-label="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <button class="help-option" id="help-faq-btn" type="button" role="menuitem">
+      <span class="help-option-icon" style="background:#fff8e6; color:#8a6a00;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/>
+          <line x1="12" y1="17" x2="12" y2="17"/>
+        </svg>
+      </span>
+      <span>
+        Browse the FAQ
+        <div class="help-option-sub">Common questions answered</div>
+      </span>
+    </button>
+
+    <button class="help-option" id="help-email-btn" type="button" role="menuitem">
+      <span class="help-option-icon" style="background:#edf7ee; color:#4ab851;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16v16H4z" opacity="0"/>
+          <path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2z"/>
+          <path d="m2 7 10 6 10-6"/>
+        </svg>
+      </span>
+      <span>
+        Email our team
+        <div class="help-option-sub">help@skillloop.org</div>
+      </span>
+    </button>
+  </div>
+</div>
+
+
+<div class="consent-overlay" id="consent-overlay">
+  <div class="consent-card">
+    <img src="/assets/skillloop-logo.png" alt="SkillLoop" class="consent-logo">
+    <h2 class="consent-title">Before you get started</h2>
+    <p class="consent-body">
+      SkillLoop collects your account details, your onboarding answers, and your activity on the
+      platform — including completed lessons, quiz results, streaks, and written reflections — so we
+      can personalize your starting level and track your progress. If you're working with a partnered
+      care team, some of this activity (like the days you've used SkillLoop) may be shared with that
+      team, including for insurance documentation your family has agreed to. We never sell your data or
+      show ads. Full details are in our
+      <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.
+    </p>
+    <p class="consent-sub">
+      If you are under 13, a parent or guardian should be the one reviewing and accepting this on your behalf.
+    </p>
+    <button class="btn btn-primary btn-block" id="consent-allow-btn" type="button">Allow</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/config.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/breathing.js"></script>
+<script src="/js/get-help.js"></script>
+<script>
+  // Assignments per module for progress math. Physical Coordination has
+  // 20 lessons x 5 assignments = 100. Other modules are not yet released,
+  // so their totals are set but their completed counts will be 0 (blank).
+  const MODULE_TOTALS = {
+    physical_coordination: 100,
+    independence_skills: 100,
+    social_skills: 125,
+    executive_function: 100,
+  };
+  const ARC_IDS = {
+    physical_coordination: 'arc-physical',
+    independence_skills: 'arc-independence',
+    social_skills: 'arc-social',
+    executive_function: 'arc-executive',
+  };
+  const BAR_IDS = {
+    physical_coordination: 'bar-physical',
+    independence_skills: 'bar-independence',
+    social_skills: 'bar-social',
+    executive_function: 'bar-executive',
+  };
+
+  (async function init() {
+    const user = await requireAuth();
+    if (!user) return;
+
+    // First-time users must complete onboarding before the dashboard
+    const { data: ob } = await window.supabaseClient
+      .from('onboarding_responses').select('user_id').eq('user_id', user.id).maybeSingle();
+    if (!ob) { window.location.href = '/onboarding.html'; return; }
+
+    // Show the data consent overlay once, right after onboarding, before first dashboard view
+    const { data: consentProfile } = await window.supabaseClient
+      .from('profiles').select('data_consent_given').eq('id', user.id).single();
+    if (!consentProfile?.data_consent_given) {
+      document.getElementById('consent-overlay').style.display = 'flex';
+    }
+
+    await logEvent(user.id, 'login');
+
+    // ---------- Daily Task: personalized starting point from onboarding answers ----------
+    (async function computeDailyTask() {
+      const LESSON_1_TITLES = [
+        'Standing Balance Basics', 'Core Stability Foundations', 'Coordinated Movement Patterns',
+        'Balance Under Movement', 'Full Sequence Review',
+      ];
+      const PC_AREA_MAP = {
+        pc_balance: 'Balance & Stability', pc_trip: 'Balance & Stability',
+        pc_hand: 'Fine Motor Dexterity & Grip', pc_sport: 'Hand-Eye Coordination',
+      };
+
+      const { data: obFull } = await window.supabaseClient
+        .from('onboarding_responses').select('answers').eq('user_id', user.id).maybeSingle();
+
+      let weakestArea = 'Balance & Stability';
+      if (obFull?.answers) {
+        const sums = {}, counts = {};
+        Object.entries(obFull.answers).forEach(([id, val]) => {
+          const area = PC_AREA_MAP[id];
+          if (area && typeof val.choiceIndex === 'number') {
+            sums[area] = (sums[area] || 0) + val.choiceIndex;
+            counts[area] = (counts[area] || 0) + 1;
+          }
+        });
+        let lowestAvg = Infinity;
+        Object.keys(sums).forEach(area => {
+          const avg = sums[area] / counts[area];
+          if (avg < lowestAvg) { lowestAvg = avg; weakestArea = area; }
+        });
+      }
+
+      const { data: pcRows } = await window.supabaseClient
+        .from('module_progress').select('lesson_index')
+        .eq('user_id', user.id).eq('module', 'physical_coordination').eq('series_index', 1);
+      const doneAssignments = new Set((pcRows || []).map(r => r.lesson_index));
+      const nextAssignment = [1, 2, 3, 4, 5].find(n => !doneAssignments.has(n));
+
+      const textEl = document.getElementById('daily-task-text');
+      const nextEl = document.getElementById('daily-task-next');
+      const btnEl = document.getElementById('daily-task-btn');
+
+      if (weakestArea === 'Balance & Stability') {
+        textEl.textContent = "Your intake suggests balance is a great place to focus first — that's exactly where we're starting you.";
+      } else {
+        textEl.textContent = `Your intake flagged ${weakestArea} as an area to build on. That topic is coming soon — for now, we're starting you with Balance & Stability, our first live topic.`;
+      }
+
+      if (nextAssignment) {
+        nextEl.textContent = `Next up: Assignment ${nextAssignment} — ${LESSON_1_TITLES[nextAssignment - 1]}`;
+        btnEl.textContent = 'Start Now';
+      } else {
+        nextEl.textContent = "You've completed every live assignment in Balance & Stability! More topics unlock soon.";
+        btnEl.textContent = 'Review Lesson 1';
+      }
+
+      document.getElementById('daily-task-card').style.display = 'block';
+    })();
+
+    const fullName = user.user_metadata?.full_name || '';
+    const hour = new Date().getHours();
+    const part = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
+    document.getElementById('greeting').textContent =
+      'Good ' + part + (fullName ? ', ' + fullName.split(' ')[0] : '');
+
+    // Stars
+    const { data: profile } = await window.supabaseClient
+      .from('profiles').select('stars').eq('id', user.id).single();
+    document.getElementById('stat-stars').textContent = profile?.stars ?? 0;
+
+    // Active days + streak
+    const activeDays = await getActiveDaysThisMonth(user.id);
+    document.getElementById('stat-days').textContent = activeDays;
+    document.getElementById('days-remaining').textContent = Math.max(0, 16 - activeDays);
+    document.getElementById('stat-streak').textContent = await getStreak(user.id);
+
+    // Per-module progress — real rows only; wheel stays blank at zero
+    const { data: rows } = await window.supabaseClient
+      .from('module_progress').select('module').eq('user_id', user.id);
+    const counts = {};
+    (rows || []).forEach(r => { counts[r.module] = (counts[r.module] || 0) + 1; });
+
+    let doneSum = 0, totalSum = 0;
+    Object.keys(MODULE_TOTALS).forEach(mod => {
+      const done = counts[mod] || 0;
+      const total = MODULE_TOTALS[mod];
+      doneSum += done; totalSum += total;
+      const frac = Math.min(1, done / total);
+      document.getElementById(ARC_IDS[mod]).setAttribute('stroke-dasharray', (frac * 100) + ' 100');
+      const bar = document.getElementById(BAR_IDS[mod]);
+      if (bar) bar.style.width = (frac * 100) + '%';
+    });
+    document.getElementById('wheel-pct').textContent =
+      Math.round((doneSum / totalSum) * 100) + '%';
+    document.getElementById('pc-count').textContent =
+      (counts['physical_coordination'] || 0) + ' done';
+    document.getElementById('ss-count').textContent =
+      (counts['social_skills'] || 0) + ' done';
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+  })();
+
+  document.getElementById('consent-allow-btn').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Saving…';
+
+    const { data: { user } } = await window.supabaseClient.auth.getUser();
+    await window.supabaseClient
+      .from('profiles')
+      .update({ data_consent_given: true, data_consent_at: new Date().toISOString() })
+      .eq('id', user.id);
+
+    document.getElementById('consent-overlay').style.display = 'none';
+  });
+</script>
+</body>
+</html>

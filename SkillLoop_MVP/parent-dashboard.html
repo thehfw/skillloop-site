@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent Dashboard — SkillLoop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .pd-shell { max-width: 860px; margin: 0 auto; padding: 2rem 1.2rem 4rem; }
+  .pd-head { text-align: center; margin-bottom: 1.6rem; }
+  .pd-head h1 { font-size: 1.5rem; font-weight: 800; }
+  .pd-head p { color: var(--muted); font-size: 0.9rem; margin-top: 0.3rem; }
+
+  .pd-summary {
+    background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 1.3rem 1.5rem; margin-bottom: 1.3rem; font-size: 0.95rem; line-height: 1.6;
+  }
+
+  .pd-grid { display: grid; grid-template-columns: 240px 1fr; gap: 1.1rem; }
+  @media (max-width: 780px) { .pd-grid { grid-template-columns: 1fr; } }
+
+  .pd-module-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.9rem; }
+  .pd-module-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .pd-module-name { font-weight: 700; font-size: 0.88rem; width: 150px; flex-shrink: 0; }
+  .pd-module-bar { flex: 1; height: 9px; background: var(--track); border-radius: 5px; overflow: hidden; }
+  .pd-module-bar i { display: block; height: 100%; border-radius: 5px; width: 0%; }
+  .pd-module-pct { font-size: 0.82rem; font-weight: 700; color: var(--muted); width: 42px; text-align: right; flex-shrink: 0; }
+
+  .loading-state { text-align: center; padding: 3rem; color: var(--muted); }
+</style>
+</head>
+<body class="themed-bg">
+
+<div class="pd-shell">
+  <a href="/dashboard.html" class="btn btn-secondary" style="margin-bottom:1.2rem;">&larr; Back to Dashboard</a>
+
+  <div id="loading" class="loading-state">Loading progress…</div>
+
+  <div id="content" style="display:none;">
+    <div class="pd-head">
+      <img src="/assets/skillloop-logo.png" alt="SkillLoop" style="height:48px; margin-bottom:0.8rem;">
+      <h1 id="pd-title">Parent Dashboard</h1>
+      <p>A plain-language look at progress on SkillLoop.</p>
+    </div>
+
+    <div class="pd-summary" id="pd-summary-text"></div>
+
+    <div class="pd-grid">
+      <div class="card text-center">
+        <h2 style="font-size:0.9rem; font-weight:800; margin-bottom:0.9rem;">Overall Progress</h2>
+        <div class="wheel-wrap" style="width:170px;">
+          <svg viewBox="0 0 220 220" role="img" aria-label="Overall progress across all four modules">
+            <path class="wheel-track" d="M 116.14 22.21 A 88 88 0 0 1 197.79 103.86" fill="none" stroke-width="13" stroke-linecap="round"/>
+            <path class="wheel-track" d="M 197.79 116.14 A 88 88 0 0 1 116.14 197.79" fill="none" stroke-width="13" stroke-linecap="round"/>
+            <path class="wheel-track" d="M 103.86 197.79 A 88 88 0 0 1 22.21 116.14" fill="none" stroke-width="13" stroke-linecap="round"/>
+            <path class="wheel-track" d="M 22.21 103.86 A 88 88 0 0 1 103.86 22.21" fill="none" stroke-width="13" stroke-linecap="round"/>
+            <path id="arc-physical" pathLength="100" d="M 116.14 22.21 A 88 88 0 0 1 197.79 103.86" fill="none" stroke="#26a4de" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 100"/>
+            <path id="arc-executive" pathLength="100" d="M 197.79 116.14 A 88 88 0 0 1 116.14 197.79" fill="none" stroke="#c94098" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 100"/>
+            <path id="arc-social" pathLength="100" d="M 103.86 197.79 A 88 88 0 0 1 22.21 116.14" fill="none" stroke="#fec41d" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 100"/>
+            <path id="arc-independence" pathLength="100" d="M 22.21 103.86 A 88 88 0 0 1 103.86 22.21" fill="none" stroke="#4ab851" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 100"/>
+          </svg>
+          <div class="wheel-center">
+            <div class="wheel-pct" id="wheel-pct">0%</div>
+            <div class="wheel-sub">overall</div>
+          </div>
+        </div>
+        <div class="chip-row" style="margin-top:1.1rem; justify-content:center;">
+          <div class="stat-chip">
+            <div class="num"><span class="star-glyph">&#9733;</span> <span id="stat-stars">0</span></div>
+            <div class="lbl">STARS</div>
+          </div>
+          <div class="stat-chip">
+            <div class="num" id="stat-streak">0</div>
+            <div class="lbl">STREAK</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 style="font-size:0.9rem; font-weight:800; margin-bottom:1rem;">Progress by Module</h2>
+        <div id="module-rows"></div>
+        <p class="muted" style="font-size:0.8rem; margin-top:0.8rem;">
+          Active days this month: <strong id="stat-days">0</strong> of 30 — this reflects how consistently SkillLoop is being used, which also supports any care-team check-ins your family has set up.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:1.1rem;">
+      <h2 style="font-size:0.9rem; font-weight:800; margin-bottom:0.5rem;">Upload IEP / 504 Plan</h2>
+      <p class="muted" style="font-size:0.83rem; margin-bottom:1rem;">Optional — sharing these helps our care team understand your teen's existing goals and supports. Stored privately and only accessible to your family and authorized staff.</p>
+      <div class="iep-upload-grid">
+        <div id="pd-iep-box"></div>
+        <div id="pd-504-box"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:1.1rem;" id="reinforcement-card">
+      <h2 style="font-size:0.9rem; font-weight:800; margin-bottom:0.5rem;">Home Reinforcement</h2>
+      <p class="muted" style="font-size:0.83rem; margin-bottom:0.9rem;">A few simple ways to keep building on what your teen is working on this week.</p>
+      <div id="reinforcement-loading" class="muted" style="font-size:0.85rem;">Generating suggestions…</div>
+      <ul id="reinforcement-list" style="list-style:none; display:none;"></ul>
+    </div>
+
+    <div class="card text-center" id="request-meeting" style="margin-top:1.1rem; background:linear-gradient(135deg, rgba(38,164,222,0.08), rgba(38,164,222,0.01)); border-color:#bfe4f5;">
+      <h2 style="font-size:1.02rem; font-weight:800; margin-bottom:0.5rem;">Want to talk to someone?</h2>
+      <p class="muted" style="font-size:0.87rem; margin-bottom:1rem; max-width:480px; margin-left:auto; margin-right:auto;">
+        Request a meeting with a SkillLoop clinician to discuss your teen's progress, ask questions, or get guidance on next steps.
+      </p>
+      <button class="btn btn-primary" id="request-meeting-btn" type="button" style="padding:0.85rem 2rem; font-size:1rem;">Request Meeting with a SkillLoop Clinician</button>
+      <p class="save-status-pd" id="meeting-status" style="display:none; margin-top:0.8rem; font-size:0.85rem; font-weight:700; color:#256d31;"></p>
+    </div>
+
+    <div class="card" style="margin-top:1.1rem;">
+      <h2 style="font-size:0.9rem; font-weight:800; margin-bottom:0.5rem;">Weekly Clinician Check-In</h2>
+      <p class="muted" style="font-size:0.83rem; margin-bottom:1rem;">Every SkillLoop student gets a weekly check-in with a licensed clinician. Set your preferred day and time — our team will confirm and send the meeting link outside the app.</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; margin-bottom:1rem;">
+        <div class="field" style="margin-bottom:0;">
+          <label for="ws-day">Preferred day</label>
+          <select id="ws-day">
+            <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+            <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="ws-time">Preferred time</label>
+          <select id="ws-time">
+            <option>9:00 AM</option><option>10:00 AM</option><option>11:00 AM</option>
+            <option>1:00 PM</option><option>2:00 PM</option><option>3:00 PM</option>
+            <option>4:00 PM</option><option>5:00 PM</option><option>6:00 PM</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-secondary" id="ws-save-btn" type="button">Save Weekly Preference</button>
+      <p id="ws-status" style="display:none; margin-top:0.7rem; font-size:0.83rem; font-weight:700; color:#256d31;"></p>
+      <p id="ws-current" class="muted" style="font-size:0.8rem; margin-top:0.6rem;"></p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/config.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/iep-upload.js"></script>
+<script>
+  const MODULE_TOTALS = {
+    physical_coordination: 100,
+    independence_skills: 100,
+    social_skills: 125,
+    executive_function: 100,
+  };
+  const MODULE_META = [
+    { key: 'physical_coordination', label: 'Physical Coordination', color: '#26a4de' },
+    { key: 'independence_skills', label: 'Independence Skills', color: '#4ab851' },
+    { key: 'social_skills', label: 'Social Skills', color: '#fec41d' },
+    { key: 'executive_function', label: 'Executive Function', color: '#c94098' },
+  ];
+  const ARC_IDS = {
+    physical_coordination: 'arc-physical',
+    independence_skills: 'arc-independence',
+    social_skills: 'arc-social',
+    executive_function: 'arc-executive',
+  };
+
+  (async function init() {
+    const user = await requireAuth();
+    if (!user) return;
+
+    const { data: ob } = await window.supabaseClient
+      .from('onboarding_responses').select('user_id').eq('user_id', user.id).maybeSingle();
+    if (!ob) { window.location.href = '/onboarding.html'; return; }
+
+    initIepUploadBox('pd-iep-box', 'iep', user.id);
+    initIepUploadBox('pd-504-box', '504', user.id);
+
+    const fullName = user.user_metadata?.full_name || '';
+    document.getElementById('pd-title').textContent = fullName ? fullName.split(' ')[0] + "'s Parent Dashboard" : 'Parent Dashboard';
+
+    const { data: profile } = await window.supabaseClient.from('profiles').select('stars').eq('id', user.id).single();
+    document.getElementById('stat-stars').textContent = profile?.stars ?? 0;
+
+    const activeDays = await getActiveDaysThisMonth(user.id);
+    document.getElementById('stat-days').textContent = activeDays;
+    document.getElementById('stat-streak').textContent = await getStreak(user.id);
+
+    const { data: rows } = await window.supabaseClient
+      .from('module_progress').select('module').eq('user_id', user.id);
+    const counts = {};
+    (rows || []).forEach(r => { counts[r.module] = (counts[r.module] || 0) + 1; });
+
+    let doneSum = 0, totalSum = 0;
+    const rowsEl = document.getElementById('module-rows');
+    rowsEl.innerHTML = '';
+    let bestModule = null, bestPct = -1;
+
+    MODULE_META.forEach(m => {
+      const done = counts[m.key] || 0;
+      const total = MODULE_TOTALS[m.key];
+      const pct = Math.round(Math.min(1, done / total) * 100);
+      doneSum += done; totalSum += total;
+      if (pct > bestPct) { bestPct = pct; bestModule = m.label; }
+
+      document.getElementById(ARC_IDS[m.key]).setAttribute('stroke-dasharray', (Math.min(1, done/total) * 100) + ' 100');
+
+      const row = document.createElement('div');
+      row.className = 'pd-module-row';
+      row.innerHTML = `
+        <span class="pd-module-dot" style="background:${m.color}"></span>
+        <span class="pd-module-name">${m.label}</span>
+        <span class="pd-module-bar"><i style="width:${pct}%; background:${m.color};"></i></span>
+        <span class="pd-module-pct">${pct}%</span>
+      `;
+      rowsEl.appendChild(row);
+    });
+
+    const overallPct = Math.round((doneSum / totalSum) * 100);
+    document.getElementById('wheel-pct').textContent = overallPct + '%';
+
+    const stars = profile?.stars ?? 0;
+    const name = fullName ? fullName.split(' ')[0] : 'Your teen';
+    document.getElementById('pd-summary-text').innerHTML =
+      `${name} has earned <strong>${stars} star${stars === 1 ? '' : 's'}</strong> so far and is <strong>${overallPct}% of the way</strong> through the modules currently available. ` +
+      `${bestPct > 0 ? `The strongest area right now is <strong>${bestModule}</strong>. ` : ''}` +
+      `In the last 30 days, SkillLoop has been used on <strong>${activeDays} day${activeDays === 1 ? '' : 's'}</strong>.`;
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+
+    // ---------- Home Reinforcement ----------
+    (async function loadReinforcement() {
+      const { data: reflections } = await window.supabaseClient
+        .from('reflections')
+        .select('reflection_texts, reflection_text, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(3);
+
+      const recentReflections = (reflections || []).map(r => ({
+        title: 'Reflection',
+        text: Array.isArray(r.reflection_texts) && r.reflection_texts.length
+          ? r.reflection_texts.map(qa => qa.answer).join(' ')
+          : (r.reflection_text || ''),
+      }));
+
+      let suggestions = [];
+      try {
+        const res = await fetch('/.netlify/functions/home-reinforcement', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ studentName: name, weakestModule: 'Physical Coordination', recentReflections }),
+        });
+        const data = await res.json();
+        suggestions = data.suggestions || [];
+      } catch (err) {
+        console.error('home-reinforcement request failed:', err);
+      }
+
+      document.getElementById('reinforcement-loading').style.display = 'none';
+      const listEl = document.getElementById('reinforcement-list');
+      listEl.style.display = 'block';
+      listEl.innerHTML = suggestions.length
+        ? suggestions.map(s => `<li style="padding:0.5rem 0; border-bottom:1px dotted var(--line); font-size:0.87rem;">• ${s}</li>`).join('')
+        : '<li class="muted" style="font-size:0.87rem;">Check back after a bit more activity for personalized suggestions.</li>';
+    })();
+
+    // ---------- Request Meeting ----------
+    document.getElementById('request-meeting-btn').addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      btn.disabled = true;
+      btn.textContent = 'Sending request…';
+
+      const { error } = await window.supabaseClient.from('meeting_requests').insert({ user_id: user.id });
+
+      const statusEl = document.getElementById('meeting-status');
+      statusEl.style.display = 'block';
+      if (error) {
+        statusEl.style.color = '#9c2b2a';
+        statusEl.textContent = 'Something went wrong — please try again or email help@skillloop.org.';
+        btn.disabled = false;
+        btn.textContent = 'Request Meeting with a SkillLoop Clinician';
+      } else {
+        statusEl.style.color = '#256d31';
+        statusEl.textContent = "Request sent! A SkillLoop clinician will reach out soon.";
+        btn.textContent = 'Request Sent';
+      }
+    });
+
+    // ---------- Weekly Clinician Session Preference ----------
+    (async function loadWeeklySession() {
+      const { data } = await window.supabaseClient
+        .from('weekly_sessions').select('day_of_week, time_slot, status, meeting_link')
+        .eq('user_id', user.id).maybeSingle();
+      const currentEl = document.getElementById('ws-current');
+      if (data) {
+        document.getElementById('ws-day').value = data.day_of_week;
+        document.getElementById('ws-time').value = data.time_slot;
+        currentEl.textContent = `Currently set: ${data.day_of_week}s at ${data.time_slot}` +
+          (data.meeting_link ? ` — meeting link confirmed.` : ` — waiting on our team to confirm and send a link.`);
+      } else {
+        currentEl.textContent = 'No weekly time set yet.';
+      }
+    })();
+
+    document.getElementById('ws-save-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('ws-save-btn');
+      const day = document.getElementById('ws-day').value;
+      const time = document.getElementById('ws-time').value;
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+
+      const { error } = await window.supabaseClient.from('weekly_sessions').upsert({
+        user_id: user.id, day_of_week: day, time_slot: time, status: 'active', updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id' });
+
+      const statusEl = document.getElementById('ws-status');
+      statusEl.style.display = 'block';
+      if (error) {
+        statusEl.style.color = '#9c2b2a';
+        statusEl.textContent = 'Could not save — please try again.';
+      } else {
+        statusEl.style.color = '#256d31';
+        statusEl.textContent = 'Saved! Our team will confirm and send a meeting link.';
+        document.getElementById('ws-current').textContent = `Currently set: ${day}s at ${time} — waiting on our team to confirm and send a link.`;
+      }
+      btn.disabled = false;
+      btn.textContent = 'Save Weekly Preference';
+    });
+  })();
+</script>
+</body>
+</html>
